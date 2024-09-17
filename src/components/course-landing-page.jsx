@@ -34,6 +34,12 @@ export function CourseLandingPageJsx() {
           >
             Contact
           </a>
+          <a
+            href="/login"
+            className="text-sm font-medium hover:underline underline-offset-4"
+          >
+            Login
+          </a>
         </nav>
       </header>
       <main className="flex-1">
