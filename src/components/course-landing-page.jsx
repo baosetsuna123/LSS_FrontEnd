@@ -7,10 +7,10 @@ import webDevelopmentImage from "../assets/bootcamp.jfif";
 import data from "../assets/data.png";
 import market from "../assets/market.png";
 
-export function CourseLandingPageJsx() {
+export function CourseLandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center">
+      <header className="px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50">
         <a href="#" className="flex items-center justify-center">
           <BookOpen className="h-6 w-6 mr-2" />
           <span className="font-bold">EduCourse</span>
@@ -216,7 +216,7 @@ export function CourseLandingPageJsx() {
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-gray-500">
-          © 2023 EduCourse. All rights reserved.
+          © 2024 EduCourse. All rights reserved.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <a className="text-xs hover:underline underline-offset-4" href="#">
