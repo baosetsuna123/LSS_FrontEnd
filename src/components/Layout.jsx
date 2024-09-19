@@ -1,10 +1,33 @@
 import { BookOpen } from "lucide-react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
-
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 export function Layout({ children }) {
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== "undefined") {
+        if (window.scrollY > lastScrollY.current) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+        lastScrollY.current = window.scrollY;
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50">
+      <header
+        className={`px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50 transition-transform duration-300 ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <Link to="/" className="flex items-center justify-center">
           {" "}
           <BookOpen className="h-6 w-6 mr-2" />
