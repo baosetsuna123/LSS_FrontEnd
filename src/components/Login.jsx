@@ -32,7 +32,10 @@ export default function Login() {
                 Email address
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                  style={{ zIndex: 10 }}
+                >
                   <Mail className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
                 <input
@@ -40,6 +43,7 @@ export default function Login() {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  style={{ zIndex: 1 }}
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Email address"
@@ -54,11 +58,16 @@ export default function Login() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <Lock
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                    style={{ zIndex: 10 }}
+                  />
                 </div>
                 <input
                   id="password"
                   name="password"
+                  style={{ zIndex: 1 }}
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
