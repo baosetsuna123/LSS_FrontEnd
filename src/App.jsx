@@ -16,7 +16,6 @@ function App() {
     <Router>
       <Routes>
         {/* Route for login, without the layout */}
-        <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected routes using the layout */}
@@ -27,6 +26,7 @@ function App() {
             </Layout>
           }
         >
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/subject/:subjectId" element={<SubjectDetailsPage />} />

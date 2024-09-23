@@ -1,9 +1,11 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const searchInputRef = useRef(null);
+
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
@@ -33,6 +35,20 @@ export function Layout({ children }) {
           <BookOpen className="h-6 w-6 mr-2" />
           <span className="font-bold">EduCourse</span>
         </Link>
+
+        <div className="flex items-center mx-auto">
+          <Search
+            className="h-6 w-6 mr-2 cursor-pointer"
+            onClick={() => searchInputRef.current.focus()}
+          />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search course ..."
+            className="border rounded px-4 py-1 w-96"
+          />
+        </div>
+
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
