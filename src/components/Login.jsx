@@ -2,14 +2,28 @@ import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
+import { fetchLogin } from "@/data/api";
+import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 export default function Login() {
+  const { setIsLoggedIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password });
+    try {
+      const response = await fetchLogin(username, password);
+      localStorage.setItem("result", JSON.stringify(response.data));
+      localStorage.setItem("token", response.data.token);
+      setIsLoggedIn(true);
+      navigate("/");
+      toast.success("Login successful");
+    } catch (error) {
+      toast.error("Login failed");
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -43,14 +57,14 @@ export default function Login() {
                 <input
                   id="email-address"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   style={{ zIndex: 1 }}
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>

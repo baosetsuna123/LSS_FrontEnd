@@ -1,12 +1,21 @@
-import { BookOpen, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { BookOpen, LogOut, Search, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+
 export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
   const searchInputRef = useRef(null);
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const popupRef = useRef(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+
     const handleScroll = () => {
       if (typeof window !== "undefined") {
         if (window.scrollY > lastScrollY.current) {
@@ -17,11 +26,42 @@ export function Layout({ children }) {
         lastScrollY.current = window.scrollY;
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [setIsLoggedIn]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popupRef.current && !popupRef.current.contains(event.target)) {
+        setIsPopupVisible(false);
+      }
+    };
+    if (isPopupVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isPopupVisible]);
+
+  const togglePopup = (event) => {
+    event.stopPropagation();
+    setIsPopupVisible((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("result");
+    setIsLoggedIn(false);
+    setIsPopupVisible(false);
+    toast.success("Logged out successfully");
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -31,11 +71,9 @@ export function Layout({ children }) {
         }`}
       >
         <Link to="/" className="flex items-center justify-center">
-          {" "}
           <BookOpen className="h-6 w-6 mr-2" />
           <span className="font-bold">EduCourse</span>
         </Link>
-
         <div className="flex items-center mx-auto">
           <Search
             className="h-6 w-6 mr-2 cursor-pointer"
@@ -48,7 +86,6 @@ export function Layout({ children }) {
             className="border rounded px-4 py-1 w-96"
           />
         </div>
-
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
@@ -68,17 +105,46 @@ export function Layout({ children }) {
           >
             Contact
           </Link>
-          <Link
-            to="/login"
-            className="text-sm font-medium hover:underline underline-offset-4"
-          >
-            Login
-          </Link>
+          {isLoggedIn ? (
+            <div className="relative">
+              <User
+                className="h-6 w-6 cursor-pointer"
+                onClick={togglePopup}
+                aria-hidden="true"
+              />
+              {isPopupVisible && (
+                <div
+                  ref={popupRef}
+                  className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+                >
+                  <Link
+                    to="/profile"
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="text-sm font-medium hover:underline underline-offset-4"
+            >
+              Login
+            </Link>
+          )}
         </nav>
       </header>
-
       <main className="flex-1">{children}</main>
-
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-gray-500">
           © 2024 EduCourse. All rights reserved.

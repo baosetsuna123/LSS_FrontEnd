@@ -58,7 +58,7 @@ export default function SignUp() {
                   type="text"
                   autoComplete="name"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -83,7 +83,7 @@ export default function SignUp() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -109,7 +109,7 @@ export default function SignUp() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -164,7 +164,7 @@ export default function SignUp() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border border-zinc-200 border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
+                className="w-full flex items-center justify-center px-4 py-2 border  rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"
@@ -177,7 +177,7 @@ export default function SignUp() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border border-zinc-200 border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
+                className="w-full flex items-center justify-center px-4 py-2 border  rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"

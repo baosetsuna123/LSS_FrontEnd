@@ -6,6 +6,9 @@ import {
   Outlet,
 } from "react-router-dom";
 import Login from "./components/Login";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for styling
+
 import CoursesPage from "./components/Courses";
 import SubjectDetailsPage from "./components/CourseDetails";
 import { Layout } from "./components/Layout";
@@ -15,6 +18,11 @@ import SignUp from "./components/SignUp";
 function App() {
   return (
     <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+      />
       <Routes>
         {/* Route for login, without the layout */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
