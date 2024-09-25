@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
+import { useNavigate } from "react-router-dom";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempted with:", { email, password });
@@ -17,7 +18,8 @@ export default function Login() {
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
-      }} // Set the background image
+        height: "100vh",
+      }}
     >
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
         <div>
@@ -117,8 +119,8 @@ export default function Login() {
 
             <div className="text-sm">
               <a
-                href="/forgot-password" // Updated link to the new page
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                onClick={() => navigate("/forgot-password")}
+                className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
               >
                 Forgot your password?
               </a>
