@@ -10,6 +10,7 @@ import CoursesPage from "./components/Courses";
 import SubjectDetailsPage from "./components/CourseDetails";
 import { Layout } from "./components/Layout";
 import ForgotPassword from "./components/ForgotPassword";
+import SignUp from "./components/SignUp";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             </Layout>
           }
         >
+          <Route path="/SignUp" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />

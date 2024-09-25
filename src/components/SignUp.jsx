@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
-export default function Login() {
+
+export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password });
+    console.log("Signup attempted with:", { name, email, password });
   };
 
   return (
@@ -24,30 +26,64 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create your account
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{" "}
+            <a
+              onClick={() => navigate("/login")}
+              className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+            >
+              Sign in to your existing account
+            </a>
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="name" className="sr-only">
+                Full Name
+              </label>
+              <div className="relative">
+                <div
+                  style={{ zIndex: 10 }}
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                  style={{ zIndex: 1 }}
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
             <div>
               <label htmlFor="email-address" className="sr-only">
                 Email address
               </label>
               <div className="relative">
                 <div
-                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                   style={{ zIndex: 10 }}
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 >
                   <Mail className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
                 <input
+                  style={{ zIndex: 1 }}
                   id="email-address"
                   name="email"
                   type="email"
                   autoComplete="email"
-                  style={{ zIndex: 1 }}
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -61,19 +97,19 @@ export default function Login() {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock
+                    style={{ zIndex: 10 }}
                     className="h-5 w-5 text-gray-400"
                     aria-hidden="true"
-                    style={{ zIndex: 10 }}
                   />
                 </div>
                 <input
+                  style={{ zIndex: 1 }}
                   id="password"
                   name="password"
-                  style={{ zIndex: 1 }}
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-zinc-200 border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -104,51 +140,16 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a
-                onClick={() => navigate("/forgot-password")}
-                className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
-              >
-                Forgot your password?
-              </a>
-            </div>
-          </div>
-
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-zinc-200 border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:border-zinc-800"
             >
-              Sign in
+              Sign up
             </button>
           </div>
         </form>
-        <div className=" text-center" style={{ marginTop: "0.5rem" }}>
-          {" "}
-          <a
-            onClick={() => navigate("/signup")}
-            className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer underline text-sm"
-          >
-            Don&apos;t have an account?
-          </a>
-        </div>
-        <div style={{ marginTop: "0.5rem" }}>
+        <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -163,7 +164,7 @@ export default function Login() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="w-full flex items-center justify-center px-4 py-2 border border-zinc-200 border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"
@@ -176,7 +177,7 @@ export default function Login() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="w-full flex items-center justify-center px-4 py-2 border border-zinc-200 border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"
@@ -187,6 +188,24 @@ export default function Login() {
               </a>
             </div>
           </div>
+        </div>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            By signing up, you agree to our{" "}
+            <a
+              href="#"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="#"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Privacy Policy
+            </a>
+          </p>
         </div>
       </div>
     </div>
