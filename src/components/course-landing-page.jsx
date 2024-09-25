@@ -5,8 +5,10 @@ import market from "../assets/market.png";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
+import { useNavigate } from "react-router-dom";
 
 export function CourseLandingPage() {
+  const navigate = useNavigate();
   return (
     <>
       <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-zinc-900 dark:bg-zinc-50">
@@ -22,7 +24,9 @@ export function CourseLandingPage() {
               </p>
             </div>
             <div className="space-x-4">
-              <Button variant="secondary">Browse Courses</Button>
+              <Button variant="secondary" onClick={() => navigate("/courses")}>
+                Browse Courses
+              </Button>
               <Button
                 variant="outline"
                 className="bg-white text-zinc-900 hover:bg-gray-100 dark:text-zinc-50"
