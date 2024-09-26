@@ -1,17 +1,52 @@
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Phone, User, UserPlus } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
+import { fetchSignUpStudent, fetchSignUpTeacher } from "@/data/api"; // Import the teacher registration API
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
+  const [fullName, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [phoneNumber, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState("student");
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup attempted with:", { name, email, password });
+    try {
+      let response;
+      if (userType === "student") {
+        response = await fetchSignUpStudent(
+          username,
+          password,
+          email,
+          fullName,
+          phoneNumber
+        );
+      } else if (userType === "teacher") {
+        response = await fetchSignUpTeacher(
+          username,
+          password,
+          email,
+          fullName,
+          phoneNumber
+        );
+      }
+      console.log("Signup successful:", response.data);
+      toast.success(
+        `${
+          userType.charAt(0).toUpperCase() + userType.slice(1)
+        } signup successful`
+      );
+      navigate("/login");
+    } catch (error) {
+      console.error("Signup failed:", error);
+      toast.error("Signup failed");
+    }
   };
 
   return (
@@ -23,7 +58,7 @@ export default function SignUp() {
         height: "100vh",
       }}
     >
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
+      <div className="max-w-md w-full space-y-8 bg-white p-5 rounded-xl shadow-md">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
@@ -38,8 +73,76 @@ export default function SignUp() {
             </a>
           </p>
         </div>
+        <div className="flex justify-center space-x-2 mb-4">
+          {["student", "teacher"].map((type) => (
+            <button
+              key={type}
+              onClick={() => setUserType(type)}
+              className={`py-2 px-4 rounded-md transition-colors duration-200 ${
+                userType === type
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="username" className="sr-only">
+                Username
+              </label>
+              <div className="relative">
+                <div
+                  style={{ zIndex: 10 }}
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <UserPlus
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <input
+                  style={{ zIndex: 1 }}
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="phone" className="sr-only">
+                Phone Number
+              </label>
+              <div className="relative">
+                <div
+                  style={{ zIndex: 10 }}
+                  className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input
+                  style={{ zIndex: 1 }}
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  placeholder="Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+            </div>
             <div>
               <label htmlFor="name" className="sr-only">
                 Full Name
@@ -58,9 +161,9 @@ export default function SignUp() {
                   type="text"
                   autoComplete="name"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Full Name"
-                  value={name}
+                  value={fullName}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
@@ -83,7 +186,7 @@ export default function SignUp() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -109,7 +212,7 @@ export default function SignUp() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border  placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm dark:border-zinc-800"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -164,7 +267,7 @@ export default function SignUp() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border  rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
+                className="w-full flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"
@@ -177,7 +280,7 @@ export default function SignUp() {
             <div>
               <a
                 href="#"
-                className="w-full flex items-center justify-center px-4 py-2 border  rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
+                className="w-full flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:border-zinc-800"
               >
                 <img
                   className="h-5 w-5"

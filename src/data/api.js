@@ -9,3 +9,34 @@ export const fetchLogin = async (username, password) => {
     password,
   });
 };
+//regitster-student
+export const fetchSignUpStudent = async (
+  username,
+  password,
+  email,
+  fullName,
+  phoneNumber
+) => {
+  return await axios.post(`${HOST_NAME}/auth/register-student`, {
+    username,
+    password,
+    email,
+    fullName,
+    phoneNumber,
+  });
+};
+export const fetchSignUpTeacher = async (
+  username,
+  password,
+  email,
+  fullName,
+  phoneNumber
+) => {
+  return await axios.post(`${HOST_NAME}/auth/register-teacher`, {
+    username,
+    password,
+    email,
+    fullName,
+    phoneNumber,
+  });
+};

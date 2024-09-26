@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
 import { fetchLogin } from "@/data/api";
@@ -44,7 +44,7 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <label htmlFor="username" className="sr-only">
                 Email address
               </label>
               <div className="relative">
@@ -52,17 +52,17 @@ export default function Login() {
                   className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                   style={{ zIndex: 10 }}
                 >
-                  <Mail className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  <User className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
                 <input
-                  id="email-address"
-                  name="email"
+                  id="username"
+                  name="username"
                   type="text"
-                  autoComplete="email"
+                  autoComplete="username"
                   style={{ zIndex: 1 }}
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
