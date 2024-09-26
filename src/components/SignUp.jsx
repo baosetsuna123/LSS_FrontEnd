@@ -37,12 +37,18 @@ export default function SignUp() {
         );
       }
       console.log("Signup successful:", response.data);
+      localStorage.setItem("status", JSON.stringify(response.data.status));
       toast.success(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
         } signup successful`
       );
-      navigate("/login");
+
+      if (userType === "teacher") {
+        navigate("/create-application");
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       console.error("Signup failed:", error);
       toast.error("Signup failed");

@@ -25,6 +25,7 @@ export const fetchSignUpStudent = async (
     phoneNumber,
   });
 };
+//register-teacher
 export const fetchSignUpTeacher = async (
   username,
   password,
@@ -38,5 +39,13 @@ export const fetchSignUpTeacher = async (
     email,
     fullName,
     phoneNumber,
+  });
+};
+//create-application
+export const fetchCreateApplication = async (status, title, description) => {
+  return await axios.post(`${HOST_NAME}/applications/create-application`, {
+    status,
+    title,
+    description,
   });
 };

@@ -14,19 +14,20 @@ import SubjectDetailsPage from "./components/CourseDetails";
 import { Layout } from "./components/Layout";
 import ForgotPassword from "./components/ForgotPassword";
 import SignUp from "./components/SignUp";
+import { Application } from "./components/Application";
 
 function App() {
   return (
     <Router>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={1000}
         hideProgressBar={false}
       />
       <Routes>
         {/* Route for login, without the layout */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
+        <Route path="/create-application" element={<Application />} />
         {/* Protected routes using the layout */}
         <Route
           element={
