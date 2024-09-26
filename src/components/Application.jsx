@@ -12,7 +12,7 @@ import { Textarea } from "./ui/textarea";
 
 export function Application() {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState(null);
+  const [description, setDescription] = useState("");
   const navigate = useNavigate();
   const status = JSON.parse(localStorage.getItem("status"));
   const handleSubmit = async (e) => {
@@ -21,7 +21,7 @@ export function Application() {
     console.log("Request Body:", requestBody);
     try {
       const response = await fetchCreateApplication(status, title, description);
-      console.log("Application created successfully:", response.data);
+      console.log("Application created successfully:", response);
       toast.success("Application created successfully");
     } catch (error) {
       console.error(
