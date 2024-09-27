@@ -1,14 +1,41 @@
 import { useState } from "react";
 import backgroundImage from "../assets/background2.png";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Import useHistory
+import { fetchForgotPassword } from "@/data/api";
+import { toast } from "react-toastify";
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhone] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Password reset requested for:", email);
+
+    // Basic validation for phone number
+    const phoneRegex = /^[0-9]{10,15}$/; // Adjust the regex based on your phone number format requirements
+
+    if (!phoneNumber) {
+      toast.error("Please enter your phone number.");
+      return;
+    }
+
+    if (!phoneRegex.test(phoneNumber)) {
+      toast.error("Please enter a valid phone number (10 to 15 digits).");
+      return;
+    }
+
+    try {
+      const response = await fetchForgotPassword(phoneNumber);
+      console.log("OTP sent successfully:", response);
+      toast.success("OTP sent successfully");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data ||
+        error.message ||
+        "An error occurred. Please try again.";
+      console.error("Error during forgot password:", errorMessage);
+      toast.error(errorMessage);
+    }
   };
 
   return (
@@ -25,27 +52,35 @@ export default function ForgotPassword() {
         </h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email-address" className="sr-only">
-              Email address
+            <label htmlFor="phone" className="sr-only">
+              PhoneNumber
             </label>
-            <input
-              id="email-address"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="relative">
+              <div
+                className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                style={{ zIndex: 10 }}
+              >
+                <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
+              </div>
+              <input
+                id="phone"
+                name="phone"
+                type="number"
+                autoComplete="number"
+                required
+                className="appearance-none rounded-md pl-10 relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Request Password Reset
+              Send OTP
             </button>
           </div>
         </form>

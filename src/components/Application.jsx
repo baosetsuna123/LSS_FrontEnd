@@ -15,6 +15,7 @@ export function Application() {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
   const status = JSON.parse(localStorage.getItem("status"));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const requestBody = { status, title, description };
@@ -22,7 +23,13 @@ export function Application() {
     try {
       const response = await fetchCreateApplication(status, title, description);
       console.log("Application created successfully:", response);
+
       toast.success("Application created successfully");
+
+      toast.info(
+        "Đơn của bạn đã được gửi thành công, chúng tôi sẽ liên lạc với bạn qua email khi tài khoản được kích hoạt"
+      );
+      navigate("/login");
     } catch (error) {
       console.error(
         "Application creation failed:",
@@ -91,7 +98,7 @@ export function Application() {
             <div className="flex flex-col items-center">
               <button
                 type="submit"
-                className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className={`group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
               >
                 Create Application
               </button>

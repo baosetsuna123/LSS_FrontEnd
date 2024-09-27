@@ -19,11 +19,7 @@ import { Application } from "./components/Application";
 function App() {
   return (
     <Router>
-      <ToastContainer
-        position="top-right"
-        autoClose={1000}
-        hideProgressBar={false}
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         {/* Route for login, without the layout */}
         <Route path="/forgot-password" element={<ForgotPassword />} />

@@ -58,13 +58,12 @@ export const fetchCreateApplication = async (status, title, description) => {
         description,
       },
       {
-        withCredentials: true, // Đảm bảo session cookie (nếu có) được gửi kèm
+        withCredentials: true,
       }
     );
-    return response.data; // Trả về dữ liệu từ response
+    return response.data;
   } catch (error) {
     if (error.response) {
-      // Server trả về phản hồi lỗi
       console.error("Error response:", error.response);
       if (error.response.status === 401) {
         throw new Error("You are not logged in as a teacher.");
@@ -74,11 +73,39 @@ export const fetchCreateApplication = async (status, title, description) => {
         throw new Error("Internal server error.");
       }
     } else if (error.request) {
-      // Không nhận được phản hồi từ server
       console.error("No response from server:", error.request);
       throw new Error("No response from server.");
     } else {
-      // Xảy ra lỗi trong khi thiết lập request
+      console.error("Error setting up request:", error.message);
+      throw new Error("Error setting up request.");
+    }
+  }
+};
+//forgot-password
+export const fetchForgotPassword = async (phoneNumber) => {
+  try {
+    const response = await axios.post(
+      `${HOST_NAME}/forgotpassword/forgot-password`,
+      {
+        phoneNumber,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error response:", error.response);
+      if (error.response.status === 404) {
+        throw new Error("Phone number not found.");
+      } else if (error.response.status === 500) {
+        throw new Error("Internal server error.");
+      }
+    } else if (error.request) {
+      console.error("No response from server:", error.request);
+      throw new Error("No response from server.");
+    } else {
       console.error("Error setting up request:", error.message);
       throw new Error("Error setting up request.");
     }

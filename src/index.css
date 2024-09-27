@@ -3,6 +3,16 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
+}
+/* Hide the spinner in Chrome, Safari, Edge, and Firefox */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Chrome, Safari, Edge */
+  margin: 0; /* Remove margin */
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
