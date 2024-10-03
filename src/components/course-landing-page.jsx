@@ -15,10 +15,10 @@ export function CourseLandingPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-white">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl text-white">
                 Unlock Your Potential with EduCourse
               </h1>
-              <p className="mx-auto max-w-[700px] text-gray-200 md:text-xl">
+              <p className="mx-auto max-w-[700px] text-gray-300 md:text-xl">
                 Discover expert-led online courses to boost your skills and
                 advance your career.
               </p>
@@ -40,33 +40,39 @@ export function CourseLandingPage() {
 
       <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
             Why Choose EduCourse?
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <Card>
+            <Card className="transition-transform transform hover:scale-105">
               <CardHeader>
-                <CheckCircle className="w-8 h-8 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle>Expert Instructors</CardTitle>
+                <CheckCircle className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
+                <CardTitle className="text-xl font-semibold">
+                  Expert Instructors
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 Learn from industry professionals with years of experience.
               </CardContent>
             </Card>
-            <Card>
+            <Card className="transition-transform transform hover:scale-105">
               <CardHeader>
-                <Users className="w-8 h-8 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle>Interactive Learning</CardTitle>
+                <Users className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
+                <CardTitle className="text-xl font-semibold">
+                  Interactive Learning
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 Engage with peers and instructors through forums and live
                 sessions.
               </CardContent>
             </Card>
-            <Card>
+            <Card className="transition-transform transform hover:scale-105">
               <CardHeader>
-                <Star className="w-8 h-8 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle>Flexible Schedule</CardTitle>
+                <Star className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
+                <CardTitle className="text-xl font-semibold">
+                  Flexible Schedule
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 Learn at your own pace with lifetime access to course materials.
@@ -78,7 +84,7 @@ export function CourseLandingPage() {
 
       <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
             Featured Courses
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -99,14 +105,19 @@ export function CourseLandingPage() {
                 image: market,
               },
             ].map((course, index) => (
-              <Card key={index}>
+              <Card
+                key={index}
+                className="transition-transform transform hover:scale-105"
+              >
                 <img
                   src={course.image}
                   alt={course.title}
-                  className="w-full h-[200px] object-cover"
+                  className="w-full h-[200px] object-cover rounded-t-lg"
                 />
                 <CardHeader>
-                  <CardTitle>{course.title}</CardTitle>
+                  <CardTitle className="text-xl font-semibold">
+                    {course.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold">{course.price}</p>
@@ -120,7 +131,7 @@ export function CourseLandingPage() {
 
       <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
         <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
             What Our Students Say
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -138,9 +149,14 @@ export function CourseLandingPage() {
                 text: "Digital Marketing Mastery helped me take my business to the next level. Great practical insights!",
               },
             ].map((testimonial, index) => (
-              <Card key={index}>
+              <Card
+                key={index}
+                className="transition-transform transform hover:scale-105"
+              >
                 <CardHeader>
-                  <CardTitle>{testimonial.name}</CardTitle>
+                  <CardTitle className="text-xl font-semibold">
+                    {testimonial.name}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-zinc-500 dark:text-zinc-400">
@@ -156,10 +172,10 @@ export function CourseLandingPage() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">
+              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-white">
                 Ready to Start Learning?
               </h2>
-              <p className="mx-auto max-w-[600px] text-gray-200 md:text-xl">
+              <p className="mx-auto max-w-[600px] text-gray-300 md:text-xl">
                 Join thousands of students and start your learning journey
                 today.
               </p>
@@ -167,16 +183,20 @@ export function CourseLandingPage() {
             <div className="w-full max-w-sm space-y-2">
               <form className="flex space-x-2">
                 <Input
-                  className="max-w-lg flex-1 bg-white"
+                  className="max-w-lg flex-1 bg-white rounded-lg shadow-md"
                   placeholder="Enter your email"
                   type="email"
                 />
-                <Button type="submit" variant="secondary">
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="rounded-lg shadow-md"
+                >
                   Get Started
                 </Button>
               </form>
-              <p className="text-xs text-gray-200">
-                By signing up, you agree to our{""}
+              <p className="text-xs text-gray-300">
+                By signing up, you agree to our{" "}
                 <a className="underline underline-offset-2" href="#">
                   Terms & Conditions
                 </a>

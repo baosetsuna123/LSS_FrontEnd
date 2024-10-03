@@ -11,16 +11,16 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation for phone number
-    const phoneRegex = /^[0-9]{10,15}$/; // Adjust the regex based on your phone number format requirements
-
+    const phoneRegex =
+      // eslint-disable-next-line no-useless-escape
+      /^[\+]?[0-9]{0,3}\W?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
     if (!phoneNumber) {
       toast.error("Please enter your phone number.");
       return;
     }
 
     if (!phoneRegex.test(phoneNumber)) {
-      toast.error("Please enter a valid phone number (10 to 15 digits).");
+      toast.error("Please enter a valid phone number.");
       return;
     }
 
@@ -28,6 +28,7 @@ export default function ForgotPassword() {
       const response = await fetchForgotPassword(phoneNumber);
       console.log("OTP sent successfully:", response);
       toast.success("OTP sent successfully");
+      navigate("/verify-otp");
     } catch (error) {
       const errorMessage =
         error.response?.data ||

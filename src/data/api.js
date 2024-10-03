@@ -111,3 +111,47 @@ export const fetchForgotPassword = async (phoneNumber) => {
     }
   }
 };
+//verify-otp
+export const fetchVerifyOtpApi = async (otp) => {
+  try {
+    const response = await axios.post(
+      "/forgotpassword/verify-otp",
+      {
+        otp,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data);
+    } else {
+      throw new Error("An error occurred while verifying OTP.");
+    }
+  }
+};
+//reset-password
+export const fetchResetPassword = async (newpass) => {
+  try {
+    const response = await axios.post(
+      "/forgotpassword/reset-password",
+      {
+        newpass,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data);
+    } else {
+      throw new Error("An error occurred while verifying OTP.");
+    }
+  }
+};

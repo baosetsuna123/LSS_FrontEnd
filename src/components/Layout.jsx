@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { BookOpen, LogOut, Search, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const navigate = useNavigate();
   const searchInputRef = useRef(null);
   const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
@@ -61,6 +62,7 @@ export function Layout({ children }) {
     setIsLoggedIn(false);
     setIsPopupVisible(false);
     toast.success("Logged out successfully");
+    navigate("/");
   };
 
   return (

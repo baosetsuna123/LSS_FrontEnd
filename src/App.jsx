@@ -1,4 +1,4 @@
-import { CourseLandingPage } from "./components/course-landing-page";
+import { CourseLandingPage } from "./components/Course-Landing-Page";
 import {
   BrowserRouter as Router,
   Route,
@@ -15,6 +15,9 @@ import { Layout } from "./components/Layout";
 import ForgotPassword from "./components/ForgotPassword";
 import SignUp from "./components/SignUp";
 import { Application } from "./components/Application";
+import VerifyOtp from "./components/Verify-Otp";
+import ResetPassword from "./components/ResetPassword";
+import Profile from "./components/Profile";
 
 function App() {
   return (
@@ -23,6 +26,8 @@ function App() {
       <Routes>
         {/* Route for login, without the layout */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
         {/* Protected routes using the layout */}
         <Route
@@ -33,6 +38,8 @@ function App() {
           }
         >
           <Route path="/SignUp" element={<SignUp />} />
+          <Route path="/profile" element={<Profile />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
