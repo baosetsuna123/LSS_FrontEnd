@@ -3,7 +3,7 @@ import backgroundImage from "../assets/background2.png";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 // import { fetchVerifyOtpApi } from "@/data/api";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { LockOutlined } from "@ant-design/icons";
 
 export default function VerifyOtp() {

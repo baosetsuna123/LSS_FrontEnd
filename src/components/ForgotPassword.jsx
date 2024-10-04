@@ -3,7 +3,7 @@ import backgroundImage from "../assets/background2.png";
 import { ArrowLeft, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Import useHistory
 import { fetchForgotPassword } from "@/data/api";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 export default function ForgotPassword() {
   const [phoneNumber, setPhone] = useState("");

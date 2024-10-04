@@ -6,9 +6,6 @@ import {
   Outlet,
 } from "react-router-dom";
 import Login from "./components/Login";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import the CSS for styling
-
 import CoursesPage from "./components/Courses";
 import SubjectDetailsPage from "./components/CourseDetails";
 import { Layout } from "./components/Layout";
@@ -18,18 +15,16 @@ import { Application } from "./components/Application";
 import VerifyOtp from "./components/Verify-Otp";
 import ResetPassword from "./components/ResetPassword";
 import Profile from "./components/Profile";
+import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
 
 function App() {
   return (
     <Router>
-      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
-        {/* Route for login, without the layout */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
-        {/* Protected routes using the layout */}
         <Route
           element={
             <Layout>
@@ -37,8 +32,15 @@ function App() {
             </Layout>
           }
         >
-          <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />

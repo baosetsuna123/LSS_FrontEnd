@@ -3,10 +3,10 @@ import { Eye, EyeOff, Lock, User } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
 import { fetchLogin } from "@/data/api";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 export default function Login() {
-  const { setIsLoggedIn } = useAuth();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function Login() {
       const response = await fetchLogin(username, password);
       localStorage.setItem("result", JSON.stringify(response.data));
       localStorage.setItem("token", response.data.token);
-      setIsLoggedIn(true);
+      login();
       navigate("/");
       toast.success("Login successful");
     } catch (error) {

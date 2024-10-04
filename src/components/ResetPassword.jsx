@@ -3,7 +3,7 @@ import backgroundImage from "../assets/background2.png";
 import { ArrowLeft, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 // import { fetchVerifyOtpApi } from "@/data/api";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 // import { fetchResetPassword } from "@/data/api";
 
 export default function ResetPassword() {

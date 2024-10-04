@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { BookOpen, LogOut, Search, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -15,8 +15,7 @@ export function Layout({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-
+    console.log("Token:", token);
     const handleScroll = () => {
       if (typeof window !== "undefined") {
         if (window.scrollY > lastScrollY.current) {
@@ -32,7 +31,7 @@ export function Layout({ children }) {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [setIsLoggedIn]);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -147,10 +146,8 @@ export function Layout({ children }) {
         </nav>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-gray-500">
-          © 2024 EduCourse. All rights reserved.
-        </p>
+      <footer className="flex flex-col bg-orange-500 gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t font-semibold">
+        <p className="text-xs">© 2024 EduCourse. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link className="text-xs hover:underline underline-offset-4" to="#">
             Terms of Service

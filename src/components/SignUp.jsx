@@ -3,7 +3,7 @@ import { Eye, EyeOff, Lock, Mail, Phone, User, UserPlus } from "lucide-react";
 import backgroundImage from "../assets/background2.png";
 import { useNavigate } from "react-router-dom";
 import { fetchSignUpStudent, fetchSignUpTeacher } from "@/data/api"; // Import the teacher registration API
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +37,6 @@ export default function SignUp() {
         );
       }
       console.log("Signup successful:", response.data);
-      localStorage.setItem("status", JSON.stringify(response.data.status));
       toast.success(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)

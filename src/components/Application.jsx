@@ -6,15 +6,15 @@ import backgroundImage from "../assets/background2.png";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Captions, Podcast } from "lucide-react";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { fetchCreateApplication } from "@/data/api";
 import { Textarea } from "./ui/textarea";
 
 export function Application() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const status = "PENDING";
   const navigate = useNavigate();
-  const status = JSON.parse(localStorage.getItem("status"));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,9 +26,6 @@ export function Application() {
 
       toast.success("Application created successfully");
 
-      toast.info(
-        "Đơn của bạn đã được gửi thành công, chúng tôi sẽ liên lạc với bạn qua email khi tài khoản được kích hoạt"
-      );
       navigate("/login");
     } catch (error) {
       console.error(
