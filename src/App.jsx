@@ -16,6 +16,7 @@ import VerifyOtp from "./components/Verify-Otp";
 import ResetPassword from "./components/ResetPassword";
 import Profile from "./components/Profile";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/subject/:subjectId" element={<SubjectDetailsPage />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Router>

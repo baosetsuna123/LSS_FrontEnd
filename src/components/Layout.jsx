@@ -9,12 +9,12 @@ export function Layout({ children }) {
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const popupRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     console.log("Token:", token);
     const handleScroll = () => {
       if (typeof window !== "undefined") {
@@ -56,9 +56,8 @@ export function Layout({ children }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     localStorage.removeItem("result");
-    setIsLoggedIn(false);
     setIsPopupVisible(false);
     toast.success("Logged out successfully");
     navigate("/");

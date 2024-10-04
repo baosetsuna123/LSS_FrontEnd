@@ -16,7 +16,7 @@ export default function Login() {
     try {
       const response = await fetchLogin(username, password);
       localStorage.setItem("result", JSON.stringify(response.data));
-      localStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("token", response.data.token);
       login();
       navigate("/");
       toast.success("Login successful");

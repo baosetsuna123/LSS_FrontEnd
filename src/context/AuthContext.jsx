@@ -4,29 +4,32 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("Token found:", token); // Log the token
+    const token = sessionStorage.getItem("token");
+    console.log("Token in useEffect:", token); // Log để kiểm tra token
     if (token) {
       setIsLoggedIn(true);
     }
+    setLoading(false);
   }, []);
 
   const login = () => {
     console.log("Logging in..."); // Log when login is called
     setIsLoggedIn(true);
-    console.log("isLoggedIn after login:", isLoggedIn); // Log the value after setting
   };
+
   const logout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem("token"); // Clear token on logout
+    sessionStorage.removeItem("token"); // Clear token on logout
   };
+
   useEffect(() => {
     console.log("isLoggedIn updated:", isLoggedIn);
   }, [isLoggedIn]);
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, setIsLoggedIn }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
