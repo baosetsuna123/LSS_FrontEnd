@@ -17,6 +17,7 @@ import ResetPassword from "./components/ResetPassword";
 import Profile from "./components/Profile";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
 import NotFound from "./components/NotFound";
+import { Dashboard } from "./components/Dashboard";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+
         <Route
           element={
             <Layout>
