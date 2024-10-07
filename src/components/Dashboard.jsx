@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,43 +8,132 @@ import {
   LayoutGrid,
   AppWindowMac,
 } from "lucide-react";
-import { useCallback } from "react";
+import ApplicationLayout from "./Applications";
+import CourseLayout from "./Course";
+import ClassLayout from "./Class";
+import CategoryLayout from "./Category";
+
 export function Dashboard() {
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [staffData, setStaffData] = useState([]);
   const itemsPerPage = 5;
-  const [activeCategory, setActiveCategory] = useState("manage");
+  const [activeCategory, setActiveCategory] = useState("category");
 
-  useEffect(() => {
-    // Simulating data fetch
-    const fetchData = () => {
-      const data = Array.from({ length: 50 }, (_, i) => ({
-        id: i + 1,
-        name: `Staff Member ${i + 1}`,
-        email: `staff${i + 1}@example.com`,
-        department: ["HR", "IT", "Finance", "Marketing"][
-          Math.floor(Math.random() * 4)
-        ],
-      }));
-      setStaffData(data);
-    };
-    fetchData();
-  }, []);
+  const categoryData = [
+    {
+      id: 1,
+      name: "Category A",
+      email: "catA@example.com",
+      department: "Marketing",
+    },
+    {
+      id: 2,
+      name: "Category B",
+      email: "catB@example.com",
+      department: "Sales",
+    },
+    {
+      id: 3,
+      name: "Category C",
+      email: "catC@example.com",
+      department: "Support",
+    },
+  ];
+
+  const applicationData = [
+    {
+      id: 1,
+      name: "Application A",
+      email: "appA@example.com",
+      department: "IT",
+    },
+    {
+      id: 2,
+      name: "Application B",
+      email: "appB@example.com",
+      department: "Finance",
+    },
+    {
+      id: 3,
+      name: "Application C",
+      email: "appC@example.com",
+      department: "HR",
+    },
+  ];
+
+  const courseData = [
+    {
+      id: 1,
+      name: "Course A",
+      email: "courseA@example.com",
+      department: "Math",
+    },
+    {
+      id: 2,
+      name: "Course B",
+      email: "courseB@example.com",
+      department: "Science",
+    },
+    {
+      id: 3,
+      name: "Course C",
+      email: "courseC@example.com",
+      department: "History",
+    },
+    {
+      id: 4,
+      name: "Course A",
+      email: "courseA@example.com",
+      department: "Math",
+    },
+    {
+      id: 5,
+      name: "Course B",
+      email: "courseB@example.com",
+      department: "Science",
+    },
+    {
+      id: 6,
+      name: "Course C",
+      email: "courseC@example.com",
+      department: "History",
+    },
+  ];
+
+  const classData = [
+    {
+      id: 1,
+      name: "Class A",
+      email: "classA@example.com",
+      department: "Biology",
+    },
+    {
+      id: 2,
+      name: "Class B",
+      email: "classB@example.com",
+      department: "Chemistry",
+    },
+    {
+      id: 3,
+      name: "Class C",
+      email: "classC@example.com",
+      department: "Physics",
+    },
+  ];
 
   const stopResizing = () => setIsResizing(false);
 
   const resize = useCallback(
     (e) => {
-      // Wrap resize in useCallback
       if (isResizing && !isSidebarCollapsed) {
         setSidebarWidth(Math.max(60, e.clientX));
       }
     },
     [isResizing, isSidebarCollapsed]
   );
+
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
     setSidebarWidth(isSidebarCollapsed ? 250 : 60);
@@ -59,8 +148,24 @@ export function Dashboard() {
     };
   }, [isResizing, resize]);
 
-  const pageCount = Math.ceil(staffData.length / itemsPerPage);
-  const currentData = staffData.slice(
+  // Determine the data to display based on the active category
+  const getDataForCurrentCategory = () => {
+    switch (activeCategory) {
+      case "application":
+        return applicationData;
+      case "course":
+        return courseData;
+      case "class":
+        return classData;
+      case "category":
+      default:
+        return categoryData;
+    }
+  };
+
+  const dataToDisplay = getDataForCurrentCategory();
+  const pageCount = Math.ceil(dataToDisplay.length / itemsPerPage);
+  const currentData = dataToDisplay.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -137,45 +242,15 @@ export function Dashboard() {
       <div className="flex-1 overflow-hidden bg-gray-100">
         <div className="p-6">
           <h1 className="text-3xl font-bold mb-6">Staff Dashboard</h1>
-
           {/* Table */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <table className="min-w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Department
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {currentData.map((staff) => (
-                  <tr key={staff.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{staff.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {staff.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {staff.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {staff.department}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
+          {activeCategory === "category" && (
+            <CategoryLayout data={currentData} />
+          )}
+          {activeCategory === "application" && (
+            <ApplicationLayout data={currentData} />
+          )}
+          {activeCategory === "course" && <CourseLayout data={currentData} />}
+          {activeCategory === "class" && <ClassLayout data={currentData} />}
           {/* Pagination */}
           <div className="mt-4 flex justify-between items-center">
             <button
