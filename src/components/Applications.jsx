@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { fetchApplicationStaff, fetchApproveApplication } from "@/data/api"; // Import the API function
 import { toast } from "react-hot-toast";
+import { Search } from "lucide-react";
 
 const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
   const [applications, setApplications] = useState([]); // State to hold application data
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const token = sessionStorage.getItem("token"); // Get the token from session storage
 
   const handleClick = async (id) => {
@@ -38,14 +40,35 @@ const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
     loadApplications();
   }, [token]);
 
-  // Calculate the current data to display based on pagination
-  const currentData = applications.slice(
+  // Calculate the current data to display based on pagination and search query
+  const filteredApplications = applications.filter((app) =>
+    app.teacherName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const currentData = filteredApplications.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
     <div>
+      <div className="flex justify-between items-center mb-4">
+        {/* Search Box */}
+        <div
+          className="flex items-center border rounded p-2"
+          style={{ width: "330px" }}
+        >
+          <Search size={16} className="mr-2" />
+          <input
+            type="text"
+            placeholder="Search Applications by Teacher Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
+          />
+        </div>
+      </div>
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full">
           <thead className="bg-gray-50">
@@ -73,7 +96,9 @@ const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.map((app, index) => (
               <tr key={app.applicationId}>
-                <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>{" "}
                 <td className="px-6 py-4 whitespace-nowrap">
                   {app.description}
                 </td>

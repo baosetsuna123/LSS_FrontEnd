@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchCreateCategory, fetchUpdateCategory } from "@/data/api";
 import { toast } from "react-hot-toast";
+import { Search } from "lucide-react";
 
 const CategoryLayout = ({
   currentPage,
@@ -8,7 +9,8 @@ const CategoryLayout = ({
   initialCategories = [],
 }) => {
   const [newCategory, setNewCategory] = useState({ name: "" });
-  const [categories, setCategories] = useState(initialCategories); // Set state using the new prop name
+  const [categories, setCategories] = useState(initialCategories);
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const token = sessionStorage.getItem("token");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -20,6 +22,10 @@ const CategoryLayout = ({
   }, [initialCategories]);
 
   const handleCreateCategory = async () => {
+    if (!newCategory.name) {
+      toast.error("Category name cannot be empty.");
+      return;
+    }
     try {
       const createdCategory = await fetchCreateCategory(newCategory, token);
       setCategories((prevCategories) => [...prevCategories, createdCategory]);
@@ -33,6 +39,10 @@ const CategoryLayout = ({
   };
 
   const handleEditCategory = async (id) => {
+    if (!newCategory.name) {
+      toast.error("Category name cannot be empty.");
+      return;
+    }
     try {
       const updatedCategory = await fetchUpdateCategory(id, newCategory, token);
       setCategories((prevCategories) =>
@@ -40,6 +50,7 @@ const CategoryLayout = ({
           cat.categoryId === id ? updatedCategory : cat
         )
       );
+
       toast.success("Category updated successfully!");
       setIsEditing(false);
       setNewCategory({ name: "" });
@@ -50,9 +61,16 @@ const CategoryLayout = ({
     }
   };
 
-  // Calculate the current data to display based on pagination
-  const currentData = Array.isArray(categories)
-    ? categories.slice(
+  // Calculate the filtered categories based on search query
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Calculate the number of pages
+
+  // Calculate the current data to display based on pagination and search query
+  const currentData = Array.isArray(filteredCategories)
+    ? filteredCategories.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
       )
@@ -63,10 +81,24 @@ const CategoryLayout = ({
       <div className="flex justify-between items-center mb-4">
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md"
+          className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md"
         >
           Create New Category
         </button>
+        {/* Search Box with Icon */}
+        <div
+          className="flex items-center border rounded p-2 ml-4"
+          style={{ width: "300px" }}
+        >
+          <Search size={16} className="mr-2" />
+          <input
+            type="text"
+            placeholder="Search Categories By Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
+          />
+        </div>
       </div>
 
       {/* Show Create Category Form */}
@@ -79,10 +111,6 @@ const CategoryLayout = ({
             value={newCategory.name}
             onChange={(e) => {
               const value = e.target.value;
-              if (value.trim() === "") {
-                alert("Tên danh mục không được để trống!"); // Thông báo nếu tên danh mục trống
-                return;
-              }
               setNewCategory({ name: value });
             }}
             className="border rounded p-2 mr-2"
@@ -120,7 +148,9 @@ const CategoryLayout = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.map((cat, index) => (
               <tr key={cat.categoryId}>
-                <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>{" "}
                 <td className="px-6 py-4 whitespace-nowrap">{cat.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
@@ -149,10 +179,6 @@ const CategoryLayout = ({
             value={newCategory.name}
             onChange={(e) => {
               const value = e.target.value;
-              if (value.trim() === "") {
-                alert("Tên danh mục không được để trống!"); // Thông báo nếu tên danh mục trống
-                return;
-              }
               setNewCategory({ ...newCategory, name: value });
             }}
             className="border rounded p-2 mr-2"
