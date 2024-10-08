@@ -1,3 +1,5 @@
+export const getCourseDataLength = (data) => data.length;
+
 const CourseLayout = ({ data }) => {
   return (
     <div>

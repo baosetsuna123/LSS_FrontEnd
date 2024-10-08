@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    console.log("Token in useEffect:", token); // Log để kiểm tra token
     if (token) {
       setIsLoggedIn(true);
     }
@@ -15,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = () => {
-    console.log("Logging in..."); // Log when login is called
     setIsLoggedIn(true);
   };
 
@@ -24,9 +22,7 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem("token"); // Clear token on logout
   };
 
-  useEffect(() => {
-    console.log("isLoggedIn updated:", isLoggedIn);
-  }, [isLoggedIn]);
+  useEffect(() => {}, [isLoggedIn]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, login, logout, loading }}>

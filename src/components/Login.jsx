@@ -18,7 +18,11 @@ export default function Login() {
       localStorage.setItem("result", JSON.stringify(response.data));
       sessionStorage.setItem("token", response.data.token);
       login();
-      navigate("/");
+      if (response.data.role === "STAFF") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
       toast.success("Login successful");
     } catch (error) {
       toast.error("Login failed");
