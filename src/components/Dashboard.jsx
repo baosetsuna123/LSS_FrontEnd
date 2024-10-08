@@ -4,7 +4,6 @@ import {
   ChevronRight,
   Menu,
   BookOpen,
-  Users,
   LayoutGrid,
   AppWindowMac,
   ArrowDown,
@@ -16,7 +15,11 @@ import ClassLayout from "./Class";
 import CategoryLayout from "./Category";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { fetchAllCategories, fetchApplicationStaff } from "@/data/api"; // Import the API function
+import {
+  fetchAllCategories,
+  fetchAllCourses,
+  fetchApplicationStaff,
+} from "@/data/api"; // Import the API function
 
 export function Dashboard() {
   const [sidebarWidth, setSidebarWidth] = useState(250);
@@ -24,14 +27,28 @@ export function Dashboard() {
   const [isResizing, setIsResizing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const user = JSON.parse(localStorage.getItem("result"));
-  const itemsPerPage = 5;
+  const itemsPerPage = 4;
   const [activeCategory, setActiveCategory] = useState("category");
   const [showLogoutText, setShowLogoutText] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
-  const [categories, setCategories] = useState([]); // State to hold categories
-  const [applications, setApplications] = useState([]); // State to hold applications
+  const [categories, setCategories] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [courses, setCourses] = useState([]);
 
   const navigate = useNavigate();
+
+  // Load active category from localStorage on component mount
+  useEffect(() => {
+    const savedCategory = localStorage.getItem("activeCategory");
+    if (savedCategory) {
+      setActiveCategory(savedCategory);
+    }
+  }, []);
+
+  // Save active category to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("activeCategory", activeCategory);
+  }, [activeCategory]);
 
   // Fetch all categories on component mount
   useEffect(() => {
@@ -66,10 +83,26 @@ export function Dashboard() {
 
     loadApplications();
   }, []);
+  useEffect(() => {
+    const loadCourses = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const data = await fetchAllCourses(token);
+        console.log(data);
+        setCourses(data || []);
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+        toast.error("Failed to fetch courses.");
+        setCourses([]);
+      }
+    };
+    loadCourses();
+  }, []);
 
   // Calculate page counts based on data lengths
   const pageCountCate = Math.ceil(categories.length / itemsPerPage);
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
+  const pageCountCourse = Math.ceil(courses.length / itemsPerPage);
 
   // Function to handle logout
   const handleLogout = () => {
@@ -137,7 +170,10 @@ export function Dashboard() {
           </div>
           <nav className={`mt-6 ${isSidebarCollapsed ? "hidden" : ""}`}>
             <button
-              onClick={() => setActiveCategory("category")}
+              onClick={() => {
+                setActiveCategory("category");
+                setCurrentPage(1); // Reset to page 1 when changing category
+              }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "category" ? "bg-gray-200" : ""
               }`}
@@ -146,7 +182,10 @@ export function Dashboard() {
               Category
             </button>
             <button
-              onClick={() => setActiveCategory("application")}
+              onClick={() => {
+                setActiveCategory("application");
+                setCurrentPage(1); // Reset to page 1 when changing category
+              }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "application" ? "bg-gray-200" : ""
               }`}
@@ -156,22 +195,16 @@ export function Dashboard() {
             </button>
             <div>
               <button
-                onClick={() => setActiveCategory("course")}
+                onClick={() => {
+                  setActiveCategory("course");
+                  setCurrentPage(1); // Reset to page 1 when changing category
+                }}
                 className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                   activeCategory === "course" ? "bg-gray-200" : ""
                 }`}
               >
                 <BookOpen size={20} className="mr-2" />
                 Course
-              </button>
-              <button
-                onClick={() => setActiveCategory("class")}
-                className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                  activeCategory === "class" ? "bg-gray-200" : ""
-                }`}
-              >
-                <Users size={20} className="mr-2" />
-                Class
               </button>
             </div>
           </nav>
@@ -244,6 +277,8 @@ export function Dashboard() {
             <CourseLayout
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
+              courses={courses}
+              setCourses={setCourses}
             />
           )}
           {activeCategory === "class" && (
@@ -264,20 +299,38 @@ export function Dashboard() {
             </button>
             <span className="text-sm text-gray-700">
               Page {currentPage} of{" "}
-              {activeCategory === "category" ? pageCountCate : pageCountApp}
+              {activeCategory === "category"
+                ? pageCountCate
+                : activeCategory === "application"
+                ? pageCountApp
+                : activeCategory === "course"
+                ? pageCountCourse
+                : 1}
             </span>
             <button
               onClick={() =>
                 setCurrentPage((prev) =>
                   Math.min(
                     prev + 1,
-                    activeCategory === "category" ? pageCountCate : pageCountApp
+                    activeCategory === "category"
+                      ? pageCountCate
+                      : activeCategory === "application"
+                      ? pageCountApp
+                      : activeCategory === "course"
+                      ? pageCountCourse
+                      : 1
                   )
                 )
               }
               disabled={
                 currentPage ===
-                (activeCategory === "category" ? pageCountCate : pageCountApp)
+                (activeCategory === "category"
+                  ? pageCountCate
+                  : activeCategory === "application"
+                  ? pageCountApp
+                  : activeCategory === "course"
+                  ? pageCountCourse
+                  : 1)
               }
               className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
             >

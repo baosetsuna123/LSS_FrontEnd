@@ -208,7 +208,7 @@ export const fetchAllCategories = async (token) => {
   try {
     const response = await api.get("/categories", {
       headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+        Authorization: `Bearer ${token}`,
       },
     });
     console.log("All categories: ", response.data);
@@ -220,7 +220,7 @@ export const fetchAllCategories = async (token) => {
 };
 // Course API
 // Function to create a new course
-export const fetchCreateCourse = async (courseDTO, image) => {
+export const fetchCreateCourse = async (courseDTO, image, token) => {
   const formData = new FormData();
   formData.append("courseDTO", JSON.stringify(courseDTO)); // Add course data as JSON
   formData.append("image", image); // Add the image file
@@ -228,7 +228,7 @@ export const fetchCreateCourse = async (courseDTO, image) => {
   try {
     const response = await api.post("/courses", formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // Let Axios handle Content-Type
       },
     });
     return response.data;
@@ -242,7 +242,8 @@ export const fetchCreateCourse = async (courseDTO, image) => {
 export const fetchUpdateCourse = async (
   courseCode,
   courseDTO,
-  image = null
+  image = null,
+  token
 ) => {
   const formData = new FormData();
   formData.append("courseDTO", JSON.stringify(courseDTO)); // Add course data as JSON
@@ -253,7 +254,7 @@ export const fetchUpdateCourse = async (
   try {
     const response = await api.put(`/courses/${courseCode}`, formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // Let Axios handle Content-Type
       },
     });
     return response.data;
@@ -264,9 +265,13 @@ export const fetchUpdateCourse = async (
 };
 
 // Function to get all courses
-export const fetchAllCourses = async () => {
+export const fetchAllCourses = async (token) => {
   try {
-    const response = await api.get("/courses");
+    const response = await api.get("/courses", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -275,9 +280,13 @@ export const fetchAllCourses = async () => {
 };
 
 // Function to delete a course by courseCode
-export const fetchDeleteCourse = async (courseCode) => {
+export const fetchDeleteCourse = async (courseCode, token) => {
   try {
-    const response = await api.delete(`/courses/${courseCode}`);
+    const response = await api.delete(`/courses/${courseCode}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error deleting course:", error);

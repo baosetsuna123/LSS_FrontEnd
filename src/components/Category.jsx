@@ -118,11 +118,9 @@ const CategoryLayout = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((cat) => (
+            {currentData.map((cat, index) => (
               <tr key={cat.categoryId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {cat.categoryId}
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{cat.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
@@ -164,6 +162,12 @@ const CategoryLayout = ({
             className="px-4 py-2 bg-green-600 text-white rounded-md"
           >
             Update Category
+          </button>
+          <button
+            onClick={() => setIsEditing(false)}
+            className="px-4 py-2 bg-gray-300 rounded-md ml-2"
+          >
+            Cancel
           </button>
         </div>
       )}

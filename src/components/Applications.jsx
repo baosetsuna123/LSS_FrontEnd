@@ -73,10 +73,7 @@ const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.map((app, index) => (
               <tr key={app.applicationId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {(currentPage - 1) * itemsPerPage + index + 1}{" "}
-                  {/* Calculate sequential ID */}
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {app.description}
                 </td>
