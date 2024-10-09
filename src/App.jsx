@@ -19,6 +19,16 @@ import ProtectedRoute from "./components/ProtectedRoute"; // Import the Protecte
 import NotFound from "./components/NotFound";
 import { Dashboard } from "./components/Dashboard";
 
+// Import các component Teacher Dashboard
+import TeacherDashboardLayout from './components/Teacher/TeacherDashboardLayout';
+import QualificationForm from './components/Teacher/QualificationForm';
+import AssignClasses from './components/Teacher/AssignClasses';
+import UpdateSchedule from './components/Teacher/UpdateSchedule';
+import CancelClassRequest from './components/Teacher/CancelClassRequest';
+import CreateClassroom from './components/Teacher/CreateClassroom';
+import ClassList from './components/Teacher/ClassList';
+import TeacherHome from './components/Teacher/TeacherHome';
+
 function App() {
   return (
     <Router>
@@ -28,6 +38,25 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Teacher Dashboard Routes */}
+        <Route
+          element={
+            <Layout>
+              <Outlet />
+            </Layout>
+          }
+        >
+          <Route path="/teacher" element={<TeacherDashboardLayout />}>
+            <Route index element={<TeacherHome />} />
+            <Route path="qualification" element={<QualificationForm />} />
+            <Route path="assign-classes" element={<AssignClasses />} />
+            <Route path="update-schedule" element={<UpdateSchedule />} />
+            <Route path="cancel-request" element={<CancelClassRequest />} />
+            <Route path="create-classroom" element={<CreateClassroom />} />
+            <Route path="class-list" element={<ClassList />} />
+          </Route>
+        </Route>
 
         <Route
           element={
