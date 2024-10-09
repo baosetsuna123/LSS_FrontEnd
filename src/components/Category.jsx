@@ -7,15 +7,15 @@ const CategoryLayout = ({
   currentPage,
   itemsPerPage,
   initialCategories = [],
+  searchQuery,
+  setSearchQuery, // Receive the search query state
 }) => {
   const [newCategory, setNewCategory] = useState({ name: "" });
   const [categories, setCategories] = useState(initialCategories);
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
-  const token = sessionStorage.getItem("token");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editCategoryId, setEditCategoryId] = useState(null);
-
+  const token = sessionStorage.getItem("token");
   // Effect to update categories when initialCategories changes
   useEffect(() => {
     setCategories(initialCategories);
@@ -66,15 +66,11 @@ const CategoryLayout = ({
     cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate the number of pages
-
   // Calculate the current data to display based on pagination and search query
-  const currentData = Array.isArray(filteredCategories)
-    ? filteredCategories.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-      )
-    : [];
+  const currentData = filteredCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div>
@@ -95,7 +91,7 @@ const CategoryLayout = ({
             type="text"
             placeholder="Search Categories By Name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)} // Update the search query
             className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
           />
         </div>
@@ -131,7 +127,7 @@ const CategoryLayout = ({
       )}
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -146,26 +142,40 @@ const CategoryLayout = ({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((cat, index) => (
-              <tr key={cat.categoryId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </td>{" "}
-                <td className="px-6 py-4 whitespace-nowrap">{cat.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => {
-                      setIsEditing(true);
-                      setEditCategoryId(cat.categoryId);
-                      setNewCategory({ name: cat.name });
-                    }}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    Edit
-                  </button>
+            {currentData.length > 0 ? (
+              currentData.map((cat, index) => (
+                <tr
+                  key={cat.categoryId}
+                  className="hover:bg-gray-100 transition duration-200"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>{" "}
+                  <td className="px-6 py-4 whitespace-nowrap">{cat.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => {
+                        setIsEditing(true);
+                        setEditCategoryId(cat.categoryId);
+                        setNewCategory({ name: cat.name });
+                      }}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="text-center py-4 text-red-600 font-semibold"
+                >
+                  No data
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

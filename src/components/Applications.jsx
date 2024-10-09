@@ -3,9 +3,13 @@ import { fetchApplicationStaff, fetchApproveApplication } from "@/data/api"; // 
 import { toast } from "react-hot-toast";
 import { Search } from "lucide-react";
 
-const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
+const ApplicationLayout = ({
+  currentPage,
+  itemsPerPage,
+  searchQuery,
+  setSearchQuery,
+}) => {
   const [applications, setApplications] = useState([]); // State to hold application data
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const token = sessionStorage.getItem("token"); // Get the token from session storage
 
   const handleClick = async (id) => {
@@ -70,7 +74,7 @@ const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
       </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -94,34 +98,48 @@ const ApplicationLayout = ({ currentPage, itemsPerPage }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((app, index) => (
-              <tr key={app.applicationId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </td>{" "}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {app.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {app.teacherName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    className={`px-4 py-2 rounded-md transition duration-200 ${
-                      app.status === "APPROVE"
-                        ? "bg-gray-400 text-white cursor-not-allowed"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
-                    onClick={() => handleClick(app.applicationId)}
-                    disabled={app.status === "APPROVE"}
-                  >
-                    Approve
-                  </button>
+            {currentData.length > 0 ? (
+              currentData.map((app, index) => (
+                <tr
+                  key={app.applicationId}
+                  className="hover:bg-gray-100 transition duration-200"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>{" "}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.description}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.teacherName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      className={`px-4 py-2 rounded-md transition duration-200 ${
+                        app.status === "APPROVE"
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "bg-blue-600 text-white hover:bg-blue-700"
+                      }`}
+                      onClick={() => handleClick(app.applicationId)}
+                      disabled={app.status === "APPROVE"}
+                    >
+                      Approve
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="text-center text-red-600 py-4 font-semibold"
+                >
+                  No Data
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

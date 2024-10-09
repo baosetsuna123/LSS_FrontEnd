@@ -13,6 +13,9 @@ export default function CourseLayout({
   itemsPerPage,
   courses,
   setCourses,
+  searchQuery,
+  setSearchQuery,
+  onDelete, // Receive the reset function
 }) {
   const [courseDTO, setCourseDTO] = useState({
     courseCode: "",
@@ -26,7 +29,6 @@ export default function CourseLayout({
   const [, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [showImageModal, setShowImageModal] = useState(false); // State for image modal
   const [selectedImage, setSelectedImage] = useState(null); // State for selected course image
   const token = sessionStorage.getItem("token");
@@ -144,12 +146,18 @@ export default function CourseLayout({
   const handleDelete = async (courseCode) => {
     setIsLoading(true);
     try {
-      const response = await fetchDeleteCourse(courseCode, token);
-      console.log("Course deleted: ", response);
-      setCourses((prevCourses) =>
-        prevCourses.filter((course) => course.courseCode !== courseCode)
+      await fetchDeleteCourse(courseCode, token); // Assuming you have a delete function
+      const updatedCourses = courses.filter(
+        (course) => course.courseCode !== courseCode
       );
+      setCourses(updatedCourses);
       toast.success("Course deleted successfully");
+
+      // Check if the current page is now empty
+      const totalPages = Math.ceil(updatedCourses.length / itemsPerPage);
+      if (currentPage > totalPages) {
+        onDelete(); // Call the reset function to navigate to page 1
+      }
     } catch (error) {
       console.error("Failed to delete course:", error);
       toast.error("Failed to delete course.");
@@ -158,13 +166,14 @@ export default function CourseLayout({
     }
   };
 
-  const currentData = Array.isArray(courses)
-    ? courses
-        .filter((course) =>
-          course.courseCode.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-    : [];
+  const filteredCourses = courses.filter((course) =>
+    course.courseCode.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const currentData = filteredCourses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleCloseModal = (e) => {
     // Check if the click is outside the modal
@@ -215,15 +224,15 @@ export default function CourseLayout({
     <div>
       <div className="flex justify-between items-center mb-4">
         <div
-          className="flex items-center border rounded p-2 ml-4"
-          style={{ width: "240px" }}
+          className="flex items-center border rounded p-2"
+          style={{ width: "330px" }}
         >
           <Search size={16} className="mr-2" />
           <input
             type="text"
-            placeholder="Search Courses By Code"
+            placeholder="Search Courses by Code"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)} // Update the search query
             className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
           />
         </div>
@@ -372,7 +381,7 @@ export default function CourseLayout({
         </div>
       )}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -399,47 +408,61 @@ export default function CourseLayout({
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentData.map((course, index) => (
-              <tr key={course.courseId}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </td>{" "}
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <img
-                    src={course.image}
-                    alt={course.name}
-                    className="w-10 h-10 object-cover cursor-pointer"
-                    onClick={() => handleImageClick(course.image)}
-                  />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {categories.find(
-                    (cat) => cat.categoryId === course.categoryId
-                  )?.name || "Unknown"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {course.courseCode}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{course.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {course.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-md mr-2"
-                    onClick={() => handleUpdateCourse(course.courseCode)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded-md"
-                    onClick={() => handleDelete(course.courseCode)}
-                  >
-                    Delete
-                  </button>
+            {currentData.length > 0 ? (
+              currentData.map((course, index) => (
+                <tr
+                  key={course.courseId}
+                  className="hover:bg-gray-100 transition duration-200"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>{" "}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={course.image}
+                      alt={course.name}
+                      className="w-10 h-10 object-cover cursor-pointer"
+                      onClick={() => handleImageClick(course.image)}
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {categories.find(
+                      (cat) => cat.categoryId === course.categoryId
+                    )?.name || "Unknown"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {course.courseCode}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{course.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {course.description}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      className="px-4 py-2 bg-yellow-500 text-white rounded-md mr-2"
+                      onClick={() => handleUpdateCourse(course.courseCode)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-500 text-white rounded-md"
+                      onClick={() => handleDelete(course.courseCode)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="text-center py-4 text-red-500 font-semibold"
+                >
+                  No Data
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

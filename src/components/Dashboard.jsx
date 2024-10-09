@@ -34,6 +34,9 @@ export function Dashboard() {
   const [categories, setCategories] = useState([]);
   const [applications, setApplications] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [searchQueryCategory, setSearchQueryCategory] = useState("");
+  const [searchQueryApplication, setSearchQueryApplication] = useState("");
+  const [searchQueryCourse, setSearchQueryCourse] = useState("");
 
   const navigate = useNavigate();
 
@@ -104,8 +107,18 @@ export function Dashboard() {
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
   const pageCountCourse = Math.ceil(courses.length / itemsPerPage);
 
+  // Function to check if any search query is active
+  const isSearchActive = () => {
+    return (
+      searchQueryCategory.trim() !== "" ||
+      searchQueryApplication.trim() !== "" ||
+      searchQueryCourse.trim() !== ""
+    );
+  };
+
   // Function to handle logout
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.stopPropagation();
     localStorage.removeItem("result");
     sessionStorage.removeItem("token");
     toast.success("You have logged out successfully.");
@@ -136,6 +149,13 @@ export function Dashboard() {
       window.removeEventListener("mouseup", stopResizing);
     };
   }, [isResizing, resize]);
+
+  // Function to reset the current page to 1
+  const resetCurrentPage = () => {
+    setCurrentPage(1);
+  };
+
+  // Close the popup and logout text when clicking outside of it
 
   return (
     <>
@@ -237,19 +257,38 @@ export function Dashboard() {
 
           {/* Logout Confirmation Popup */}
           {showLogoutPopup && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white shadow-lg rounded-md p-6">
-                <p>Bạn có chắc chắn muốn thoát không?</p>
-                <div className="flex justify-end mt-4">
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full flex flex-col items-center">
+                {/* Add an icon or image at the top */}
+                <svg
+                  className="w-16 h-16 text-red-600 mb-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M18.364 5.636a9 9 0 11-12.728 0M12 9v4m0 4h.01"
+                  ></path>
+                </svg>
+
+                <p className="text-gray-800 text-lg font-semibold mb-6 text-center">
+                  Do you really want to log out?
+                </p>
+
+                <div className="flex justify-center space-x-4 w-full">
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md mr-2"
+                    className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors duration-300 ease-in-out w-full"
                   >
                     Yes
                   </button>
                   <button
                     onClick={() => setShowLogoutPopup(false)}
-                    className="px-4 py-2 bg-gray-300 rounded-md"
+                    className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-md transition-colors duration-300 ease-in-out w-full"
                   >
                     No
                   </button>
@@ -264,6 +303,8 @@ export function Dashboard() {
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               initialCategories={categories} // Pass categories to CategoryLayout
+              searchQuery={searchQueryCategory}
+              setSearchQuery={setSearchQueryCategory} // Pass down the search query state
             />
           )}
           {activeCategory === "application" && (
@@ -271,6 +312,9 @@ export function Dashboard() {
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               applications={applications} // Pass applications to ApplicationLayout
+              searchQuery={searchQueryApplication}
+              setSearchQuery={setSearchQueryApplication} // Pass down the search query state
+              onDelete={resetCurrentPage} // Pass down the reset function
             />
           )}
           {activeCategory === "course" && (
@@ -279,6 +323,9 @@ export function Dashboard() {
               itemsPerPage={itemsPerPage}
               courses={courses}
               setCourses={setCourses}
+              searchQuery={searchQueryCourse}
+              setSearchQuery={setSearchQueryCourse} // Pass down the search query state
+              onDelete={resetCurrentPage} // Pass down the reset function
             />
           )}
           {activeCategory === "class" && (
@@ -289,54 +336,56 @@ export function Dashboard() {
           )}
 
           {/* Pagination Controls */}
-          <div className="mt-4 flex justify-between items-center">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <span className="text-sm text-gray-700">
-              Page {currentPage} of{" "}
-              {activeCategory === "category"
-                ? pageCountCate
-                : activeCategory === "application"
-                ? pageCountApp
-                : activeCategory === "course"
-                ? pageCountCourse
-                : 1}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(
-                    prev + 1,
-                    activeCategory === "category"
-                      ? pageCountCate
-                      : activeCategory === "application"
-                      ? pageCountApp
-                      : activeCategory === "course"
-                      ? pageCountCourse
-                      : 1
-                  )
-                )
-              }
-              disabled={
-                currentPage ===
-                (activeCategory === "category"
+          {!isSearchActive() && ( // Only show pagination if no search query is active
+            <div className="mt-4 flex justify-between items-center">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <span className="text-sm text-gray-700">
+                Page {currentPage} of{" "}
+                {activeCategory === "category"
                   ? pageCountCate
                   : activeCategory === "application"
                   ? pageCountApp
                   : activeCategory === "course"
                   ? pageCountCourse
-                  : 1)
-              }
-              className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+                  : 1}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(
+                      prev + 1,
+                      activeCategory === "category"
+                        ? pageCountCate
+                        : activeCategory === "application"
+                        ? pageCountApp
+                        : activeCategory === "course"
+                        ? pageCountCourse
+                        : 1
+                    )
+                  )
+                }
+                disabled={
+                  currentPage ===
+                  (activeCategory === "category"
+                    ? pageCountCate
+                    : activeCategory === "application"
+                    ? pageCountApp
+                    : activeCategory === "course"
+                    ? pageCountCourse
+                    : 1)
+                }
+                className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>
