@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import backgroundImage from "../assets/background2.png";
+import backgroundImage from "../../assets/background2.png";
 import { useNavigate } from "react-router-dom";
 import { fetchLogin } from "@/data/api";
 import { toast } from "react-hot-toast";

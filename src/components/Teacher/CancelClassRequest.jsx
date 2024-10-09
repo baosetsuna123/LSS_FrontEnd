@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 function CancelClassRequest() {
   const [classes, setClasses] = useState([]);
@@ -66,6 +66,7 @@ function CancelClassRequest() {
       setUrgency("normal");
       setAdditionalInfo("");
     } catch (error) {
+      console.error("Có lỗi xảy ra khi gửi yêu cầu:", error);
       setSubmitMessage("Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.");
     } finally {
       setIsSubmitting(false);

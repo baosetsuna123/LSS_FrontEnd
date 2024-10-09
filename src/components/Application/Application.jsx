@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import backgroundImage from "../assets/background2.png";
+import backgroundImage from "../../assets/background2.png";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Captions, Podcast } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { fetchCreateApplication } from "@/data/api";
-import { Textarea } from "./ui/textarea";
+import { Textarea } from "../ui/textarea";
 
 export function Application() {
   const [title, setTitle] = useState("");

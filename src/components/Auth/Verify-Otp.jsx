@@ -1,24 +1,25 @@
 import { useState } from "react";
-import backgroundImage from "../assets/background2.png";
-import { ArrowLeft, Lock } from "lucide-react";
+import backgroundImage from "../../assets/background2.png";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 // import { fetchVerifyOtpApi } from "@/data/api";
 import { toast } from "react-hot-toast";
-// import { fetchResetPassword } from "@/data/api";
+import { LockOutlined } from "@ant-design/icons";
 
-export default function ResetPassword() {
-  const [newpass, setNewpass] = useState("");
+export default function VerifyOtp() {
+  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
-  const [showConfirm, setShowConfirm] = useState(false);
   const test = 123456;
-  const handleResetPassword = async () => {
-    try {
-      //   const responseMessage = await fetchResetPassword(newpass);
-      //   console.log("Reset password successfully:", responseMessage);
+  const [showConfirm, setShowConfirm] = useState(false); // Added state for confirmation dialog
 
-      if (newpass == test) {
-        toast.success("Reset password successfully");
-        navigate("/login");
+  const handleVerifyOtp = async () => {
+    try {
+      //   const responseMessage = await fetchVerifyOtpApi(otp);
+      //   console.log("OTP verify successfully:", responseMessage);
+
+      if (otp == test) {
+        toast.success("OTP verify successfully");
+        navigate("/reset-password");
       }
     } catch (error) {
       const errorMessage =
@@ -29,9 +30,11 @@ export default function ResetPassword() {
       toast.error(errorMessage);
     }
   };
+
   const handleBackClick = () => {
     setShowConfirm(true); // Show confirmation dialog
   };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
@@ -42,34 +45,32 @@ export default function ResetPassword() {
     >
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Reset Password
+          Verify Otp
         </h2>
-        <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
+        <form className="mt-8 space-y-6" onSubmit={handleVerifyOtp}>
           <div>
-            <label htmlFor="newpass" className="sr-only">
-              New Password
+            <label htmlFor="otp" className="sr-only">
+              Otp
             </label>
             <div className="relative">
               <div
                 className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
                 style={{ zIndex: 10 }}
               >
-                <Lock
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                  style={{ zIndex: 10 }}
-                />
+                {/* <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                 */}
+                <LockOutlined />
               </div>
               <input
-                id="newpass"
-                name="newpass"
+                id="otp"
+                name="otp"
                 type="number"
                 autoComplete="number"
                 required
                 className="appearance-none rounded-md pl-10 relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="New Password"
-                value={newpass}
-                onChange={(e) => setNewpass(e.target.value)}
+                placeholder="Otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
               />
             </div>
           </div>
@@ -78,18 +79,19 @@ export default function ResetPassword() {
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Confirm
+              Verify
             </button>
           </div>
         </form>
         <div className="mt-4 flex justify-center">
           <button
             className="group relative flex items-center justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            onClick={handleBackClick}
+            onClick={handleBackClick} // Updated to use handleBackClick
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Login
           </button>
+
           {showConfirm && ( // Conditional rendering for confirmation dialog
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center">

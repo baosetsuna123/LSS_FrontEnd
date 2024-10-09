@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   FaChalkboardTeacher,
@@ -94,7 +94,7 @@ function TeacherDashboardLayout() {
       <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
         <header className="bg-white shadow-sm py-4 px-6 border-b border-gray-200">
           <h1 className="text-2xl font-semibold text-gray-800">
-            Welcome, "Call API Teacher Name"
+            Welcome, Call API Teacher Name
           </h1>
           <p className="text-red-600">Call API Class</p>
         </header>

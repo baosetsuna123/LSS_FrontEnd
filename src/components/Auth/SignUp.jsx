@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, Phone, User, UserPlus } from "lucide-react";
-import backgroundImage from "../assets/background2.png";
+import backgroundImage from "../../assets/background2.png";
 import { useNavigate } from "react-router-dom";
 import { fetchSignUpStudent, fetchSignUpTeacher } from "@/data/api"; // Import the teacher registration API
 import { toast } from "react-hot-toast";

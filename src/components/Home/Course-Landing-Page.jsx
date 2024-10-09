@@ -1,10 +1,10 @@
 import { CheckCircle, Star, Users } from "lucide-react";
-import webDevelopmentImage from "../assets/bootcamp.jfif";
-import data from "../assets/data.png";
-import market from "../assets/market.png";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
+import webDevelopmentImage from "../../assets/bootcamp.jfif";
+import data from "../../assets/data.png";
+import market from "../../assets/market.png";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 
 export function CourseLandingPage() {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import backgroundImage from "../assets/background2.png";
+import backgroundImage from "../../assets/background2.png";
 import { ArrowLeft, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Import useHistory
 import { fetchForgotPassword } from "@/data/api";
