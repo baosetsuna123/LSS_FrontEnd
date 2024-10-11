@@ -16,7 +16,7 @@ import VerifyOtp from "./components/Auth/Verify-Otp";
 import ResetPassword from "./components/Auth/ResetPassword";
 import Profile from "./components/Student/Profile";
 import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Import the ProtectedRoute
-import NotFound from "./Notfound/NotFound";
+import NotFound from "./components/Notfound/NotFound";
 import { Dashboard } from "./components/Staff/Dashboard";
 
 // Import các component Teacher Dashboard
