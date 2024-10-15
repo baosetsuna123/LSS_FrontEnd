@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-
+import profile from "../../assets/profiles.jpg";
 export default function Profile() {
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const result = localStorage.getItem("result");
@@ -52,7 +52,14 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+      style={{
+        backgroundImage: `url(${profile})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <Card className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-32 sm:h-48"></div>
         <CardContent className="relative px-4 sm:px-6 lg:px-8 py-8">

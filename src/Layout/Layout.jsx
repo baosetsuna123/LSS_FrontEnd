@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { BookOpen, LogOut, Search, User } from "lucide-react";
+import { BookOpen, LogOut, Search, User, Wallet } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export function Layout({ children }) {
@@ -123,6 +123,13 @@ export function Layout({ children }) {
                   >
                     <User className="h-4 w-4 mr-2" />
                     My Profile
+                  </Link>
+                  <Link
+                    to="/wallet"
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <Wallet className="h-4 w-4 mr-2" />
+                    My Wallet
                   </Link>
                   <button
                     onClick={handleLogout}

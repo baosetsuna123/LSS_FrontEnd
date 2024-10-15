@@ -28,6 +28,7 @@ import CancelClassRequest from "./components/Teacher/CancelClassRequest";
 import CreateClassroom from "./components/Teacher/CreateClassroom";
 import ClassList from "./components/Teacher/ClassList";
 import TeacherHome from "./components/Teacher/TeacherHome";
+import { MyWallet } from "./components/Student/Wallet";
 
 function App() {
   return (
@@ -74,7 +75,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/wallet"
+            element={
+              <ProtectedRoute>
+                <MyWallet />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/courses" element={<CoursesPage />} />

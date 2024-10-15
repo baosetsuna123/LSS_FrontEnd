@@ -324,3 +324,52 @@ export const fetchApproveApplication = async (id, token) => {
     throw error;
   }
 };
+//--------------------------Payment API--------------------------
+// Function to call the recharge API
+export const fetchRecharge = async (amount, token) => {
+  try {
+    const response = await api.post(
+      "/payment/recharge",
+      { amount },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating recharge:", error);
+    throw error;
+  }
+};
+
+// Function to handle VNPay return
+export const fetchVNPayReturn = async (params, token) => {
+  try {
+    const response = await api.get("/payment/return", {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error handling VNPay return:", error);
+    throw error;
+  }
+};
+//Wallet- get balance
+export const fetchBalance = async (token) => {
+  try {
+    const response = await api.get("/wallet/balance", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};

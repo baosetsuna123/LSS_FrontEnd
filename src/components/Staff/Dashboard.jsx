@@ -20,8 +20,10 @@ import {
   fetchAllCourses,
   fetchApplicationStaff,
 } from "@/data/api"; // Import the API function
+import { useAuth } from "@/context/AuthContext";
 
 export function Dashboard() {
+  const { logout } = useAuth();
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -120,7 +122,7 @@ export function Dashboard() {
   const handleLogout = (e) => {
     e.stopPropagation();
     localStorage.removeItem("result");
-    sessionStorage.removeItem("token");
+    logout();
     toast.success("You have logged out successfully.");
     navigate("/login");
   };
