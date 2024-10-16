@@ -79,6 +79,12 @@ export default function Profile() {
                 <p className="text-sm text-gray-500">
                   Software Engineer | Class of 2024
                 </p>
+                <p className="text-sm text-gray-500">
+                  Email: {result ? JSON.parse(result).email : null}
+                </p>
+                <p className="text-sm text-gray-500">
+                  FullName: {result ? JSON.parse(result).fullName : "Misasa"}
+                </p>
               </div>
               <div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
                 <Button>

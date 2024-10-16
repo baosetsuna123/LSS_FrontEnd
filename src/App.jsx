@@ -29,6 +29,7 @@ import CreateClassroom from "./components/Teacher/CreateClassroom";
 import ClassList from "./components/Teacher/ClassList";
 import TeacherHome from "./components/Teacher/TeacherHome";
 import { MyWallet } from "./components/Student/Wallet";
+import { ClassDetail } from "./components/Student/class-detail";
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
+          <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/subject/:subjectId" element={<SubjectDetailsPage />} />
           <Route path="*" element={<NotFound />} />

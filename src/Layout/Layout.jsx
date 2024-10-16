@@ -14,8 +14,6 @@ export function Layout({ children }) {
   const popupRef = useRef(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    console.log("Token:", token);
     const handleScroll = () => {
       if (typeof window !== "undefined") {
         if (window.scrollY > lastScrollY.current) {

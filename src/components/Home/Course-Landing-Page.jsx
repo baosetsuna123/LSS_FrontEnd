@@ -1,14 +1,24 @@
 import { CheckCircle, Star, Users } from "lucide-react";
 import webDevelopmentImage from "../../assets/bootcamp.jfif";
-import data from "../../assets/data.png";
-import market from "../../assets/market.png";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
+import { useClassContext } from "@/context/ClassContext";
 
 export function CourseLandingPage() {
   const navigate = useNavigate();
+  const { classes } = useClassContext();
+  console.log(classes);
+  const handleClassClick = (id) => {
+    navigate(`/class/${id}`);
+  };
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   return (
     <>
       <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-zinc-900 dark:bg-zinc-50">
@@ -85,42 +95,39 @@ export function CourseLandingPage() {
       <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container px-4 md:px-6">
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
-            Featured Courses
+            Featured Classes
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Web Development Bootcamp",
-                price: "$99",
-                image: webDevelopmentImage,
-              },
-              {
-                title: "Data Science Fundamentals",
-                price: "$129",
-                image: data,
-              },
-              {
-                title: "Digital Marketing Mastery",
-                price: "$79",
-                image: market,
-              },
-            ].map((course, index) => (
+            {classes.map((course, index) => (
               <Card
                 key={index}
+                onClick={() => handleClassClick(course.classId)}
                 className="transition-transform transform hover:scale-105"
               >
                 <img
-                  src={course.image}
-                  alt={course.title}
+                  src={course.image || webDevelopmentImage}
+                  alt={course.name}
                   className="w-full h-[200px] object-cover rounded-t-lg"
                 />
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">
-                    {course.title}
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl font-semibold">
+                      {course.name}
+                    </CardTitle>
+                    <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                      {course.courseCode}
+                    </p>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold">{course.price}</p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl font-bold">
+                      {formatCurrency(course.price)}
+                    </p>
+                    <p className="text-lg font-light text-gray-500">
+                      Created by {course.teacherName}
+                    </p>
+                  </div>
                   <Button className="mt-4 w-full">Enroll Now</Button>
                 </CardContent>
               </Card>

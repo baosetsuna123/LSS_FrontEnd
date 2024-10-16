@@ -3,10 +3,13 @@ import App from "./App.jsx";
 import "./index.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { Toaster } from "react-hot-toast";
+import { ClassProvider } from "./context/ClassContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <Toaster />
-    <App />
+    <ClassProvider>
+      <Toaster />
+      <App />
+    </ClassProvider>
   </AuthProvider>
 );

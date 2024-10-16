@@ -4,6 +4,7 @@ const api = axios.create({
   baseURL: "/api",
   withCredentials: true,
 });
+
 //Login api
 export const fetchLogin = async (username, password) => {
   return await api.post("/auth/login", {
@@ -363,6 +364,49 @@ export const fetchVNPayReturn = async (params, token) => {
 export const fetchBalance = async (token) => {
   try {
     const response = await api.get("/wallet/balance", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+//----------------class-----------------
+//get all classes
+export const fetchClasses = async (token) => {
+  try {
+    const response = await api.get("/classes", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+//get by id
+export const fetchClassbyID = async (id, token) => {
+  try {
+    const response = await api.get(`/classes/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+//get by teacherName
+export const fetchClassbyteacherName = async (name, token) => {
+  try {
+    const response = await api.get(`/classes/teacher/${name}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
