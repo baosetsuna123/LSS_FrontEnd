@@ -13,30 +13,46 @@ export const useClassContext = () => {
 export const ClassProvider = ({ children }) => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("token"); // Get the token from sessionStorage
+  // Function to fetch classes
+  const getClasses = async (token) => {
+    try {
+      const localClasses = localStorage.getItem("classes");
 
-    const getClasses = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchClasses(token);
-        setClasses(response);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      // Load from localStorage if available
+      if (localClasses) {
+        setClasses(JSON.parse(localClasses));
       }
-    };
 
+      const response = await fetchClasses(token);
+      if (response) {
+        setClasses(response);
+        localStorage.setItem("classes", JSON.stringify(response)); // Cache fresh data
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      setLoading(true);
+    }
+  };
+  const clearClasses = () => {
+    setClasses([]); // Clear classes
+    localStorage.removeItem("classes"); // Optionally clear from localStorage
+  };
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
     if (token) {
-      getClasses(); // Fetch classes if token exists
+      getClasses(token);
+      setLoading(false);
+    } else {
+      setLoading(true); // Stop loading if no token
     }
   }, []); // Run only once when the component mounts
 
   return (
-    <ClassContext.Provider value={{ classes, loading, error }}>
+    <ClassContext.Provider
+      value={{ classes, loading, setLoading, getClasses, clearClasses }}
+    >
       {children}
     </ClassContext.Provider>
   );

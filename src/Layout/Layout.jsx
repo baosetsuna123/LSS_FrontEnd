@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { BookOpen, LogOut, Search, User, Wallet } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useClassContext } from "@/context/ClassContext";
 
 export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -12,7 +13,7 @@ export function Layout({ children }) {
   const { isLoggedIn, logout } = useAuth();
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const popupRef = useRef(null);
-
+  const { clearClasses, setLoading } = useClassContext();
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
@@ -56,7 +57,10 @@ export function Layout({ children }) {
   const handleLogout = () => {
     logout();
     localStorage.removeItem("result");
+    localStorage.removeItem("classes");
     setIsPopupVisible(false);
+    clearClasses();
+    setLoading(true);
     toast.success("Logged out successfully");
     navigate("/");
   };
@@ -87,9 +91,9 @@ export function Layout({ children }) {
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
-            to="/courses"
+            to="/class"
           >
-            Courses
+            Classes
           </Link>
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"

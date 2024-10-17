@@ -62,29 +62,134 @@ export function MyWallet() {
       currency: "VND",
     }).format(amount);
   };
+  const handleInputChange = (e) => {
+    let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
+    // Check if it's a valid number or empty, allowing for decimal input
+    if (!isNaN(value) || value === "") {
+      setAmount(value); // Update state with the raw number (without commas)
+    }
+  };
+
+  // Format the input value with commas
+  const formatWithCommas = (num) => {
+    if (!num) return "";
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas to the number string
+  };
   // Hàm chuyển đổi số thành định dạng "triệu", "nghìn", "đồng"
-  const formatAmount = (amount) => {
-    if (amount === "") return ""; // Trả về chuỗi rỗng nếu không có giá trị
-    const num = parseFloat(amount);
-    if (isNaN(num) || num < 0) return ""; // Trả về chuỗi rỗng nếu giá trị không hợp lệ
+  const numberToWords = (num, includeZero = false, isThousandPart = false) => {
+    const units = [
+      "",
+      "một",
+      "hai",
+      "ba",
+      "bốn",
+      "năm",
+      "sáu",
+      "bảy",
+      "tám",
+      "chín",
+    ];
+    const tens = [
+      "",
+      "mười",
+      "hai mươi",
+      "ba mươi",
+      "bốn mươi",
+      "năm mươi",
+      "sáu mươi",
+      "bảy mươi",
+      "tám mươi",
+      "chín mươi",
+    ];
+    const hundreds = [
+      "",
+      "một trăm",
+      "hai trăm",
+      "ba trăm",
+      "bốn trăm",
+      "năm trăm",
+      "sáu trăm",
+      "bảy trăm",
+      "tám trăm",
+      "chín trăm",
+    ];
 
-    const million = Math.floor(num / 1_000_000);
+    let result = "";
+
+    // Handle case where number is zero but includeZero is true
+    if (num === 0 && includeZero) {
+      return isThousandPart ? "không trăm lẻ" : "không";
+    }
+
+    // Handle hundreds part
+    const hundredPart = Math.floor(num / 100);
+    const tenPart = Math.floor((num % 100) / 10);
+    const unitPart = num % 10;
+
+    // Add hundreds part
+    if (hundredPart > 0) {
+      result += `${hundreds[hundredPart]} `;
+    }
+
+    // Add tens part
+    if (tenPart > 0) {
+      result += `${tens[tenPart]} `;
+    } else if (hundredPart > 0 && unitPart > 0) {
+      result += "lẻ "; // Read "lẻ" when tens is 0 but there are units
+    }
+
+    // Add units part
+    if (unitPart > 0) {
+      if (tenPart > 0 && unitPart === 5) {
+        result += "lăm "; // Read as "lăm" when unit is 5 and there are tens
+      } else {
+        result += `${units[unitPart]} `;
+      }
+    }
+
+    return result.trim();
+  };
+
+  const formatAmount = (amount) => {
+    if (amount === "" || isNaN(amount) || parseFloat(amount) < 0) return ""; // Validate input
+
+    const num = Math.floor(parseFloat(amount)); // Round down to avoid decimals
+    const billion = Math.floor(num / 1_000_000_000);
+    const million = Math.floor((num % 1_000_000_000) / 1_000_000);
     const thousand = Math.floor((num % 1_000_000) / 1_000);
     const remainder = Math.floor(num % 1_000);
 
     let result = "";
-    if (million > 0) {
-      result += `${million} triệu `;
-    }
-    if (thousand > 0) {
-      result += `${thousand} nghìn `;
-    }
-    if (remainder > 0) {
-      result += `${remainder} đồng`;
+
+    // Handle billions
+    if (billion > 0) {
+      result += `${numberToWords(billion)} tỷ `;
     }
 
-    return result.trim(); // Trả về kết quả đã định dạng
+    // Handle millions
+    if (million > 0) {
+      result += `${numberToWords(million)} triệu `;
+    } else if (billion > 0 && thousand > 0) {
+      result += "không trăm lẻ "; // Add "không trăm lẻ" if millions are 0 but there are thousands
+    }
+
+    // Handle thousands
+    if (thousand > 0) {
+      result += `${numberToWords(thousand)} nghìn `;
+    } else if ((billion > 0 || million > 0) && remainder > 0) {
+      result += "không trăm lẻ "; // Add "không trăm lẻ" if there's billion/million but no thousands
+    }
+
+    // Handle remainder (less than 1000)
+    if (remainder > 0 || result === "") {
+      // Ensure "đồng" is added even for amounts less than 1000
+      result += `${numberToWords(remainder, true)} đồng`;
+    } else {
+      result = result.trim() + " đồng"; // Ensure "đồng" is added if there are no remainder
+    }
+
+    return result.trim(); // Remove extra spaces
   };
 
   // Hàm để lấy số dư
@@ -197,10 +302,10 @@ export function MyWallet() {
                   <Label htmlFor="amount">Amount</Label>
                   <Input
                     id="amount"
-                    type="number"
+                    type="text" // Use "text" instead of "number" to allow formatting with commas
                     placeholder="Enter amount"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)} // Giữ nguyên giá trị là chuỗi
+                    value={formatWithCommas(amount)} // Display the formatted value
+                    onChange={handleInputChange} // Handle input changes
                   />
                   {amount && (
                     <p className="text-gray-600 text-sm">

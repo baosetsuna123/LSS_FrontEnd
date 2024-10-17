@@ -1,4 +1,4 @@
-import { CheckCircle, Star, Users } from "lucide-react";
+import { CheckCircle, Loader, Star, Users } from "lucide-react";
 import webDevelopmentImage from "../../assets/bootcamp.jfif";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -8,7 +8,7 @@ import { useClassContext } from "@/context/ClassContext";
 
 export function CourseLandingPage() {
   const navigate = useNavigate();
-  const { classes } = useClassContext();
+  const { classes, loading } = useClassContext();
   console.log(classes);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
@@ -34,8 +34,8 @@ export function CourseLandingPage() {
               </p>
             </div>
             <div className="space-x-4">
-              <Button variant="secondary" onClick={() => navigate("/courses")}>
-                Browse Courses
+              <Button variant="secondary" onClick={() => navigate("/class")}>
+                Browse Classes
               </Button>
               <Button
                 variant="outline"
@@ -54,37 +54,39 @@ export function CourseLandingPage() {
             Why Choose EduCourse?
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="transition-transform transform hover:scale-105">
+            <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
               <CardHeader>
-                <CheckCircle className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle className="text-xl font-semibold">
+                <CheckCircle className="w-10 h-10 mb-2 text-green-500 hover:text-green-700 transition duration-300" />
+                <CardTitle className="text-xl font-semibold text-gray-800">
                   Expert Instructors
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="text-gray-600">
                 Learn from industry professionals with years of experience.
               </CardContent>
             </Card>
-            <Card className="transition-transform transform hover:scale-105">
+
+            <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
               <CardHeader>
-                <Users className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle className="text-xl font-semibold">
+                <Users className="w-10 h-10 mb-2 text-blue-500 hover:text-blue-700 transition duration-300" />
+                <CardTitle className="text-xl font-semibold text-gray-800">
                   Interactive Learning
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="text-gray-600">
                 Engage with peers and instructors through forums and live
                 sessions.
               </CardContent>
             </Card>
-            <Card className="transition-transform transform hover:scale-105">
+
+            <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
               <CardHeader>
-                <Star className="w-10 h-10 mb-2 text-zinc-900 dark:text-zinc-50" />
-                <CardTitle className="text-xl font-semibold">
+                <Star className="w-10 h-10 mb-2 text-yellow-500 hover:text-yellow-700 transition duration-300" />
+                <CardTitle className="text-xl font-semibold text-gray-800">
                   Flexible Schedule
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="text-gray-600">
                 Learn at your own pace with lifetime access to course materials.
               </CardContent>
             </Card>
@@ -98,40 +100,55 @@ export function CourseLandingPage() {
             Featured Classes
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {classes.map((course, index) => (
-              <Card
-                key={index}
-                onClick={() => handleClassClick(course.classId)}
-                className="transition-transform transform hover:scale-105"
-              >
-                <img
-                  src={course.image || webDevelopmentImage}
-                  alt={course.name}
-                  className="w-full h-[200px] object-cover rounded-t-lg"
-                />
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-semibold">
-                      {course.name}
-                    </CardTitle>
-                    <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                      {course.courseCode}
-                    </p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center">
-                    <p className="text-2xl font-bold">
-                      {formatCurrency(course.price)}
-                    </p>
-                    <p className="text-lg font-light text-gray-500">
-                      Created by {course.teacherName}
-                    </p>
-                  </div>
-                  <Button className="mt-4 w-full">Enroll Now</Button>
-                </CardContent>
-              </Card>
-            ))}
+            {loading ? (
+              <div className="col-span-full flex justify-center">
+                <Loader className="w-10 h-10 animate-spin" />
+              </div>
+            ) : (
+              classes.map((course, index) => (
+                <Card
+                  key={index}
+                  onClick={() => handleClassClick(course.classId)}
+                  className="transition-transform transform hover:scale-105"
+                >
+                  <img
+                    src={course.image || webDevelopmentImage}
+                    alt={course.name}
+                    className="w-full h-[200px] object-cover rounded-t-lg"
+                  />
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-xl font-semibold">
+                        {course.name}
+                      </CardTitle>
+                      <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                        {course.courseCode}
+                      </p>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center">
+                      <p className="text-2xl font-bold">
+                        {formatCurrency(course.price)}
+                      </p>
+                      <p className="text-lg font-light text-gray-500">
+                        Created by {course.teacherName}
+                      </p>
+                    </div>
+                    <Button className="mt-4 w-full">Enroll Now</Button>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          {/* Xem tất cả button */}
+          <div className="flex justify-center mt-8">
+            <Button
+              onClick={() => navigate("/class")}
+              className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+            >
+              Xem tất cả
+            </Button>
           </div>
         </div>
       </section>

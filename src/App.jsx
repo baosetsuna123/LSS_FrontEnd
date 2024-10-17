@@ -6,8 +6,6 @@ import {
   Outlet,
 } from "react-router-dom";
 import Login from "./components/Auth/Login";
-import CoursesPage from "./components/Courses";
-import SubjectDetailsPage from "./components/CourseDetails";
 import { Layout } from "./Layout/Layout";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import SignUp from "./components/Auth/SignUp";
@@ -30,6 +28,7 @@ import ClassList from "./components/Teacher/ClassList";
 import TeacherHome from "./components/Teacher/TeacherHome";
 import { MyWallet } from "./components/Student/Wallet";
 import { ClassDetail } from "./components/Student/class-detail";
+import { ViewAllClasses } from "./components/Student/All_Class";
 
 function App() {
   return (
@@ -87,8 +86,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/class/:id" element={<ClassDetail />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/subject/:subjectId" element={<SubjectDetailsPage />} />
+          <Route path="/class" element={<ViewAllClasses />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

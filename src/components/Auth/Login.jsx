@@ -2,15 +2,18 @@ import { useState } from "react";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import backgroundImage from "../../assets/background2.png";
 import { useNavigate } from "react-router-dom";
-import { fetchLogin } from "@/data/api";
+import { fetchClasses, fetchLogin } from "@/data/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
+import { useClassContext } from "@/context/ClassContext";
 export default function Login() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { getClasses } = useClassContext();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -18,11 +21,24 @@ export default function Login() {
       localStorage.setItem("result", JSON.stringify(response.data));
       sessionStorage.setItem("token", response.data.token);
       login();
+
+      // Navigate based on user role
       if (response.data.role === "STAFF") {
         navigate("/dashboard");
+        // Optionally fetch classes for STAFF if needed
+      } else if (response.data.role === "TEACHER") {
+        navigate("/teacher");
+        // Optionally fetch classes for TEACHER if needed
       } else {
         navigate("/");
       }
+
+      // Fetch classes only if the role is relevant (e.g., STUDENT)
+      if (response.data.role === "STUDENT") {
+        const classData = await fetchClasses(response.data.token);
+        localStorage.setItem("classes", JSON.stringify(classData));
+      }
+      getClasses(response.data.token);
       toast.success("Login successful");
     } catch (error) {
       toast.error("Login failed");

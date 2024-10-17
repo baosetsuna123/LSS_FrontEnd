@@ -8,10 +8,11 @@ import {
   AppWindowMac,
   ArrowDown,
   LogOut,
+  School,
 } from "lucide-react";
 import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
-import ClassLayout from "./Class";
+// import ClassLayout from "./Class";
 import CategoryLayout from "./Category";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -19,6 +20,7 @@ import {
   fetchAllCategories,
   fetchAllCourses,
   fetchApplicationStaff,
+  fetchClasses,
 } from "@/data/api"; // Import the API function
 import { useAuth } from "@/context/AuthContext";
 
@@ -27,6 +29,7 @@ export function Dashboard() {
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [classes, setClasses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const user = JSON.parse(localStorage.getItem("result"));
   const itemsPerPage = 4;
@@ -39,6 +42,7 @@ export function Dashboard() {
   const [searchQueryCategory, setSearchQueryCategory] = useState("");
   const [searchQueryApplication, setSearchQueryApplication] = useState("");
   const [searchQueryCourse, setSearchQueryCourse] = useState("");
+  const [searchQueryClass] = useState("");
 
   const navigate = useNavigate();
 
@@ -103,18 +107,33 @@ export function Dashboard() {
     };
     loadCourses();
   }, []);
-
+  useEffect(() => {
+    const loadClasses = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const data = await fetchClasses(token);
+        console.log(data);
+        setClasses(data || []);
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+        // toast.error("Failed to fetch classes.");
+        setCourses([]);
+      }
+    };
+    loadClasses();
+  }, []);
   // Calculate page counts based on data lengths
   const pageCountCate = Math.ceil(categories.length / itemsPerPage);
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
   const pageCountCourse = Math.ceil(courses.length / itemsPerPage);
-
+  const pageCountClass = Math.ceil(classes.length / itemsPerPage);
   // Function to check if any search query is active
   const isSearchActive = () => {
     return (
       searchQueryCategory.trim() !== "" ||
       searchQueryApplication.trim() !== "" ||
-      searchQueryCourse.trim() !== ""
+      searchQueryCourse.trim() !== "" ||
+      searchQueryClass.trim() !== ""
     );
   };
 
@@ -215,20 +234,30 @@ export function Dashboard() {
               <AppWindowMac size={20} className="mr-2" />
               Application
             </button>
-            <div>
-              <button
-                onClick={() => {
-                  setActiveCategory("course");
-                  setCurrentPage(1); // Reset to page 1 when changing category
-                }}
-                className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                  activeCategory === "course" ? "bg-gray-200" : ""
-                }`}
-              >
-                <BookOpen size={20} className="mr-2" />
-                Course
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setActiveCategory("course");
+                setCurrentPage(1); // Reset to page 1 when changing category
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                activeCategory === "course" ? "bg-gray-200" : ""
+              }`}
+            >
+              <BookOpen size={20} className="mr-2" />
+              Course
+            </button>
+            <button
+              onClick={() => {
+                setActiveCategory("class");
+                setCurrentPage(1); // Reset to page 1 when changing category
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                activeCategory === "class" ? "bg-gray-200" : ""
+              }`}
+            >
+              <School size={20} className="mr-2" />
+              Class
+            </button>
           </nav>
         </div>
         {/* Main Content */}
@@ -330,12 +359,17 @@ export function Dashboard() {
               onDelete={resetCurrentPage} // Pass down the reset function
             />
           )}
-          {activeCategory === "class" && (
-            <ClassLayout
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-            />
-          )}
+          {/* {activeCategory === "class" && (
+            // <ClassLayout
+            //   currentPage={currentPage}
+            //   itemsPerPage={itemsPerPage}
+            //   classes={classes}
+            //   setClasses={setClasses}
+            //   searchQuery={searchQueryClass}
+            //   setSearchQuery={setSearchQueryClass} // Pass down the search query state
+            //   onDelete={resetCurrentPage} // Pass down the reset function
+            // />
+          )} */}
 
           {/* Pagination Controls */}
           {!isSearchActive() && ( // Only show pagination if no search query is active
@@ -355,6 +389,8 @@ export function Dashboard() {
                   ? pageCountApp
                   : activeCategory === "course"
                   ? pageCountCourse
+                  : activeCategory === "class"
+                  ? pageCountClass
                   : 1}
               </span>
               <button
@@ -368,6 +404,8 @@ export function Dashboard() {
                         ? pageCountApp
                         : activeCategory === "course"
                         ? pageCountCourse
+                        : activeCategory === "class"
+                        ? pageCountClass
                         : 1
                     )
                   )
@@ -380,6 +418,8 @@ export function Dashboard() {
                     ? pageCountApp
                     : activeCategory === "course"
                     ? pageCountCourse
+                    : activeCategory === "class"
+                    ? pageCountClass
                     : 1)
                 }
                 className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
