@@ -212,7 +212,6 @@ export const fetchAllCategories = async (token) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("All categories: ", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);

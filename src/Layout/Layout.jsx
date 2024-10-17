@@ -58,6 +58,7 @@ export function Layout({ children }) {
     logout();
     localStorage.removeItem("result");
     localStorage.removeItem("classes");
+    localStorage.removeItem("activeCategory");
     setIsPopupVisible(false);
     clearClasses();
     setLoading(true);
