@@ -416,3 +416,17 @@ export const fetchClassbyteacherName = async (name, token) => {
     throw error;
   }
 };
+// Create Order
+export const fetchCreateOrder = async (classId, token) => {
+  try {
+    const response = await api.post(`/orders/${classId}`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};

@@ -8,6 +8,18 @@ import { useClassContext } from "@/context/ClassContext";
 export function CourseLandingPage() {
   const navigate = useNavigate();
   const { classes, loading } = useClassContext();
+  const currentUserName = localStorage.getItem("result").username;
+
+  // Function to check if the user is enrolled in a specific class
+  const isUserEnrolledInClass = (classId) => {
+    const classDetail = classes.find((cls) => cls.classId === classId);
+    if (classDetail && classDetail.students) {
+      return classDetail.students.some(
+        (student) => student.username === currentUserName
+      );
+    }
+    return false; // User is not enrolled in the class
+  };
   console.log(classes);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
@@ -134,7 +146,14 @@ export function CourseLandingPage() {
                         Created by {course.teacherName}
                       </p>
                     </div>
-                    <Button className="mt-4 w-full">Enroll Now</Button>
+                    <Button
+                      className="mt-4 w-full"
+                      disabled={isUserEnrolledInClass(course.classId)}
+                    >
+                      {isUserEnrolledInClass(course.classId)
+                        ? "Enrolled"
+                        : "Enroll Now"}
+                    </Button>
                   </CardContent>
                 </Card>
               ))
