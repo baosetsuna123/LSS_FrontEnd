@@ -1,5 +1,4 @@
 import { CheckCircle, Loader, Star, Users } from "lucide-react";
-import webDevelopmentImage from "../../assets/bootcamp.jfif";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -105,14 +104,14 @@ export function CourseLandingPage() {
                 <Loader className="w-10 h-10 animate-spin" />
               </div>
             ) : (
-              classes.map((course, index) => (
+              classes.slice(0, 3).map((course, index) => (
                 <Card
                   key={index}
                   onClick={() => handleClassClick(course.classId)}
                   className="transition-transform transform hover:scale-105"
                 >
                   <img
-                    src={course.image || webDevelopmentImage}
+                    src={course.imageUrl}
                     alt={course.name}
                     className="w-full h-[200px] object-cover rounded-t-lg"
                   />

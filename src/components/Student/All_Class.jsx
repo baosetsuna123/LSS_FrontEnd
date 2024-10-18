@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import webDevelopmentImage from "../../assets/bootcamp.jfif";
 import { Search, X } from "lucide-react";
 import { useClassContext } from "@/context/ClassContext";
 import { useNavigate } from "react-router-dom";
@@ -172,7 +171,7 @@ export function ViewAllClasses() {
                     <CardContent className="p-6">
                       <div className="flex flex-col gap-4">
                         <img
-                          src={classItem.image || webDevelopmentImage}
+                          src={classItem.imageUrl}
                           alt={classItem.name}
                           className="w-full h-48 object-cover rounded-lg"
                         />

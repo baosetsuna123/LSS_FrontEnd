@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import webDevelopmentImage from "../../assets/bootcamp.jfif";
 import {
   Calendar,
   Clock,
@@ -57,7 +56,7 @@ export function ClassDetail() {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <img
-                  src={webDevelopmentImage}
+                  src={classDetail.imageUrl}
                   alt={classDetail.name}
                   className="w-full rounded-lg object-cover"
                 />

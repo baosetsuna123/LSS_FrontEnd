@@ -13,7 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import profile from "../../assets/profiles.jpg";
+import profile from "../../assets/profilebg.jfif";
 export default function Profile() {
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const result = localStorage.getItem("result");

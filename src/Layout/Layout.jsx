@@ -11,9 +11,36 @@ export function Layout({ children }) {
   const navigate = useNavigate();
   const searchInputRef = useRef(null);
   const { isLoggedIn, logout } = useAuth();
-  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [isSearchPopupVisible, setIsSearchPopupVisible] = useState(false);
+  const [isUserPopupVisible, setIsUserPopupVisible] = useState(false);
   const popupRef = useRef(null);
-  const { clearClasses, setLoading } = useClassContext();
+  const { clearClasses, setLoading, classes } = useClassContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredClasses, setFilteredClasses] = useState([]);
+  const handleSearchInputChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  useEffect(() => {
+    if (searchTerm.trim() !== "") {
+      const filtered = classes.filter(
+        (c) =>
+          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.teacherName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredClasses(filtered);
+      setIsSearchPopupVisible(filtered.length > 0); // Show popup if there are results
+    } else {
+      setFilteredClasses([]); // Clear filtered classes when search term is empty
+      setIsSearchPopupVisible(false); // Hide the popup when search term is empty
+    }
+  }, [searchTerm, classes]);
+  // Handle class navigation when a row is clicked
+  const handleClassClick = (classId) => {
+    setIsSearchPopupVisible(false);
+    navigate(`/class/${classId}`);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
@@ -35,10 +62,10 @@ export function Layout({ children }) {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
-        setIsPopupVisible(false);
+        setIsUserPopupVisible(false);
       }
     };
-    if (isPopupVisible) {
+    if (isUserPopupVisible) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -47,11 +74,11 @@ export function Layout({ children }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isPopupVisible]);
+  }, [isUserPopupVisible]);
 
   const togglePopup = (event) => {
     event.stopPropagation();
-    setIsPopupVisible((prev) => !prev);
+    setIsUserPopupVisible((prev) => !prev);
   };
 
   const handleLogout = () => {
@@ -59,7 +86,7 @@ export function Layout({ children }) {
     localStorage.removeItem("result");
     localStorage.removeItem("classes");
     localStorage.removeItem("activeCategory");
-    setIsPopupVisible(false);
+    setIsUserPopupVisible(false);
     clearClasses();
     setLoading(true);
     toast.success("Logged out successfully");
@@ -77,7 +104,7 @@ export function Layout({ children }) {
           <BookOpen className="h-6 w-6 mr-2" />
           <span className="font-bold">EduCourse</span>
         </Link>
-        <div className="flex items-center mx-auto">
+        <div className="flex items-center mx-auto relative">
           <Search
             className="h-6 w-6 mr-2 cursor-pointer"
             onClick={() => searchInputRef.current.focus()}
@@ -85,10 +112,43 @@ export function Layout({ children }) {
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Search course ..."
+            placeholder="Search classes ..."
+            value={searchTerm}
+            onChange={handleSearchInputChange}
             className="border rounded px-4 py-1 w-96"
           />
+
+          {/* Search Results Popup */}
+          {isSearchPopupVisible && filteredClasses.length > 0 && (
+            <div
+              ref={popupRef}
+              className="absolute top-full left-0 mt-2 ml-7 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+              style={{
+                width: "calc(93.5%)", // Adjust width to ensure it aligns with the input
+              }}
+            >
+              {filteredClasses.map((course) => (
+                <div
+                  key={course.classId}
+                  onClick={() => handleClassClick(course.classId)}
+                  className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  <img
+                    src={course.imageUrl}
+                    alt={course.name}
+                    className="w-10 h-10 object-cover rounded mr-4"
+                  />
+                  <span className="font-semibold">{course.name}</span>
+                  <span className="ml-auto text-gray-500">
+                    {course.courseCode}
+                  </span>{" "}
+                  {/* Course code at the end */}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
@@ -115,7 +175,7 @@ export function Layout({ children }) {
                 onClick={togglePopup}
                 aria-hidden="true"
               />
-              {isPopupVisible && (
+              {isUserPopupVisible && (
                 <div
                   ref={popupRef}
                   className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"
