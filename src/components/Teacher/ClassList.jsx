@@ -1,3 +1,4 @@
+import { fetchClassbyteacher, fetchCoursesService } from "@/data/api";
 import { useState, useEffect } from "react";
 
 function ClassList() {
@@ -5,80 +6,134 @@ function ClassList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedClass, setSelectedClass] = useState(null);
+  const result = localStorage.getItem("result")
+  const [classesUpdated, setClassesUpdated] = useState([]);
+  const [courses, setCourses] = useState([])
+  let token;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
+
+  const fetchClasses = async () => {
+    try {
+      const res = await fetchClassbyteacher(token);
+      setClasses(res);
+    } catch (error) {
+      console.log(error)
+    }
+  };
 
   useEffect(() => {
-    // Giả lập việc lấy dữ liệu từ API
-    const fetchClasses = async () => {
-      // Thay thế bằng cuộc gọi API thực tế
-      const mockClasses = [
-        {
-          id: 1,
-          name: "Thiết kế đồ họa cơ bản",
-          subject: "Đồ họa",
-          students: 25,
-          schedule: "Thứ 2, 4, 6 - 08:00-10:00",
-          status: "Đang diễn ra",
-          startDate: "2023-09-01",
-          endDate: "2023-12-31",
-          teacher: "Nguyễn Văn A",
-          room: "Phòng Lab 101",
-        },
-        {
-          id: 2,
-          name: "Photoshop nâng cao",
-          subject: "Xử lý ảnh",
-          students: 20,
-          schedule: "Thứ 3, 5, 7 - 13:00-15:00",
-          status: "Sắp diễn ra",
-          startDate: "2024-01-15",
-          endDate: "2024-05-30",
-          teacher: "Trần Thị B",
-          room: "Phòng Lab 202",
-        },
-        {
-          id: 3,
-          name: "Illustrator cho người mới bắt đầu",
-          subject: "Đồ họa vector",
-          students: 22,
-          schedule: "Thứ 2, 4, 6 - 14:00-16:00",
-          status: "Đã kết thúc",
-          startDate: "2023-03-01",
-          endDate: "2023-06-30",
-          teacher: "Lê Văn C",
-          room: "Phòng Lab 303",
-        },
-        {
-          id: 4,
-          name: "Thiết kế UI/UX",
-          subject: "Thiết kế giao diện",
-          students: 18,
-          schedule: "Thứ 3, 5, 7 - 09:00-11:00",
-          status: "Đang diễn ra",
-          startDate: "2023-10-01",
-          endDate: "2024-02-28",
-          teacher: "Phạm Thị D",
-          room: "Phòng Lab 404",
-        },
-        {
-          id: 5,
-          name: "Đồ họa 3D cơ bản",
-          subject: "3D Modeling",
-          students: 15,
-          schedule: "Thứ 2, 4, 6 - 18:00-20:00",
-          status: "Sắp diễn ra",
-          startDate: "2024-03-01",
-          endDate: "2024-07-31",
-          teacher: "Hoàng Văn E",
-          room: "Phòng Lab 505",
-        },
-      ];
-      setClasses(mockClasses);
-    };
-
     fetchClasses();
-  }, []);
+  }, [token]);
 
-  const filteredClasses = classes.filter(
+  useEffect(() => {
+    if (classes.length > 0 && courses.length > 0) {
+      const newClasses = classes.map((classItem) => {
+        const course = courses.find(course => course.courseCode === classItem.courseCode);
+        return {
+          ...classItem,
+          courseName: course ? course.name : "Khóa học không xác định"
+        };
+      });
+      setClassesUpdated(newClasses);
+    }
+  }, [classes, courses])
+
+
+
+  const fetchCourses = async () => {
+    try {
+      const res = await fetchCoursesService(token);
+      setCourses(res);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  // useEffect(() => {
+  //   // Giả lập việc lấy dữ liệu từ API
+  //   const fetchClasses = async () => {
+  //     // Thay thế bằng cuộc gọi API thực tế
+  //     const mockClasses = [
+  //       {
+  //         id: 1,
+  //         name: "Thiết kế đồ họa cơ bản",
+  //         subject: "Đồ họa",
+  //         students: 25,
+  //         schedule: "Thứ 2, 4, 6 - 08:00-10:00",
+  //         status: "Đang diễn ra",
+  //         startDate: "2023-09-01",
+  //         endDate: "2023-12-31",
+  //         teacher: "Nguyễn Văn A",
+  //         room: "Phòng Lab 101",
+  //       },
+  //       {
+  //         id: 2,
+  //         name: "Photoshop nâng cao",
+  //         subject: "Xử lý ảnh",
+  //         students: 20,
+  //         schedule: "Thứ 3, 5, 7 - 13:00-15:00",
+  //         status: "Sắp diễn ra",
+  //         startDate: "2024-01-15",
+  //         endDate: "2024-05-30",
+  //         teacher: "Trần Thị B",
+  //         room: "Phòng Lab 202",
+  //       },
+  //       {
+  //         id: 3,
+  //         name: "Illustrator cho người mới bắt đầu",
+  //         subject: "Đồ họa vector",
+  //         students: 22,
+  //         schedule: "Thứ 2, 4, 6 - 14:00-16:00",
+  //         status: "Đã kết thúc",
+  //         startDate: "2023-03-01",
+  //         endDate: "2023-06-30",
+  //         teacher: "Lê Văn C",
+  //         room: "Phòng Lab 303",
+  //       },
+  //       {
+  //         id: 4,
+  //         name: "Thiết kế UI/UX",
+  //         subject: "Thiết kế giao diện",
+  //         students: 18,
+  //         schedule: "Thứ 3, 5, 7 - 09:00-11:00",
+  //         status: "Đang diễn ra",
+  //         startDate: "2023-10-01",
+  //         endDate: "2024-02-28",
+  //         teacher: "Phạm Thị D",
+  //         room: "Phòng Lab 404",
+  //       },
+  //       {
+  //         id: 5,
+  //         name: "Đồ họa 3D cơ bản",
+  //         subject: "3D Modeling",
+  //         students: 15,
+  //         schedule: "Thứ 2, 4, 6 - 18:00-20:00",
+  //         status: "Sắp diễn ra",
+  //         startDate: "2024-03-01",
+  //         endDate: "2024-07-31",
+  //         teacher: "Hoàng Văn E",
+  //         room: "Phòng Lab 505",
+  //       },
+  //     ];
+  //     setClasses(mockClasses);
+  //   };
+
+  //   fetchClasses();
+  // }, []);
+
+  const filteredClasses = classesUpdated.filter(
     (cls) =>
       (cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         cls.subject.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -112,9 +167,9 @@ function ClassList() {
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">Tất cả trạng thái</option>
-          <option value="Đang diễn ra">Đang diễn ra</option>
-          <option value="Sắp diễn ra">Sắp diễn ra</option>
-          <option value="Đã kết thúc">Đã kết thúc</option>
+          <option value="ACTIVE">Đang diễn ra</option>
+          <option value="INACTIVE">Sắp diễn ra</option>
+          <option value="COMPLETED">Đã kết thúc</option>
         </select>
       </div>
       <div className="overflow-x-auto">
@@ -139,26 +194,28 @@ function ClassList() {
                 <td className="py-3 px-6 text-left whitespace-nowrap">
                   <span className="font-medium">{cls.name}</span>
                 </td>
-                <td className="py-3 px-6 text-left">{cls.subject}</td>
-                <td className="py-3 px-6 text-center">{cls.students}</td>
+                <td className="py-3 px-6 text-left">{cls.courseName}</td>
+                <td className="py-3 px-6 text-center">{cls.maxStudents}</td>
                 <td className="py-3 px-6 text-center">{cls.schedule}</td>
                 <td className="py-3 px-6 text-center">
                   <span
-                    className={`bg-${
-                      cls.status === "Đang diễn ra"
-                        ? "green"
-                        : cls.status === "Sắp diễn ra"
+                    className={` bg-${cls.status === "ACTIVE"
+                      ? "green"
+                      : cls.status === "INACTIVE"
                         ? "yellow"
                         : "red"
-                    }-200 text-${
-                      cls.status === "Đang diễn ra"
+                      }-200 text-${cls.status === "ACTIVE"
                         ? "green"
-                        : cls.status === "Sắp diễn ra"
-                        ? "yellow"
-                        : "red"
-                    }-600 py-1 px-3 rounded-full text-xs`}
+                        : cls.status === "INACTIVE"
+                          ? "yellow"
+                          : "red"
+                      }-600 py-1 px-3 rounded-full text-xs`}
                   >
-                    {cls.status}
+                    {cls.status === "ACTIVE"
+                      ? "Đang diễn ra"
+                      : cls.status === "INACTIVE"
+                        ? "Sắp diễn ra"
+                        : "Đã kết thúc"}
                   </span>
                 </td>
                 <td className="py-3 px-6 text-center">
@@ -191,20 +248,24 @@ function ClassList() {
               </h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
-                  <strong>Môn học:</strong> {selectedClass.subject}
+                  <strong>Môn học:</strong> {selectedClass.courseName}
                   <br />
-                  <strong>Số học sinh:</strong> {selectedClass.students}
+                  <strong>Số học sinh:</strong> {selectedClass.maxStudents}
                   <br />
                   <strong>Lịch học:</strong> {selectedClass.schedule}
                   <br />
-                  <strong>Trạng thái:</strong> {selectedClass.status}
+                  <strong>Trạng thái:</strong> {selectedClass.status === "ACTIVE"
+                    ? "Đang diễn ra"
+                    : selectedClass.status === "INACTIVE"
+                      ? "Sắp diễn ra"
+                      : "Đã kết thúc"}
                   <br />
                   <strong>Thời gian:</strong> {selectedClass.startDate} -{" "}
                   {selectedClass.endDate}
                   <br />
-                  <strong>Giáo viên:</strong> {selectedClass.teacher}
+                  <strong>Giáo viên:</strong> {selectedClass.teacherName}
                   <br />
-                  <strong>Phòng học:</strong> {selectedClass.room}
+                  <strong>Phòng học:</strong> {selectedClass.location}
                 </p>
               </div>
               <div className="items-center px-4 py-3">

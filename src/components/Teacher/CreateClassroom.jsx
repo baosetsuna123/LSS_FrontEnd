@@ -1,3 +1,4 @@
+import { fetchClassbyteacher } from "@/data/api";
 import { useState, useEffect } from "react";
 
 function CreateClassroom() {
@@ -11,21 +12,30 @@ function CreateClassroom() {
   const [duration, setDuration] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const result = localStorage.getItem("result")
+  let token;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
+
+  const fetchClasses = async () => {
+    try {
+      const res = await fetchClassbyteacher(token);
+      setClasses(res);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
 
   useEffect(() => {
-    // Giả lập việc lấy dữ liệu từ API
-    const fetchClasses = async () => {
-      // Thay thế bằng cuộc gọi API thực tế
-      const mockClasses = [
-        { id: 1, name: "Lớp A - Thiết kế đồ họa cơ bản" },
-        { id: 2, name: "Lớp B - Lý thuyết màu sắc và bố cục" },
-        { id: 3, name: "Lớp C - Kỹ thuật chụp ảnh số" },
-      ];
-      setClasses(mockClasses);
-    };
-
     fetchClasses();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -220,11 +230,10 @@ function CreateClassroom() {
       </form>
       {submitMessage && (
         <div
-          className={`mt-4 p-4 rounded-lg ${
-            submitMessage.includes("thành công")
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
+          className={`mt-4 p-4 rounded-lg ${submitMessage.includes("thành công")
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+            }`}
         >
           {submitMessage}
         </div>

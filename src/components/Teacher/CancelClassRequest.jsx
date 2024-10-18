@@ -1,3 +1,4 @@
+import { fetchClassbyteacher } from "@/data/api";
 import { useState, useEffect } from "react";
 
 function CancelClassRequest() {
@@ -9,6 +10,28 @@ function CancelClassRequest() {
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const result = localStorage.getItem("result")
+  let token;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
+
+  const fetchClasses = async () => {
+    try {
+      const res = await fetchClassbyteacher(token);
+      setClasses(res);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    fetchClasses();
+  }, [token])
 
   useEffect(() => {
     // Giả lập việc lấy dữ liệu từ API
@@ -90,13 +113,13 @@ function CancelClassRequest() {
             id="class"
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
           >
             <option value="">-- Chọn lớp --</option>
             {classes.map((cls) => (
               <option key={cls.id} value={cls.id}>
-                {cls.name} - {cls.course} ({cls.schedule})
+                {cls.name}
               </option>
             ))}
           </select>

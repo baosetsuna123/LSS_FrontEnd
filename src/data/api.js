@@ -404,9 +404,9 @@ export const fetchClassbyID = async (id, token) => {
   }
 };
 //get by teacherName
-export const fetchClassbyteacherName = async (name, token) => {
+export const fetchClassbyteacherName = async (teacherName, token) => {
   try {
-    const response = await api.get(`/classes/teacher/${name}`, {
+    const response = await api.get(`/classes/teacher/${teacherName}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -416,4 +416,68 @@ export const fetchClassbyteacherName = async (name, token) => {
     console.error("Error fetch balance:", error);
     throw error;
   }
+};
+
+export const fetchClassbyteacher = async (token) => {
+  try {
+    const response = await api.get(`/classes/my-classes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+
+
+//Get by courses 
+export const fetchCoursesService = async (token) => {
+  try {
+    const response = await api.get("/courses", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+
+//update class
+export const fetchUpdateClass = async ({
+  token,
+  classId,
+  name,
+  location,
+  maxStudents,
+}) => {
+  return await api.put(`/classes/${classId}`, {
+    name,         
+    location,      
+    maxStudents,  
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const createApplication = async ({
+  title,
+  description,
+}) => {
+  return await api.post(`/applications/create-application`, {
+    title,
+    description,
+  }, {
+    headers: {
+      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+    },
+    withCredentials: true, 
+  });
 };

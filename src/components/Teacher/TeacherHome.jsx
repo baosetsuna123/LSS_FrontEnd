@@ -13,6 +13,17 @@ function TeacherHome() {
     "Chủ nhật",
   ];
   const periods = Array.from({ length: 5 }, (_, i) => i + 1);
+  const result = localStorage.getItem("result")
+  
+  let token;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
 
   useEffect(() => {
     // Giả lập việc lấy dữ liệu từ API
@@ -94,7 +105,7 @@ function TeacherHome() {
     };
 
     fetchTimetable();
-  }, []);
+  }, [token]);
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];

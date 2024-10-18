@@ -1,3 +1,4 @@
+import { fetchClassbyteacherName } from "@/data/api";
 import { useState, useEffect } from "react";
 
 function AssignClasses() {
@@ -7,65 +8,35 @@ function AssignClasses() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCourse, setFilterCourse] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const result = localStorage.getItem("result")
+  let token;
+  let nameTeacher;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+      nameTeacher = parsedResult.fullName;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
 
   useEffect(() => {
     // Giả lập việc lấy dữ liệu từ API
     const fetchClasses = async () => {
       // Thay thế bằng cuộc gọi API thực tế
-      const mockClasses = [
-        {
-          id: 1,
-          name: "Lớp A",
-          course: "Thiết kế đồ họa cơ bản",
-          schedule: "Thứ 2, 4, 6 (18:00-20:00)",
-          capacity: 20,
-          enrolled: 15,
-          status: "Chưa phân công",
-        },
-        {
-          id: 2,
-          name: "Lớp B",
-          course: "Illustrator nâng cao",
-          schedule: "Thứ 3, 5, 7 (19:00-21:00)",
-          capacity: 15,
-          enrolled: 10,
-          status: "Đã phân công",
-        },
-        {
-          id: 3,
-          name: "Lớp C",
-          course: "Photoshop và xử lý ảnh",
-          schedule: "Thứ 2, 4, 6 (14:00-16:00)",
-          capacity: 18,
-          enrolled: 12,
-          status: "Chưa phân công",
-        },
-        {
-          id: 4,
-          name: "Lớp D",
-          course: "Thiết kế UI/UX",
-          schedule: "Thứ 3, 5, 7 (15:00-17:00)",
-          capacity: 22,
-          enrolled: 20,
-          status: "Đã phân công",
-        },
-        {
-          id: 5,
-          name: "Lớp E",
-          course: "Thiết kế 3D và Animation",
-          schedule: "Thứ 2, 4, 6 (16:00-18:00)",
-          capacity: 25,
-          enrolled: 18,
-          status: "Chưa phân công",
-        },
-      ];
-      setAvailableClasses(mockClasses);
+      try {
+        const res = await fetchClassbyteacherName(nameTeacher,token);
+        setAvailableClasses(res);
+      } catch (error) {
+        console.log(error)
+      }
     };
 
     fetchClasses();
     // Giả lập lấy chuyên môn của giáo viên
     setTeacherSpecialization("Thiết kế đồ họa cơ bản");
-  }, []);
+  }, [nameTeacher,token]);
 
   const handleClassSelect = (classId) => {
     const classToSelect = availableClasses.find((cls) => cls.id === classId);
@@ -140,9 +111,8 @@ function AssignClasses() {
         {filteredClasses.map((cls) => (
           <li
             key={cls.id}
-            className={`flex items-center justify-between p-4 border rounded-lg ${
-              cls.status === "Đã phân công" ? "bg-gray-100" : "hover:bg-gray-50"
-            }`}
+            className={`flex items-center justify-between p-4 border rounded-lg ${cls.status === "Đã phân công" ? "bg-gray-100" : "hover:bg-gray-50"
+              }`}
           >
             <div className="flex items-center">
               <input
@@ -151,11 +121,10 @@ function AssignClasses() {
                 checked={selectedClasses.includes(cls.id)}
                 onChange={() => handleClassSelect(cls.id)}
                 disabled={cls.status === "Đã phân công"}
-                className={`mr-4 h-5 w-5 ${
-                  cls.status === "Đã phân công"
+                className={`mr-4 h-5 w-5 ${cls.status === "Đã phân công"
                     ? "text-gray-400"
                     : "text-blue-600"
-                }`}
+                  }`}
               />
               <label htmlFor={`class-${cls.id}`} className="flex flex-col">
                 <span className="font-semibold">
@@ -169,22 +138,20 @@ function AssignClasses() {
             </div>
             <div className="flex flex-col items-end">
               <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  cls.course === teacherSpecialization
+                className={`px-2 py-1 rounded-full text-xs font-semibold ${cls.course === teacherSpecialization
                     ? "bg-green-100 text-green-800"
                     : "bg-gray-100 text-gray-800"
-                }`}
+                  }`}
               >
                 {cls.course === teacherSpecialization
                   ? "Phù hợp chuyên môn"
                   : "Khác chuyên môn"}
               </span>
               <span
-                className={`mt-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                  cls.status === "Chưa phân công"
+                className={`mt-2 px-2 py-1 rounded-full text-xs font-semibold ${cls.status === "Chưa phân công"
                     ? "bg-yellow-100 text-yellow-800"
                     : "bg-red-100 text-red-800"
-                }`}
+                  }`}
               >
                 {cls.status}
               </span>
