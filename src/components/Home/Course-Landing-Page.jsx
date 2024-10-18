@@ -4,18 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
+import { useAuth } from "@/context/AuthContext";
 
 export function CourseLandingPage() {
   const navigate = useNavigate();
   const { classes, loading } = useClassContext();
-  const currentUserName = localStorage.getItem("result").username;
-
+  const { isLoggedIn } = useAuth();
+  const storedResult = localStorage.getItem("result");
+  const currentUserName = storedResult
+    ? JSON.parse(storedResult).username
+    : null;
+  console.log(currentUserName);
   // Function to check if the user is enrolled in a specific class
   const isUserEnrolledInClass = (classId) => {
     const classDetail = classes.find((cls) => cls.classId === classId);
     if (classDetail && classDetail.students) {
       return classDetail.students.some(
-        (student) => student.username === currentUserName
+        (student) => student.userName === currentUserName
       );
     }
     return false; // User is not enrolled in the class
@@ -160,14 +165,16 @@ export function CourseLandingPage() {
             )}
           </div>
           {/* Xem tất cả button */}
-          <div className="flex justify-center mt-8">
-            <Button
-              onClick={() => navigate("/class")}
-              className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-            >
-              Xem tất cả
-            </Button>
-          </div>
+          {isLoggedIn && (
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={() => navigate("/class")}
+                className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+              >
+                Xem tất cả
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
