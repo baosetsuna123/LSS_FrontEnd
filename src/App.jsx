@@ -29,6 +29,7 @@ import TeacherHome from "./components/Teacher/TeacherHome";
 import { MyWallet } from "./components/Student/Wallet";
 import { ClassDetail } from "./components/Student/class-detail";
 import { ViewAllClasses } from "./components/Student/All_Class";
+import { MyOrders } from "./components/Student/Order";
 
 function App() {
   return (
@@ -80,6 +81,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyWallet />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order"
+            element={
+              <ProtectedRoute>
+                <MyOrders />
               </ProtectedRoute>
             }
           />

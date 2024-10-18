@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { BookOpen, LogOut, Search, User, Wallet } from "lucide-react";
+import {
+  BookOpen,
+  LogOut,
+  Search,
+  ShoppingBag,
+  User,
+  Wallet,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
 
@@ -193,6 +200,13 @@ export function Layout({ children }) {
                   >
                     <Wallet className="h-4 w-4 mr-2" />
                     My Wallet
+                  </Link>
+                  <Link
+                    to="/order"
+                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                  >
+                    <ShoppingBag className="h-4 w-4 mr-2" />
+                    My Order
                   </Link>
                   <button
                     onClick={handleLogout}

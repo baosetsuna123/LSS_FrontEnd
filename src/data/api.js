@@ -430,3 +430,17 @@ export const fetchCreateOrder = async (classId, token) => {
     throw error;
   }
 };
+// Get Order by UserToken
+export const fetchOrdersByUser = async (token) => {
+  try {
+    const response = await api.get("/orders/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
