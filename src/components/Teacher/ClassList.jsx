@@ -219,7 +219,8 @@ function ClassList() {
                   </span>
                 </td>
                 <td className="py-3 px-6 text-center">
-                  {cls.startDate} - {cls.endDate}
+                {cls.startDate.split('T')[0]} {'->'} {" "}
+                {cls.endDate.split('T')[0]}
                 </td>
                 <td className="py-3 px-6 text-center">
                   <button
@@ -260,8 +261,8 @@ function ClassList() {
                       ? "Sắp diễn ra"
                       : "Đã kết thúc"}
                   <br />
-                  <strong>Thời gian:</strong> {selectedClass.startDate} -{" "}
-                  {selectedClass.endDate}
+                  <strong>Thời gian:</strong> {selectedClass.startDate.split('T')[0]} {'->'} {" "}
+                  {selectedClass.endDate.split('T')[0]}
                   <br />
                   <strong>Giáo viên:</strong> {selectedClass.teacherName}
                   <br />

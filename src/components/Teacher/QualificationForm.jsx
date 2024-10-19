@@ -1,3 +1,4 @@
+import { createApplication } from "@/data/api";
 import { useState } from "react";
 
 function QualificationForm() {
@@ -5,24 +6,32 @@ function QualificationForm() {
     fullName: "",
     email: "",
     phone: "",
-    highestDegree: "",
-    university: "",
-    graduationYear: "",
     specialization: "",
+    course: "",
     teachingExperience: "",
     certifications: "",
-    languages: "",
     additionalSkills: "",
     resumeLink: "",
   });
+
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const res = await createApplication({
+        ...formData,
+        title: "123",
+        description: "123",
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
     console.log("Form submitted:", formData);
     setFormSubmitted(true);
   };
@@ -77,55 +86,7 @@ function QualificationForm() {
             />
           </div>
           <div>
-            <label htmlFor="highestDegree" className="block mb-2 text-gray-700">
-              Bằng cấp cao nhất <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="highestDegree"
-              name="highestDegree"
-              value={formData.highestDegree}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="university" className="block mb-2 text-gray-700">
-              Trường đại học <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="university"
-              name="university"
-              value={formData.university}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="graduationYear"
-              className="block mb-2 text-gray-700"
-            >
-              Năm tốt nghiệp <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="graduationYear"
-              name="graduationYear"
-              value={formData.graduationYear}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="specialization"
-              className="block mb-2 text-gray-700"
-            >
+            <label htmlFor="specialization" className="block mb-2 text-gray-700">
               Chuyên ngành <span className="text-red-500">*</span>
             </label>
             <input
@@ -138,24 +99,34 @@ function QualificationForm() {
               required
             />
           </div>
-          <div>
-            <label
-              htmlFor="teachingExperience"
-              className="block mb-2 text-gray-700"
-            >
-              Kinh nghiệm giảng dạy (năm){" "}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="teachingExperience"
-              name="teachingExperience"
-              value={formData.teachingExperience}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+        </div>
+
+        <div>
+          <label htmlFor="course" className="block mb-2 text-gray-700">
+            Môn đăng ký dạy <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="course"
+            name="course"
+            value={formData.course}
+            onChange={handleChange}
+            className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="teachingExperience" className="block mb-2 text-gray-700">
+            Kinh nghiệm giảng dạy
+          </label>
+          <textarea
+            id="teachingExperience"
+            name="teachingExperience"
+            value={formData.teachingExperience}
+            onChange={handleChange}
+            className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="3"
+          ></textarea>
         </div>
         <div>
           <label htmlFor="certifications" className="block mb-2 text-gray-700">
@@ -171,24 +142,7 @@ function QualificationForm() {
           ></textarea>
         </div>
         <div>
-          <label htmlFor="languages" className="block mb-2 text-gray-700">
-            Ngôn ngữ giảng dạy <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="languages"
-            name="languages"
-            value={formData.languages}
-            onChange={handleChange}
-            className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="additionalSkills"
-            className="block mb-2 text-gray-700"
-          >
+          <label htmlFor="additionalSkills" className="block mb-2 text-gray-700">
             Kỹ năng bổ sung
           </label>
           <textarea
@@ -220,11 +174,9 @@ function QualificationForm() {
           Gửi đơn
         </button>
       </form>
-
       {formSubmitted && (
         <div className="mt-4 p-4 bg-green-100 text-green-700 rounded">
-          Đơn của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ
-          lại với bạn sớm.
+          Đơn của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ lại với bạn sớm.
         </div>
       )}
     </div>

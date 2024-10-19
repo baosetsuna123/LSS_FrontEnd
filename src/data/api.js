@@ -449,24 +449,50 @@ export const fetchCoursesService = async (token) => {
 };
 
 //update class
-export const fetchUpdateClass = async ({
-  token,
-  classId,
-  name,
-  location,
-  maxStudents,
-}) => {
-  return await api.put(`/classes/${classId}`, {
-    name,         
-    location,      
-    maxStudents,  
-  }, {
+export const fetchUpdateClass = async ({ token, data }) => {
+  const formData = new FormData();
+
+  // Create an object for classDTO
+  const classDTO = {
+    classId: data.classId,
+    name: data.name,
+    code: data.code,
+    description: data.description,
+    status: data.status,
+    location: data.location,
+    maxStudents: data.maxStudents,
+    price: data.price,
+    createDate: data.createDate,
+    teacherName: data.teacherName,
+    startDate: data.startDate,
+    endDate: data.endDate,
+    courseCode: data.courseCode,
+    fullName: data.fullName,
+    students: data.students,
+    slotId: data.slotId,
+  };
+
+  // Append classDTO as a JSON string
+  formData.append('classDTO', JSON.stringify(classDTO));
+
+  // If an image is provided, append it to the formData
+  if (data.imageUrl) {
+    formData.append('imageUrl', data.imageUrl);
+  }
+
+  // Make the API call
+  const response = await api.put(`/classes/${data.classId}`, formData, {
     headers: {
+      'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${token}`,
     },
   });
+
+  return response.data;
 };
 
+
+//
 export const createApplication = async ({
   title,
   description,
@@ -478,6 +504,22 @@ export const createApplication = async ({
     headers: {
       Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
-    withCredentials: true, 
+    withCredentials: true,
   });
+};
+
+
+// get all slots
+export const fetchSlots = async (token) => {
+  try {
+    const response = await api.get(`/slots`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
 };

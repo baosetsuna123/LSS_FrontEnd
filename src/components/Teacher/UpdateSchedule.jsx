@@ -1,4 +1,4 @@
-import { fetchClassbyteacher, fetchCoursesService, fetchUpdateClass } from "@/data/api";
+import { fetchClassbyteacher, fetchCoursesService, fetchSlots, fetchUpdateClass } from "@/data/api";
 import { useState, useEffect } from "react";
 import { FaClock } from "react-icons/fa";
 
@@ -11,6 +11,7 @@ function UpdateSchedule() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [courses, setCourses] = useState([])
+  const [slots, setSlots] = useState([])
   const result = localStorage.getItem("result")
   let token;
   if (result) {
@@ -95,18 +96,38 @@ function UpdateSchedule() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+
+  const fetchSlotList = async () => {
+    try {
+      const res = await fetchSlots(token);
+      setSlots(res);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu:", error);
+    }
+  };
+
   useEffect(() => {
-    if (classes.length > 0 && courses.length > 0) {
+    fetchSlotList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  useEffect(() => {
+    if (classes.length > 0 && courses.length > 0 && slots.length > 0) {
       const newClasses = classes.map((classItem) => {
         const course = courses.find(course => course.courseCode === classItem.courseCode);
+        const slot = slots.find(slot => slot.slotId === classItem.slotId);
         return {
           ...classItem,
-          courseName: course ? course.name : "Khóa học không xác định"
+          courseName: course ? course.name : "Khóa học không xác định",
+          slotStart: slot ? slot.start : "Thời gian không xác định",
+          slotEnd: slot ? slot.end : "Thời gian không xác định"
         };
       });
+  
       setClassesUpdated(newClasses);
     }
-  }, [classes, courses])
+  }, [classes, courses, slots]);
+  
 
 
   const handleEdit = (classInfo) => {
@@ -116,19 +137,21 @@ function UpdateSchedule() {
 
   const handleSave = async (updatedClass) => {
     try {
-      await fetchUpdateClass({
-        ...updatedClass, token
-      })
-      fetchCourses()
-      fetchClasses()
+
+      // Pass the updated class details to fetchUpdateClass
+      await fetchUpdateClass({ data: { ...updatedClass }, token });
+
+      // Fetch updated data and reset states
+      fetchCourses();
+      fetchClasses();
       setIsPopupOpen(false);
       setEditingClass(null);
       alert("Thông tin lớp học đã được cập nhật thành công!");
     } catch (error) {
-      console.log(error)
+      console.error(error);
     }
-
   };
+
 
   const handleCancel = () => {
     setIsPopupOpen(false);
@@ -151,12 +174,15 @@ function UpdateSchedule() {
 
 
 
+
   useEffect(() => {
     if (editingClass && editingClass.startDate) {
       setStartTime(editingClass.startDate.split('T')[0]);
       setEndTime(editingClass.endDate.split('T')[0]);
     }
   }, [editingClass]);
+
+  console.log(classesUpdated)
 
   const filteredClasses = classesUpdated.filter(
     (cls) =>
@@ -190,7 +216,7 @@ function UpdateSchedule() {
                 <p className="text-gray-600">Môn học: {cls.courseName}</p>
                 <p className="text-gray-600">Số học sinh: {cls.maxStudents}</p>
                 <p className="mt-2">
-                  <span className="font-medium"></span> {formatSchedule(cls.startDate, cls.endDate)}
+                  <span className="font-medium"></span> Thứ 4 - {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
               <button
@@ -293,20 +319,6 @@ function UpdateSchedule() {
                   <option>{editingClass.teacherName}</option>
                 </select>
               </div>
-
-              {/* <div className="mb-4">
-                <label className="block mb-2 font-medium text-gray-700">
-                  Ngày học:
-                </label>
-                <input
-                  type="number"
-                  id="startDate"
-                  name="startDate"
-                  value={editingClass.startDate}
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div> */}
               <div className="mb-4 col-span-2">
                 <label className="block mb-2 font-medium text-gray-700">Thời gian học:</label>
                 <div className="flex items-center space-x-4">
@@ -333,12 +345,14 @@ function UpdateSchedule() {
                   </div>
                 </div>
               </div>
+
+
               <div>
                 <label
                   htmlFor="room"
                   className="block mb-2 font-medium text-gray-700"
                 >
-                  Phòng học:
+                  Link phòng học:
                 </label>
                 <input
                   type="text"
@@ -349,7 +363,7 @@ function UpdateSchedule() {
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <label className="block mb-2 font-medium text-gray-700">
                   Thời gian học:
                 </label>
@@ -357,21 +371,62 @@ function UpdateSchedule() {
                   <div className="relative flex-1">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <select
-                      value={startTime}
-                      onChange={(e) => handleTimeChange(e, "start")}
+                      id="slotId"
+                      name="slotId"
+                      value={editingClass.slotId}
+                      onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="">Chọn tiết bắt đầu</option>
-                      <option value="08:00">Tiết 1 (08:00 - 09:30)</option>
-                      <option value="09:30">Tiết 2 (09:30 - 11:00)</option>
-                      <option value="11:00">Tiết 3 (11:00 - 12:30)</option>
-                      <option value="14:00">Tiết 4 (14:00 - 15:30)</option>
-                      <option value="15:30">Tiết 5 (15:30 - 17:00)</option>
-                      <option value="17:00">Tiết 6 (17:00 - 18:30)</option>
+                      {slots.map((slot) => (
+                        <option key={slot.slotId} value={slot.slotId}>
+                          Tiết {slot.slotId} ({slot.start} - {slot.end})
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
-              </div> */}
+              </div>
+              <div className="mb-4">
+                <label className="block mb-2 font-medium text-gray-700">
+                  Mô tả:
+                </label>
+                <div className="flex items-center space-x-4">
+                  <textarea
+                    type="text"
+                    id="description"
+                    name="description"
+                    disabled
+                    className="min-w-[620px] p-3 border rounded-lg outline-none min-h-[120px]"
+                    value={editingClass.description}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              {/* <div>
+                <label
+                  htmlFor="image"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Hình ảnh:
+                </label>
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {imagePreview && (
+                <div className="mb-4">
+                  <img
+                    src={imagePreview}
+                    alt="Selected Preview"
+                    className="w-full h-auto max-h-48 object-cover rounded-lg"
+                  />
+                </div>
+              )} */}
             </div>
             <div className="flex justify-end space-x-2 mt-4">
               <button
