@@ -29,16 +29,22 @@ export default function Login() {
       } else if (response.data.role === "TEACHER") {
         navigate("/teacher");
         // Optionally fetch classes for TEACHER if needed
-      } else {
-        navigate("/");
+      } else if (response.data.role === "STUDENT") {
+        try {
+          const classData = await fetchClasses(response.data.token);
+          localStorage.setItem("classes", JSON.stringify(classData));
+          navigate("/");
+        } catch (classFetchError) {
+          console.error(
+            "Failed to fetch classes for student:",
+            classFetchError
+          );
+          toast.error("Failed to fetch classes. Please try again.");
+          return; // Prevent further execution if fetching classes fails
+        }
       }
 
-      // Fetch classes only if the role is relevant (e.g., STUDENT)
-      if (response.data.role === "STUDENT") {
-        const classData = await fetchClasses(response.data.token);
-        localStorage.setItem("classes", JSON.stringify(classData));
-      }
-      getClasses(response.data.token);
+      getClasses(response.data.token); // Optionally fetch classes based on the role
       toast.success("Login successful");
     } catch (error) {
       toast.error("Login failed");

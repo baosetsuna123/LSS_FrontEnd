@@ -8,6 +8,7 @@ const CategoryLayout = ({
   itemsPerPage,
   initialCategories = [],
   searchQuery,
+  onUpdatePagination,
   setSearchQuery, // Receive the search query state
 }) => {
   const [newCategory, setNewCategory] = useState({ name: "" });
@@ -28,7 +29,14 @@ const CategoryLayout = ({
     }
     try {
       const createdCategory = await fetchCreateCategory(newCategory, token);
-      setCategories((prevCategories) => [...prevCategories, createdCategory]);
+      setCategories((prevCategories) => {
+        const updatedCategories = [...prevCategories, createdCategory];
+
+        // Check for pagination after creating the category
+        onUpdatePagination(updatedCategories.length);
+
+        return updatedCategories;
+      });
       toast.success("Category created successfully!");
       setNewCategory({ name: "" });
       setShowCreateForm(false);

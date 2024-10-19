@@ -43,6 +43,7 @@ export function Dashboard() {
   const [searchQueryApplication, setSearchQueryApplication] = useState("");
   const [searchQueryCourse, setSearchQueryCourse] = useState("");
   const [searchQueryClass] = useState("");
+  const [totalCategories, setTotalCategories] = useState(0); // Track total categories
 
   const navigate = useNavigate();
 
@@ -58,7 +59,10 @@ export function Dashboard() {
   useEffect(() => {
     localStorage.setItem("activeCategory", activeCategory);
   }, [activeCategory]);
-
+  const handleUpdatePagination = (totalCount) => {
+    setTotalCategories(totalCount);
+    setCurrentPage(1); // Reset to page 1 if total count changes
+  };
   // Fetch all categories on component mount
   useEffect(() => {
     const loadCategories = async () => {
@@ -66,6 +70,7 @@ export function Dashboard() {
       try {
         const data = await fetchAllCategories(token);
         setCategories(data || []); // Ensure categories is always an array
+        setTotalCategories(data.length); // Track total categories
       } catch (error) {
         console.error("Failed to fetch categories:", error);
         toast.error("Failed to fetch categories.");
@@ -126,7 +131,7 @@ export function Dashboard() {
   //   loadClasses();
   // }, []);
   // Calculate page counts based on data lengths
-  const pageCountCate = Math.ceil(categories.length / itemsPerPage);
+  const pageCountCate = Math.ceil(totalCategories / itemsPerPage);
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
   const pageCountCourse = Math.ceil(courses.length / itemsPerPage);
   const pageCountClass = Math.ceil(classes.length / itemsPerPage);
@@ -336,6 +341,8 @@ export function Dashboard() {
             <CategoryLayout
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
+              setCurrentPage={setCurrentPage}
+              onUpdatePagination={handleUpdatePagination}
               initialCategories={categories} // Pass categories to CategoryLayout
               searchQuery={searchQueryCategory}
               setSearchQuery={setSearchQueryCategory} // Pass down the search query state
@@ -355,6 +362,7 @@ export function Dashboard() {
             <CourseLayout
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
+              setCurrentPage={setCurrentPage}
               courses={courses}
               setCourses={setCourses}
               searchQuery={searchQueryCourse}
@@ -377,60 +385,118 @@ export function Dashboard() {
 
           {/* Pagination Controls */}
           {!isSearchActive() && ( // Only show pagination if no search query is active
-            <div className="mt-4 flex justify-between items-center">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <span className="text-sm text-gray-700">
-                Page {currentPage} of{" "}
-                {activeCategory === "category"
-                  ? pageCountCate
-                  : activeCategory === "application"
-                  ? pageCountApp
-                  : activeCategory === "course"
-                  ? pageCountCourse
-                  : activeCategory === "class"
-                  ? pageCountClass
-                  : 1}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(
-                      prev + 1,
-                      activeCategory === "category"
-                        ? pageCountCate
-                        : activeCategory === "application"
-                        ? pageCountApp
-                        : activeCategory === "course"
-                        ? pageCountCourse
-                        : activeCategory === "class"
-                        ? pageCountClass
-                        : 1
-                    )
-                  )
-                }
-                disabled={
-                  currentPage ===
-                  (activeCategory === "category"
-                    ? pageCountCate
-                    : activeCategory === "application"
-                    ? pageCountApp
-                    : activeCategory === "course"
-                    ? pageCountCourse
-                    : activeCategory === "class"
-                    ? pageCountClass
-                    : 1)
-                }
-                className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+            <>
+              {activeCategory === "category" &&
+                categories.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountCate}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountCate)
+                        )
+                      }
+                      disabled={currentPage === pageCountCate}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              {activeCategory === "application" &&
+                applications.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountApp}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountApp)
+                        )
+                      }
+                      disabled={currentPage === pageCountApp}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              {activeCategory === "course" && courses.length > itemsPerPage && (
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="text-sm text-gray-700">
+                    Page {currentPage} of {pageCountCourse}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, pageCountCourse)
+                      )
+                    }
+                    disabled={currentPage === pageCountCourse}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+              {activeCategory === "class" && classes.length > itemsPerPage && (
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="text-sm text-gray-700">
+                    Page {currentPage} of {pageCountClass}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, pageCountClass)
+                      )
+                    }
+                    disabled={currentPage === pageCountClass}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

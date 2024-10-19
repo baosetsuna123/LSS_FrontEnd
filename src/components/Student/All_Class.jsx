@@ -208,29 +208,32 @@ export function ViewAllClasses() {
               )}
             </div>
             {/* Pagination Controls only when there is no search term */}
-            {!searchTerm && (
-              <div className="flex justify-between mt-4">
-                <Button
-                  disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                >
-                  Previous
-                </Button>
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                >
-                  Next
-                </Button>
-              </div>
-            )}
+            {!searchTerm &&
+              selectedCourseCodes.length === 0 &&
+              maxPrice >= 200000 &&
+              contextClasses.length > itemsPerPage && (
+                <div className="flex justify-between mt-4">
+                  <Button
+                    disabled={currentPage === 1}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                  >
+                    Previous
+                  </Button>
+                  <span>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    disabled={currentPage === totalPages}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
           </div>
         </div>
       </div>

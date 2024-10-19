@@ -71,11 +71,12 @@ export function ClassDetail() {
     const fetchClassDetail = async () => {
       const response = await fetchClassbyID(id, token); // Replace with your API
       setClassDetail(response);
-
-      // Check if the user is enrolled in the class (replace with actual logic)
+      const storedResult = localStorage.getItem("result");
+      const currentUserName = storedResult
+        ? JSON.parse(storedResult).username
+        : null;
       const isUserEnrolled = response?.students?.some(
-        (student) =>
-          student.username === localStorage.getItem("result").username
+        (student) => student.userName === currentUserName
       );
       setIsEnrolled(isUserEnrolled); // Set enrollment status
     };
@@ -155,7 +156,7 @@ export function ClassDetail() {
                     {formatCurrency(classDetail?.price)}
                   </p>
                   <Button onClick={handleEnrollClick} disabled={isEnrolled}>
-                    {isEnrolled ? "Đã đăng ký" : "Enroll Now"}
+                    {isEnrolled ? "Enrolled" : "Enroll Now"}
                   </Button>
                 </div>
               </div>

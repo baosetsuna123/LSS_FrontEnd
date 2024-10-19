@@ -5,6 +5,7 @@ import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
 export function CourseLandingPage() {
   const navigate = useNavigate();
@@ -14,18 +15,24 @@ export function CourseLandingPage() {
   const currentUserName = storedResult
     ? JSON.parse(storedResult).username
     : null;
-  console.log(currentUserName);
-  // Function to check if the user is enrolled in a specific class
-  const isUserEnrolledInClass = (classId) => {
-    const classDetail = classes.find((cls) => cls.classId === classId);
-    if (classDetail && classDetail.students) {
-      return classDetail.students.some(
-        (student) => student.userName === currentUserName
-      );
+  const [enrollmentStatus, setEnrollmentStatus] = useState({});
+
+  useEffect(() => {
+    if (classes.length > 0 && currentUserName) {
+      const status = {};
+      classes.forEach((course) => {
+        const classDetail = classes.find(
+          (cls) => cls.classId === course.classId
+        );
+        if (classDetail && classDetail.students) {
+          status[course.classId] = classDetail.students.some(
+            (student) => student.userName === currentUserName
+          );
+        }
+      });
+      setEnrollmentStatus(status);
     }
-    return false; // User is not enrolled in the class
-  };
-  console.log(classes);
+  }, [classes, currentUserName]);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
   };
@@ -153,9 +160,9 @@ export function CourseLandingPage() {
                     </div>
                     <Button
                       className="mt-4 w-full"
-                      disabled={isUserEnrolledInClass(course.classId)}
+                      disabled={enrollmentStatus[course.classId]}
                     >
-                      {isUserEnrolledInClass(course.classId)
+                      {enrollmentStatus[course.classId]
                         ? "Enrolled"
                         : "Enroll Now"}
                     </Button>

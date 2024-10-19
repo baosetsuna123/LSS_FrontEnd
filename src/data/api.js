@@ -296,7 +296,7 @@ export const fetchDeleteCourse = async (courseCode, token) => {
 //get-application/staff
 export const fetchApplicationStaff = async (token) => {
   try {
-    const response = await api.get("/applications/staff", {
+    const response = await api.get("/applications/all", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -431,8 +431,7 @@ export const fetchClassbyteacher = async (token) => {
   }
 };
 
-
-//Get by courses 
+//Get by courses
 export const fetchCoursesService = async (token) => {
   try {
     const response = await api.get("/courses", {
@@ -462,7 +461,6 @@ export const fetchCreateOrder = async (classId, token) => {
   }
 };
 
-
 //update class
 export const fetchUpdateClass = async ({ token, data }) => {
   const formData = new FormData();
@@ -488,17 +486,17 @@ export const fetchUpdateClass = async ({ token, data }) => {
   };
 
   // Append classDTO as a JSON string
-  formData.append('classDTO', JSON.stringify(classDTO));
+  formData.append("classDTO", JSON.stringify(classDTO));
 
   // If an image is provided, append it to the formData
   if (data.imageUrl) {
-    formData.append('imageUrl', data.imageUrl);
+    formData.append("imageUrl", data.imageUrl);
   }
 
   // Make the API call
   const response = await api.put(`/classes/${data.classId}`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
     },
   });
@@ -506,23 +504,22 @@ export const fetchUpdateClass = async ({ token, data }) => {
   return response.data;
 };
 
-
 //
-export const createApplication = async ({
-  title,
-  description,
-}) => {
-  return await api.post(`/applications/create-application`, {
-    title,
-    description,
-  }, {
-    headers: {
-      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+export const createApplication = async ({ title, description }) => {
+  return await api.post(
+    `/applications/create-application`,
+    {
+      title,
+      description,
     },
-    withCredentials: true,
-  });
+    {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    }
+  );
 };
-
 
 // get all slots
 export const fetchSlots = async (token) => {
@@ -538,7 +535,6 @@ export const fetchSlots = async (token) => {
     throw error;
   }
 };
-
 
 // Get Order by UserToken
 export const fetchOrdersByUser = async (token) => {

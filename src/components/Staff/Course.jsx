@@ -26,7 +26,7 @@ export default function CourseLayout({
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null); // State for image preview
   const [categories, setCategories] = useState([]);
-  const [, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false); // State for image modal
@@ -71,20 +71,26 @@ export default function CourseLayout({
       return;
     }
     setIsLoading(true);
+
+    // Disable the button for 2 seconds
+
     try {
       const response = await fetchCreateCourse(courseDTO, image, token);
       toast.success("Course created successfully!");
+
       let courseData = response;
       if (typeof response === "string" && response.includes("{")) {
         const jsonString = response.substring(response.indexOf("{"));
         courseData = JSON.parse(jsonString);
       }
+
       setCourses((prevCourses) => [...prevCourses, courseData]);
       setIsFormVisible(false);
     } catch (error) {
       console.error("Failed to create course:", error);
       toast.error("Failed to create course.");
     } finally {
+      // Ensure that loading state is cleared after 2 seconds
       setIsLoading(false);
     }
   };
@@ -103,6 +109,9 @@ export default function CourseLayout({
   const handleSaveUpdateCourse = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // Disable the button for 2 seconds
+
     try {
       const response = await fetchUpdateCourse(
         courseDTO.courseCode,
@@ -138,10 +147,10 @@ export default function CourseLayout({
       console.error("Failed to update course:", error);
       toast.error("Failed to update course.");
     } finally {
+      // Ensure that loading state is cleared after 2 seconds
       setIsLoading(false);
     }
   };
-
   const handleDelete = async (courseCode) => {
     setIsLoading(true);
     try {
@@ -364,9 +373,16 @@ export default function CourseLayout({
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200"
+                className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading} // Disable the button while API call is in progress
               >
-                {isEditing ? "Update Course" : "Create Course"}
+                {isLoading
+                  ? "Processing..."
+                  : isEditing
+                  ? "Update Course"
+                  : "Create Course"}
               </button>
               <button
                 type="button"
@@ -434,7 +450,7 @@ export default function CourseLayout({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{course.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {course.description}
+                    {course.description.slice(0, 15)} ...
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
