@@ -1,14 +1,30 @@
 import { CheckCircle, Loader, Star, Users } from "lucide-react";
-import webDevelopmentImage from "../../assets/bootcamp.jfif";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
+import { useAuth } from "@/context/AuthContext";
 
 export function CourseLandingPage() {
   const navigate = useNavigate();
   const { classes, loading } = useClassContext();
+  const { isLoggedIn } = useAuth();
+  const storedResult = localStorage.getItem("result");
+  const currentUserName = storedResult
+    ? JSON.parse(storedResult).username
+    : null;
+  console.log(currentUserName);
+  // Function to check if the user is enrolled in a specific class
+  const isUserEnrolledInClass = (classId) => {
+    const classDetail = classes.find((cls) => cls.classId === classId);
+    if (classDetail && classDetail.students) {
+      return classDetail.students.some(
+        (student) => student.userName === currentUserName
+      );
+    }
+    return false; // User is not enrolled in the class
+  };
   console.log(classes);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
@@ -105,14 +121,14 @@ export function CourseLandingPage() {
                 <Loader className="w-10 h-10 animate-spin" />
               </div>
             ) : (
-              classes.map((course, index) => (
+              classes.slice(0, 3).map((course, index) => (
                 <Card
                   key={index}
                   onClick={() => handleClassClick(course.classId)}
                   className="transition-transform transform hover:scale-105"
                 >
                   <img
-                    src={course.image || webDevelopmentImage}
+                    src={course.imageUrl}
                     alt={course.name}
                     className="w-full h-[200px] object-cover rounded-t-lg"
                   />
@@ -135,21 +151,30 @@ export function CourseLandingPage() {
                         Created by {course.teacherName}
                       </p>
                     </div>
-                    <Button className="mt-4 w-full">Enroll Now</Button>
+                    <Button
+                      className="mt-4 w-full"
+                      disabled={isUserEnrolledInClass(course.classId)}
+                    >
+                      {isUserEnrolledInClass(course.classId)
+                        ? "Enrolled"
+                        : "Enroll Now"}
+                    </Button>
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
           {/* Xem tất cả button */}
-          <div className="flex justify-center mt-8">
-            <Button
-              onClick={() => navigate("/class")}
-              className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-            >
-              Xem tất cả
-            </Button>
-          </div>
+          {isLoggedIn && (
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={() => navigate("/class")}
+                className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+              >
+                Xem tất cả
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

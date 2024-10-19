@@ -212,7 +212,6 @@ export const fetchAllCategories = async (token) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("All categories: ", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -404,9 +403,9 @@ export const fetchClassbyID = async (id, token) => {
   }
 };
 //get by teacherName
-export const fetchClassbyteacherName = async (teacherName, token) => {
+export const fetchClassbyteacherName = async (name, token) => {
   try {
-    const response = await api.get(`/classes/teacher/${teacherName}`, {
+    const response = await api.get(`/classes/teacher/${name}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -447,6 +446,22 @@ export const fetchCoursesService = async (token) => {
     throw error;
   }
 };
+
+// Create Order
+export const fetchCreateOrder = async (classId, token) => {
+  try {
+    const response = await api.post(`/orders/${classId}`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+
 
 //update class
 export const fetchUpdateClass = async ({ token, data }) => {
@@ -513,6 +528,22 @@ export const createApplication = async ({
 export const fetchSlots = async (token) => {
   try {
     const response = await api.get(`/slots`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+
+
+// Get Order by UserToken
+export const fetchOrdersByUser = async (token) => {
+  try {
+    const response = await api.get("/orders/user", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

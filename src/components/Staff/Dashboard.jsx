@@ -20,7 +20,7 @@ import {
   fetchAllCategories,
   fetchAllCourses,
   fetchApplicationStaff,
-  fetchClasses,
+  // fetchClasses,
 } from "@/data/api"; // Import the API function
 import { useAuth } from "@/context/AuthContext";
 
@@ -29,7 +29,7 @@ export function Dashboard() {
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [classes, setClasses] = useState([]);
+  const [classes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const user = JSON.parse(localStorage.getItem("result"));
   const itemsPerPage = 4;
@@ -92,36 +92,39 @@ export function Dashboard() {
 
     loadApplications();
   }, []);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const loadCourses = async () => {
       const token = sessionStorage.getItem("token");
+      setLoading(true);
       try {
         const data = await fetchAllCourses(token);
         console.log(data);
-        setCourses(data || []);
+        setCourses(data);
+        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch courses:", error);
         toast.error("Failed to fetch courses.");
-        setCourses([]);
+        setLoading(true);
       }
     };
     loadCourses();
   }, []);
-  useEffect(() => {
-    const loadClasses = async () => {
-      const token = sessionStorage.getItem("token");
-      try {
-        const data = await fetchClasses(token);
-        console.log(data);
-        setClasses(data || []);
-      } catch (error) {
-        console.error("Failed to fetch classes:", error);
-        // toast.error("Failed to fetch classes.");
-        setCourses([]);
-      }
-    };
-    loadClasses();
-  }, []);
+  // useEffect(() => {
+  //   const loadClasses = async () => {
+  //     const token = sessionStorage.getItem("token");
+  //     try {
+  //       const data = await fetchClasses(token);
+  //       console.log(data);
+  //       setClasses(data || []);
+  //     } catch (error) {
+  //       console.error("Failed to fetch classes:", error);
+  //       // toast.error("Failed to fetch classes.");
+  //       setCourses([]);
+  //     }
+  //   };
+  //   loadClasses();
+  // }, []);
   // Calculate page counts based on data lengths
   const pageCountCate = Math.ceil(categories.length / itemsPerPage);
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
@@ -356,7 +359,8 @@ export function Dashboard() {
               setCourses={setCourses}
               searchQuery={searchQueryCourse}
               setSearchQuery={setSearchQueryCourse} // Pass down the search query state
-              onDelete={resetCurrentPage} // Pass down the reset function
+              onDelete={resetCurrentPage}
+              loading={loading}
             />
           )}
           {/* {activeCategory === "class" && (

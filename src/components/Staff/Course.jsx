@@ -47,7 +47,6 @@ export default function CourseLayout({
     const fetchCate = async () => {
       try {
         const data = await fetchAllCategories(token);
-        console.log("All categories: ", data);
         setCategories(data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
