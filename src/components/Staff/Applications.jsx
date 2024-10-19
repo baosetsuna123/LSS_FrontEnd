@@ -125,7 +125,7 @@ const ApplicationLayout = ({
                       onClick={() => handleClick(app.applicationId)}
                       disabled={app.status === "APPROVE"}
                     >
-                      Approve
+                      {app.status === "APPROVE" ? "Approved" : "Approve"}
                     </button>
                   </td>
                 </tr>

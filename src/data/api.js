@@ -296,7 +296,7 @@ export const fetchDeleteCourse = async (courseCode, token) => {
 //get-application/staff
 export const fetchApplicationStaff = async (token) => {
   try {
-    const response = await api.get("/applications/all", {
+    const response = await api.get("/applications/staff", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
