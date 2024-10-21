@@ -4,12 +4,15 @@ import "./index.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { Toaster } from "react-hot-toast";
 import { ClassProvider } from "./context/ClassContext.jsx";
+import { WalletProvider } from "./context/WalletContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <ClassProvider>
-      <Toaster />
-      <App />
+      <WalletProvider>
+        <Toaster />
+        <App />
+      </WalletProvider>
     </ClassProvider>
   </AuthProvider>
 );

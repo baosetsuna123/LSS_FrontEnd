@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { fetchClassbyID, fetchCreateOrder } from "@/data/api"; // Assume createOrder is the API to create an order
 import Breadcrumb from "../Home/Breadcrumb";
 import toast from "react-hot-toast";
+import { useWallet } from "@/context/WalletContext";
 
 // Modal Component for Confirmation
 
@@ -31,7 +32,15 @@ export function ClassDetail() {
   const [isEnrolled, setIsEnrolled] = useState(false); // State for enrollment status
   const token = sessionStorage.getItem("token");
   const [, setIsProcessing] = useState(false);
-
+  const { balance, loadBalance } = useWallet();
+  useEffect(() => {
+    if (token) {
+      loadBalance(token);
+    }
+  }, [token, loadBalance]);
+  console.log(balance);
+  console.log(classDetail?.price);
+  const newBalance = balance - classDetail?.price;
   // Confirmation Modal
   function ConfirmationModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
@@ -47,6 +56,7 @@ export function ClassDetail() {
             Bạn đồng ý tham gia vào lớp học này với giá{" "}
             {formatCurrency(classDetail?.price)}?
           </p>
+          <p className="mb-6">Số dư mới: {formatCurrency(newBalance)}</p>
           <div className="flex justify-between space-x-4">
             <Button
               onClick={onConfirm}
