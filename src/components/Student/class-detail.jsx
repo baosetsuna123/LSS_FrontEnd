@@ -38,8 +38,6 @@ export function ClassDetail() {
       loadBalance(token);
     }
   }, [token, loadBalance]);
-  console.log(balance);
-  console.log(classDetail?.price);
   const newBalance = balance - classDetail?.price;
   // Confirmation Modal
   function ConfirmationModal({ isOpen, onClose, onConfirm }) {

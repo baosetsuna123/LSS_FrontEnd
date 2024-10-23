@@ -448,9 +448,11 @@ export default function CourseLayout({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {course.courseCode}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{course.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {course.description.slice(0, 15)} ...
+                    {course.name.slice(0, 17)} ...
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {course.description.slice(0, 17)} ...
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
