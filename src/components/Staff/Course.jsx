@@ -6,7 +6,7 @@ import {
   fetchUpdateCourse,
 } from "@/data/api";
 import { toast } from "react-hot-toast";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 
 export default function CourseLayout({
   currentPage,
@@ -23,6 +23,9 @@ export default function CourseLayout({
     description: "",
     categoryId: 1,
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
+
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null); // State for image preview
   const [categories, setCategories] = useState([]);
@@ -151,28 +154,6 @@ export default function CourseLayout({
       setIsLoading(false);
     }
   };
-  const handleDelete = async (courseCode) => {
-    setIsLoading(true);
-    try {
-      await fetchDeleteCourse(courseCode, token); // Assuming you have a delete function
-      const updatedCourses = courses.filter(
-        (course) => course.courseCode !== courseCode
-      );
-      setCourses(updatedCourses);
-      toast.success("Course deleted successfully");
-
-      // Check if the current page is now empty
-      const totalPages = Math.ceil(updatedCourses.length / itemsPerPage);
-      if (currentPage > totalPages) {
-        onDelete(); // Call the reset function to navigate to page 1
-      }
-    } catch (error) {
-      console.error("Failed to delete course:", error);
-      toast.error("Failed to delete course.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const filteredCourses = courses.filter((course) =>
     course.courseCode.toLowerCase().includes(searchQuery.toLowerCase())
@@ -189,7 +170,35 @@ export default function CourseLayout({
       setShowImageModal(false);
     }
   };
+  const handleDeleteClick = (course) => {
+    setCourseToDelete(course);
+    setShowDeleteModal(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (courseToDelete) {
+      setIsLoading(true);
+      try {
+        await fetchDeleteCourse(courseToDelete.courseCode, token);
+        const updatedCourses = courses.filter(
+          (course) => course.courseCode !== courseToDelete.courseCode
+        );
+        setCourses(updatedCourses);
+        toast.success("Course deleted successfully");
+
+        const totalPages = Math.ceil(updatedCourses.length / itemsPerPage);
+        if (currentPage > totalPages) {
+          onDelete();
+        }
+      } catch (error) {
+        console.error("Failed to delete course:", error);
+        toast.error("Failed to delete course.");
+      } finally {
+        setIsLoading(false);
+        setShowDeleteModal(false);
+      }
+    }
+  };
   useEffect(() => {
     // Add event listener for clicks outside the modal
     document.addEventListener("mousedown", handleCloseModal);
@@ -262,7 +271,37 @@ export default function CourseLayout({
           Add Course
         </button>
       </div>
-
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex items-center justify-center mb-4">
+              <Trash2 size={48} className="text-red-500" />
+            </div>
+            <h2 className="text-xl font-semibold mb-4 text-center">
+              Confirm Deletion
+            </h2>
+            <p className="text-center mb-6">
+              Are you sure you want to delete this course?
+              <br />
+              <span className="font-semibold">{courseToDelete?.name}</span>
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {isFormVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <form
@@ -463,7 +502,7 @@ export default function CourseLayout({
                     </button>
                     <button
                       className="px-4 py-2 bg-red-500 text-white rounded-md"
-                      onClick={() => handleDelete(course.courseCode)}
+                      onClick={() => handleDeleteClick(course)}
                     >
                       Delete
                     </button>
