@@ -1,168 +1,114 @@
-import { createApplication } from "@/data/api";
+import { fetchCreateApplication } from "@/data/api";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function QualificationForm() {
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    specialization: "",
-    course: "",
-    teachingExperience: "",
-    certifications: "",
-    additionalSkills: "",
-    resumeLink: "",
-  });
-
+    title: "",
+    major: "",
+    experience: "",
+    cv: "",
+    certificate: "",
+  })
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const status = "PENDING";
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const requestBody = { status: status, ...formData };
     try {
-      const res = await createApplication({
-        ...formData,
-        title: "123",
-        description: "123",
-      });
-      console.log(res);
+      const response = await fetchCreateApplication(requestBody);
+      console.log("Application created successfully:", response);
+      toast.success("Application created successfully");
+      setFormSubmitted(true);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      console.log(error);
+      console.error("Application creation failed:", error.response ? error.response.data : error.message);
+      toast.error("Application creation failed");
     }
-    console.log("Form submitted:", formData);
-    setFormSubmitted(true);
   };
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
-        Đơn đăng ký trình độ giảng dạy
+        Đăng ký giảng dạy
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           <div>
-            <label htmlFor="fullName" className="block mb-2 text-gray-700">
-              Họ và tên <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block mb-2 text-gray-700">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="phone" className="block mb-2 text-gray-700">
-              Số điện thoại <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="specialization" className="block mb-2 text-gray-700">
+            <label htmlFor="major" className="block mb-2 text-gray-700">
               Chuyên ngành <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              id="specialization"
-              name="specialization"
-              value={formData.specialization}
+              id="major"
+              name="major"
+              value={formData.major}
+              onChange={handleChange}
+              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="title" className="block mb-2 text-gray-700">
+              Môn đăng ký dạy <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
         </div>
-
         <div>
-          <label htmlFor="course" className="block mb-2 text-gray-700">
-            Môn đăng ký dạy <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="course"
-            name="course"
-            value={formData.course}
-            onChange={handleChange}
-            className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="teachingExperience" className="block mb-2 text-gray-700">
+          <label htmlFor="experience" className="block mb-2 text-gray-700">
             Kinh nghiệm giảng dạy
           </label>
           <textarea
-            id="teachingExperience"
-            name="teachingExperience"
-            value={formData.teachingExperience}
+            id="experience"
+            name="experience"
+            value={formData.experience}
             onChange={handleChange}
             className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
           ></textarea>
         </div>
         <div>
-          <label htmlFor="certifications" className="block mb-2 text-gray-700">
+          <label htmlFor="certificate" className="block mb-2 text-gray-700">
             Chứng chỉ (nếu có)
           </label>
           <textarea
-            id="certifications"
-            name="certifications"
-            value={formData.certifications}
+            id="certificate"
+            name="certificate"
+            value={formData.certificate}
             onChange={handleChange}
             className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
           ></textarea>
         </div>
         <div>
-          <label htmlFor="additionalSkills" className="block mb-2 text-gray-700">
-            Kỹ năng bổ sung
-          </label>
-          <textarea
-            id="additionalSkills"
-            name="additionalSkills"
-            value={formData.additionalSkills}
-            onChange={handleChange}
-            className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
-          ></textarea>
-        </div>
-        <div>
-          <label htmlFor="resumeLink" className="block mb-2 text-gray-700">
+          <label htmlFor="cv" className="block mb-2 text-gray-700">
             Link CV (nếu có)
           </label>
           <input
             type="url"
-            id="resumeLink"
-            name="resumeLink"
-            value={formData.resumeLink}
+            id="cv"
+            name="cv"
+            value={formData.cv}
             onChange={handleChange}
             className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />

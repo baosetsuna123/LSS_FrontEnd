@@ -54,11 +54,6 @@ function TeacherDashboardLayout() {
       icon: FaBan,
     },
     {
-      path: "/teacher/create-classroom",
-      label: "Tạo phòng học",
-      icon: FaDoorOpen,
-    },
-    {
       path: "/teacher/class-list",
       label: "Xem danh sách lớp học",
       icon: FaList,
@@ -71,7 +66,7 @@ function TeacherDashboardLayout() {
       {/* Sidebar */}
       <aside
         className={`${isSidebarOpen ? "w-64" : "w-20"
-          } bg-gray-900 text-white shadow-md transition-all duration-300 ease-in-out`}
+          } bg-gray-900 text-white shadow-md transition-all duration-300 ease-in-out min-h-screen`}
       >
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           {isSidebarOpen && (
@@ -111,7 +106,7 @@ function TeacherDashboardLayout() {
           <h1 className="text-2xl font-semibold text-gray-800">
             Welcome, {teacherName}
           </h1>
-          <p className="text-red-600">Call API Class</p>
+          {/* <p className="text-red-600">Call API Class</p> */}
         </header>
         <div className="flex-1 overflow-y-auto p-4">
           <Outlet />

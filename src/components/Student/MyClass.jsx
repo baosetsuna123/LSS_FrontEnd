@@ -1,7 +1,7 @@
-import { fetchClassbyteacher, fetchCoursesService } from "@/data/api";
-import { useState, useEffect } from "react";
+import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
+import { useEffect, useState } from "react";
 
-function TeacherHome() {
+const MyClass = () => {
   const [timetable, setTimetable] = useState({});
   const days = [
     "Thứ 2",
@@ -55,12 +55,12 @@ function TeacherHome() {
 
   const fetchTimetable = async () => {
     try {
-      const classes = await fetchClassbyteacher(token);
+      const classes = await fetchOrderClasses(token);
       const courses = await fetchCoursesService(token);
-      const updatedClasses = classes.map((classItem) => {
+      const updatedClasses = classes.data.content.map((classItem) => {
         const matchedCourse = courses.find((c) => c.courseCode === classItem.courseCode);
         if (matchedCourse) {
-          return { ...classItem, courseName: matchedCourse.name };
+          return { ...classItem, courseName: matchedCourse.name};
         }
         return classItem;
       });
@@ -85,17 +85,16 @@ function TeacherHome() {
           <p className="text-xs">Lớp: {lesson.class}</p>
           <p className="text-xs">Phòng: {lesson.room}</p>
           {/* <p className="text-xs font-semibold">
-            Tiết: {(period - 1) * 3 + 1}-{(period - 1) * 3 + 3}
-          </p> */}
+              Tiết: {(period - 1) * 3 + 1}-{(period - 1) * 3 + 3}
+            </p> */}
         </div>
       );
     }
-    return null;
+    return <div className="min-h-[80px]"></div>;
   };
-
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Thời khóa biểu</h2>
+    <div className="my-6 px-4">
+      <h2 className="text-2xl font-bold mb-4">Thời khóa biểu của tôi</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
@@ -115,8 +114,8 @@ function TeacherHome() {
                   Tiết {period}
                   <br />
                   {/* <span className="text-xs font-normal">
-                    (Tiết {(period - 1) * 3 + 1}-{(period - 1) * 3 + 3})
-                  </span> */}
+                      (Tiết {(period - 1) * 3 + 1}-{(period - 1) * 3 + 3})
+                    </span> */}
                 </td>
                 {days.map((day) => (
                   <td
@@ -135,4 +134,4 @@ function TeacherHome() {
   );
 }
 
-export default TeacherHome;
+export default MyClass;

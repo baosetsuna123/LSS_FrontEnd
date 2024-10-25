@@ -39,33 +39,33 @@ function UpdateSchedule() {
   // ];
 
   const daysOfWeek = [
-    "Thứ 2",
-    "Thứ 3",
-    "Thứ 4",
-    "Thứ 5",
-    "Thứ 6",
-    "Thứ 7",
-    "Chủ nhật",
+    { value: 2, name: 'Thứ 2' },
+    { value: 3, name: 'Thứ 3' },
+    { value: 4, name: 'Thứ 4' },
+    { value: 5, name: 'Thứ 5' },
+    { value: 6, name: 'Thứ 6' },
+    { value: 7, name: 'Thứ 7' },
+    { value: 8, name: 'Chủ nhật' },
   ];
-  const formatSchedule = (startDate, endDate) => {
+  // const formatSchedule = (startDate, endDate) => {
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const dayNames = [];
+  //   const start = new Date(startDate);
+  //   const end = new Date(endDate);
+  //   const dayNames = [];
 
-    for (let m = new Date(start); m <= end; m.setDate(m.getDate() + 1)) {
-      const dayIndex = m.getDay();
+  //   for (let m = new Date(start); m <= end; m.setDate(m.getDate() + 1)) {
+  //     const dayIndex = m.getDay();
 
-      if (!dayNames.includes(daysOfWeek[dayIndex])) {
-        dayNames.push(daysOfWeek[dayIndex]);
-      }
-    }
+  //     if (!dayNames.includes(daysOfWeek[dayIndex])) {
+  //       dayNames.push(daysOfWeek[dayIndex]);
+  //     }
+  //   }
 
-    const startTime = start.toTimeString().slice(0, 5);
-    const endTime = end.toTimeString().slice(0, 5);
+  //   const startTime = start.toTimeString().slice(0, 5);
+  //   const endTime = end.toTimeString().slice(0, 5);
 
-    return `${dayNames.join(', ')} - ${startTime} - ${endTime}`;
-  };
+  //   return `${dayNames.join(', ')} - ${startTime} - ${endTime}`;
+  // };
 
 
   const fetchClasses = async () => {
@@ -123,11 +123,11 @@ function UpdateSchedule() {
           slotEnd: slot ? slot.end : "Thời gian không xác định"
         };
       });
-  
+
       setClassesUpdated(newClasses);
     }
   }, [classes, courses, slots]);
-  
+
 
 
   const handleEdit = (classInfo) => {
@@ -138,10 +138,8 @@ function UpdateSchedule() {
   const handleSave = async (updatedClass) => {
     try {
 
-      // Pass the updated class details to fetchUpdateClass
       await fetchUpdateClass({ data: { ...updatedClass }, token });
 
-      // Fetch updated data and reset states
       fetchCourses();
       fetchClasses();
       setIsPopupOpen(false);
@@ -174,6 +172,7 @@ function UpdateSchedule() {
 
 
 
+console.log(editingClass)
 
   useEffect(() => {
     if (editingClass && editingClass.startDate) {
@@ -182,7 +181,6 @@ function UpdateSchedule() {
     }
   }, [editingClass]);
 
-  console.log(classesUpdated)
 
   const filteredClasses = classesUpdated.filter(
     (cls) =>
@@ -248,6 +246,7 @@ function UpdateSchedule() {
                   type="text"
                   id="name"
                   name="name"
+                  disabled
                   value={editingClass.name}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -291,6 +290,7 @@ function UpdateSchedule() {
                   type="number"
                   id="maxStudents"
                   name="maxStudents"
+                  disabled
                   value={editingClass.maxStudents}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -345,8 +345,6 @@ function UpdateSchedule() {
                   </div>
                 </div>
               </div>
-
-
               <div>
                 <label
                   htmlFor="room"
@@ -363,6 +361,28 @@ function UpdateSchedule() {
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="room"
+                  className="block mb-2 font-medium text-gray-700"
+                >
+                  Ngày học
+                </label>
+                <select
+                  id="dayofWeek"
+                  name="dayofWeek"
+                  disabled
+                  value={editingClass.dayofWeek}
+                  onChange={handleInputChange}
+                  className="w-full px-2 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {daysOfWeek.map((slot) => (
+                    <option key={slot.value} value={slot.value}>
+                      {slot.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="mb-4">
                 <label className="block mb-2 font-medium text-gray-700">
                   Thời gian học:
@@ -373,6 +393,7 @@ function UpdateSchedule() {
                     <select
                       id="slotId"
                       name="slotId"
+                      disabled
                       value={editingClass.slotId}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -386,7 +407,7 @@ function UpdateSchedule() {
                   </div>
                 </div>
               </div>
-              <div className="mb-4">
+              <div className="mb-4 col-span-2">
                 <label className="block mb-2 font-medium text-gray-700">
                   Mô tả:
                 </label>

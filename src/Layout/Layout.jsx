@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   BookOpen,
+  CalendarCheck,
   LogOut,
   Search,
   ShoppingBag,
@@ -24,6 +25,31 @@ export function Layout({ children }) {
   const { clearClasses, setLoading, classes } = useClassContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredClasses, setFilteredClasses] = useState([]);
+  const [hiddenHeader, setHiddenHeader] = useState(false);
+  const location = useLocation()
+  const result = localStorage.getItem("result");
+
+  let role;
+
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      role = parsedResult.role;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
+  useEffect(() => {
+    if (location.pathname) {
+      const paths = location.pathname.split('/');
+      if (paths.length > 1 && paths[1] === 'teacher') {
+        setHiddenHeader(true);
+      } else {
+        setHiddenHeader(false);
+      }
+    }
+  }, [location.pathname]);
+
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -102,132 +128,143 @@ export function Layout({ children }) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header
-        className={`px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50 transition-transform duration-300 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <Link to="/" className="flex items-center justify-center">
-          <BookOpen className="h-6 w-6 mr-2" />
-          <span className="font-bold">EduCourse</span>
-        </Link>
-        <div className="flex items-center mx-auto relative">
-          <Search
-            className="h-6 w-6 mr-2 cursor-pointer"
-            onClick={() => searchInputRef.current.focus()}
-          />
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Search classes ..."
-            value={searchTerm}
-            onChange={handleSearchInputChange}
-            className="border rounded px-4 py-1 w-96"
-          />
+      {
+        !hiddenHeader && <header
+          className={`px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50 transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
+            }`}
+        >
+          <Link to="/" className="flex items-center justify-center">
+            <BookOpen className="h-6 w-6 mr-2" />
+            <span className="font-bold">EduCourse</span>
+          </Link>
+          <div className="flex items-center mx-auto relative">
+            <Search
+              className="h-6 w-6 mr-2 cursor-pointer"
+              onClick={() => searchInputRef.current.focus()}
+            />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search classes ..."
+              value={searchTerm}
+              onChange={handleSearchInputChange}
+              className="border rounded px-4 py-1 w-96"
+            />
 
-          {/* Search Results Popup */}
-          {isSearchPopupVisible && filteredClasses.length > 0 && (
-            <div
-              ref={popupRef}
-              className="absolute top-full left-0 mt-2 ml-7 bg-white border border-gray-300 rounded-md shadow-lg z-50"
-              style={{
-                width: "calc(93.5%)", // Adjust width to ensure it aligns with the input
-              }}
-            >
-              {filteredClasses.map((course) => (
-                <div
-                  key={course.classId}
-                  onClick={() => handleClassClick(course.classId)}
-                  className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  <img
-                    src={course.imageUrl}
-                    alt={course.name}
-                    className="w-10 h-10 object-cover rounded mr-4"
-                  />
-                  <span className="font-semibold">{course.name}</span>
-                  <span className="ml-auto text-gray-500">
-                    {course.courseCode}
-                  </span>{" "}
-                  {/* Course code at the end */}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+            {/* Search Results Popup */}
+            {isSearchPopupVisible && filteredClasses.length > 0 && (
+              <div
+                ref={popupRef}
+                className="absolute top-full left-0 mt-2 ml-7 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+                style={{
+                  width: "calc(93.5%)", // Adjust width to ensure it aligns with the input
+                }}
+              >
+                {filteredClasses.map((course) => (
+                  <div
+                    key={course.classId}
+                    onClick={() => handleClassClick(course.classId)}
+                    className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    <img
+                      src={course.imageUrl}
+                      alt={course.name}
+                      className="w-10 h-10 object-cover rounded mr-4"
+                    />
+                    <span className="font-semibold">{course.name}</span>
+                    <span className="ml-auto text-gray-500">
+                      {course.courseCode}
+                    </span>{" "}
+                    {/* Course code at the end */}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="/class"
-          >
-            Classes
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="/about"
-          >
-            About
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4"
-            to="/contact"
-          >
-            Contact
-          </Link>
-          {isLoggedIn ? (
-            <div className="relative">
-              <User
-                className="h-6 w-6 cursor-pointer"
-                onClick={togglePopup}
-                aria-hidden="true"
-              />
-              {isUserPopupVisible && (
-                <div
-                  ref={popupRef}
-                  className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"
-                >
-                  <Link
-                    to="/profile"
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    My Profile
-                  </Link>
-                  <Link
-                    to="/wallet"
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                  >
-                    <Wallet className="h-4 w-4 mr-2" />
-                    My Wallet
-                  </Link>
-                  <Link
-                    to="/order"
-                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                  >
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    My Order
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
+          <nav className="ml-auto flex gap-4 sm:gap-6">
             <Link
-              to="/login"
               className="text-sm font-medium hover:underline underline-offset-4"
+              to="/class"
             >
-              Login
+              Classes
             </Link>
-          )}
-        </nav>
-      </header>
+            <Link
+              className="text-sm font-medium hover:underline underline-offset-4"
+              to="/about"
+            >
+              About
+            </Link>
+            <Link
+              className="text-sm font-medium hover:underline underline-offset-4"
+              to="/contact"
+            >
+              Contact
+            </Link>
+            {isLoggedIn ? (
+              <div className="relative">
+                <User
+                  className="h-6 w-6 cursor-pointer"
+                  onClick={togglePopup}
+                  aria-hidden="true"
+                />
+                {isUserPopupVisible && (
+                  <div
+                    ref={popupRef}
+                    className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+                  >
+                    <Link
+                      to="/profile"
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/wallet"
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <Wallet className="h-4 w-4 mr-2" />
+                      My Wallet
+                    </Link>
+                    <Link
+                      to="/order"
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      My Order
+                    </Link>
+                    {
+                      role === "STUDENT" &&
+                      <Link
+                        to="/my-class"
+                        className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      >
+                        <CalendarCheck className="h-4 w-4 mr-2" />
+                        My class
+                      </Link>
+                    }
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="text-sm font-medium hover:underline underline-offset-4"
+              >
+                Login
+              </Link>
+            )}
+          </nav>
+        </header>
+      }
       <main className="flex-1">{children}</main>
       <footer className="flex flex-col bg-orange-500 gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t font-semibold">
         <p className="text-xs">© 2024 EduCourse. All rights reserved.</p>

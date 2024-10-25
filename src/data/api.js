@@ -51,14 +51,12 @@ export const fetchSignUpTeacher = async (
   );
 };
 //create-application
-export const fetchCreateApplication = async (status, title, description) => {
+export const fetchCreateApplication = async (data) => {
   try {
     const response = await api.post(
       "/applications/create-application",
       {
-        status,
-        title,
-        description,
+        ...data
       },
       {
         withCredentials: true,
@@ -465,6 +463,7 @@ export const fetchCreateOrder = async (classId, token) => {
 export const fetchUpdateClass = async ({ token, data }) => {
   const formData = new FormData();
 
+
   // Create an object for classDTO
   const classDTO = {
     classId: data.classId,
@@ -483,6 +482,7 @@ export const fetchUpdateClass = async ({ token, data }) => {
     fullName: data.fullName,
     students: data.students,
     slotId: data.slotId,
+    dayofWeek: data.dayofWeek
   };
 
   // Append classDTO as a JSON string
@@ -540,6 +540,22 @@ export const fetchSlots = async (token) => {
 export const fetchOrdersByUser = async (token) => {
   try {
     const response = await api.get("/orders/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+
+
+// Get Order by UserToken
+export const fetchOrderClasses = async (token) => {
+  try {
+    const response = await api.get("/orders/classes", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

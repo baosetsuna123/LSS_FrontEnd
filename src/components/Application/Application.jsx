@@ -1,37 +1,39 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import backgroundImage from "../../assets/background2.png";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Captions, Podcast } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { fetchCreateApplication } from "@/data/api";
-import { Textarea } from "../ui/textarea";
-
+import backgroundImage from "../../assets/background2.png";
 export function Application() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    major: "",
+    experience: "",
+    cv: "",
+    certificate: "",
+  })
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const status = "PENDING";
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const requestBody = { status, title, description };
-    console.log("Request Body:", requestBody);
+    const requestBody = { status: status, ...formData};
     try {
-      const response = await fetchCreateApplication(status, title, description);
+      const response = await fetchCreateApplication(requestBody);
       console.log("Application created successfully:", response);
-
       toast.success("Application created successfully");
-
-      navigate("/login");
+      setFormSubmitted(true);
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      console.error(
-        "Application creation failed:",
-        error.response ? error.response.data : error.message
-      );
+      console.error("Application creation failed:", error.response ? error.response.data : error.message);
       toast.error("Application creation failed");
     }
   };
@@ -45,74 +47,93 @@ export function Application() {
         height: "100vh",
       }}
     >
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Create Your Application
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Captions
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                </div>
-                <Input
-                  id="title"
-                  placeholder="Enter task title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  className="pl-10"
-                />
-              </div>
+      <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
+        <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
+          Đăng ký giảng dạy
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="major" className="block mb-2 text-gray-700">
+                Chuyên ngành <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="major"
+                name="major"
+                value={formData.major}
+                onChange={handleChange}
+                className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex mt-3 pointer-events-none">
-                  <Podcast
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                </div>
-                <Textarea
-                  id="description"
-                  placeholder="Enter task description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={4}
-                  className="pl-10" // Add padding to the left to make space for the icon
-                  style={{ resize: "none" }} // Optional: Prevent resizing if needed
-                />
-              </div>
+            <div>
+              <label htmlFor="title" className="block mb-2 text-gray-700">
+                Môn đăng ký dạy <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
-            <div className="flex flex-col items-center">
-              <button
-                type="submit"
-                className={`group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-              >
-                Create Application
-              </button>
-            </div>
-          </form>
-          <div className="mt-4 flex flex-col items-center">
-            <button
-              type="button"
-              className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={() => navigate("/SignUp")}
-            >
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back to Sign Up
-            </button>
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <label htmlFor="experience" className="block mb-2 text-gray-700">
+              Kinh nghiệm giảng dạy
+            </label>
+            <textarea
+              id="experience"
+              name="experience"
+              value={formData.experience}
+              onChange={handleChange}
+              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows="3"
+            ></textarea>
+          </div>
+          <div>
+            <label htmlFor="certificate" className="block mb-2 text-gray-700">
+              Chứng chỉ (nếu có)
+            </label>
+            <textarea
+              id="certificate"
+              name="certificate"
+              value={formData.certificate}
+              onChange={handleChange}
+              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows="3"
+            ></textarea>
+          </div>
+          <div>
+            <label htmlFor="cv" className="block mb-2 text-gray-700">
+              Link CV (nếu có)
+            </label>
+            <input
+              type="url"
+              id="cv"
+              name="cv"
+              value={formData.cv}
+              onChange={handleChange}
+              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-gray-900 text-white font-semibold px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+          >
+            Gửi đơn
+          </button>
+        </form>
+        {formSubmitted && (
+          <div className="mt-4 p-4 bg-green-100 text-green-700 rounded">
+            Đơn của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ lại với bạn sớm.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

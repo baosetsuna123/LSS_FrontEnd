@@ -30,6 +30,7 @@ import { MyWallet } from "./components/Student/Wallet";
 import { ClassDetail } from "./components/Student/class-detail";
 import { ViewAllClasses } from "./components/Student/All_Class";
 import { MyOrders } from "./components/Student/Order";
+import MyClass from "./components/Student/MyClass";
 
 function App() {
   return (
@@ -96,6 +97,7 @@ function App() {
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/class" element={<ViewAllClasses />} />
+          <Route path="/my-class" element={<MyClass />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
