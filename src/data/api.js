@@ -56,7 +56,7 @@ export const fetchCreateApplication = async (data) => {
     const response = await api.post(
       "/applications/create-application",
       {
-        ...data
+        ...data,
       },
       {
         withCredentials: true,
@@ -463,7 +463,6 @@ export const fetchCreateOrder = async (classId, token) => {
 export const fetchUpdateClass = async ({ token, data }) => {
   const formData = new FormData();
 
-
   // Create an object for classDTO
   const classDTO = {
     classId: data.classId,
@@ -482,7 +481,7 @@ export const fetchUpdateClass = async ({ token, data }) => {
     fullName: data.fullName,
     students: data.students,
     slotId: data.slotId,
-    dayofWeek: data.dayofWeek
+    dayofWeek: data.dayofWeek,
   };
 
   // Append classDTO as a JSON string
@@ -551,7 +550,6 @@ export const fetchOrdersByUser = async (token) => {
   }
 };
 
-
 // Get Order by UserToken
 export const fetchOrderClasses = async (token) => {
   try {
@@ -563,6 +561,37 @@ export const fetchOrderClasses = async (token) => {
     return response.data;
   } catch (error) {
     console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+//-----------------Feedback-----------------
+export const fetchQuestionFeedback = async (token) => {
+  try {
+    const response = await api.get("/api/feedback-question", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const submitFeedback = async (orderId, feedbackData, token) => {
+  try {
+    const response = await api.post(
+      `/feedback/order/${orderId}/submit`,
+      feedbackData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
     throw error;
   }
 };

@@ -1,4 +1,9 @@
-import { fetchClassbyteacher, fetchCoursesService, fetchSlots, fetchUpdateClass } from "@/data/api";
+import {
+  fetchClassbyteacher,
+  fetchCoursesService,
+  fetchSlots,
+  fetchUpdateClass,
+} from "@/data/api";
 import { useState, useEffect } from "react";
 import { FaClock } from "react-icons/fa";
 
@@ -9,10 +14,10 @@ function UpdateSchedule() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [courses, setCourses] = useState([])
-  const [slots, setSlots] = useState([])
-  const result = localStorage.getItem("result")
+  const [, setEndTime] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [slots, setSlots] = useState([]);
+  const result = localStorage.getItem("result");
   let token;
   if (result) {
     try {
@@ -39,13 +44,13 @@ function UpdateSchedule() {
   // ];
 
   const daysOfWeek = [
-    { value: 2, name: 'Thứ 2' },
-    { value: 3, name: 'Thứ 3' },
-    { value: 4, name: 'Thứ 4' },
-    { value: 5, name: 'Thứ 5' },
-    { value: 6, name: 'Thứ 6' },
-    { value: 7, name: 'Thứ 7' },
-    { value: 8, name: 'Chủ nhật' },
+    { value: 2, name: "Thứ 2" },
+    { value: 3, name: "Thứ 3" },
+    { value: 4, name: "Thứ 4" },
+    { value: 5, name: "Thứ 5" },
+    { value: 6, name: "Thứ 6" },
+    { value: 7, name: "Thứ 7" },
+    { value: 8, name: "Chủ nhật" },
   ];
   // const formatSchedule = (startDate, endDate) => {
 
@@ -67,13 +72,12 @@ function UpdateSchedule() {
   //   return `${dayNames.join(', ')} - ${startTime} - ${endTime}`;
   // };
 
-
   const fetchClasses = async () => {
     try {
       const res = await fetchClassbyteacher(token);
       setClasses(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -81,13 +85,12 @@ function UpdateSchedule() {
     fetchClasses();
   }, [token]);
 
-
   const fetchCourses = async () => {
     try {
       const res = await fetchCoursesService(token);
       setCourses(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -95,7 +98,6 @@ function UpdateSchedule() {
     fetchCourses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
-
 
   const fetchSlotList = async () => {
     try {
@@ -114,21 +116,21 @@ function UpdateSchedule() {
   useEffect(() => {
     if (classes.length > 0 && courses.length > 0 && slots.length > 0) {
       const newClasses = classes.map((classItem) => {
-        const course = courses.find(course => course.courseCode === classItem.courseCode);
-        const slot = slots.find(slot => slot.slotId === classItem.slotId);
+        const course = courses.find(
+          (course) => course.courseCode === classItem.courseCode
+        );
+        const slot = slots.find((slot) => slot.slotId === classItem.slotId);
         return {
           ...classItem,
           courseName: course ? course.name : "Khóa học không xác định",
           slotStart: slot ? slot.start : "Thời gian không xác định",
-          slotEnd: slot ? slot.end : "Thời gian không xác định"
+          slotEnd: slot ? slot.end : "Thời gian không xác định",
         };
       });
 
       setClassesUpdated(newClasses);
     }
   }, [classes, courses, slots]);
-
-
 
   const handleEdit = (classInfo) => {
     setEditingClass({ ...classInfo });
@@ -137,7 +139,6 @@ function UpdateSchedule() {
 
   const handleSave = async (updatedClass) => {
     try {
-
       await fetchUpdateClass({ data: { ...updatedClass }, token });
 
       fetchCourses();
@@ -150,7 +151,6 @@ function UpdateSchedule() {
     }
   };
 
-
   const handleCancel = () => {
     setIsPopupOpen(false);
     setEditingClass(null);
@@ -161,7 +161,6 @@ function UpdateSchedule() {
     setEditingClass((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleTimeChange = (e, type) => {
     if (type === "start") {
       setStartTime(e.target.value);
@@ -170,17 +169,14 @@ function UpdateSchedule() {
     }
   };
 
-
-
-console.log(editingClass)
+  console.log(editingClass);
 
   useEffect(() => {
     if (editingClass && editingClass.startDate) {
-      setStartTime(editingClass.startDate.split('T')[0]);
-      setEndTime(editingClass.endDate.split('T')[0]);
+      setStartTime(editingClass.startDate.split("T")[0]);
+      setEndTime(editingClass.endDate.split("T")[0]);
     }
   }, [editingClass]);
-
 
   const filteredClasses = classesUpdated.filter(
     (cls) =>
@@ -214,7 +210,8 @@ console.log(editingClass)
                 <p className="text-gray-600">Môn học: {cls.courseName}</p>
                 <p className="text-gray-600">Số học sinh: {cls.maxStudents}</p>
                 <p className="mt-2">
-                  <span className="font-medium"></span> Thứ 4 - {cls.slotStart} - {cls.slotEnd}
+                  <span className="font-medium"></span> Thứ 4 - {cls.slotStart}{" "}
+                  - {cls.slotEnd}
                 </p>
               </div>
               <button
@@ -262,12 +259,14 @@ console.log(editingClass)
                 <select
                   id="course"
                   name="course"
-                  value={editingClass.courseCode || ''}
+                  value={editingClass.courseCode || ""}
                   disabled
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="" disabled>Chọn khóa học</option>
+                  <option value="" disabled>
+                    Chọn khóa học
+                  </option>
                   {courses.length > 0 ? (
                     courses.map((course) => (
                       <option key={course.courseCode} value={course.courseCode}>
@@ -275,7 +274,9 @@ console.log(editingClass)
                       </option>
                     ))
                   ) : (
-                    <option value="" disabled>Không có khóa học nào</option>
+                    <option value="" disabled>
+                      Không có khóa học nào
+                    </option>
                   )}
                 </select>
               </div>
@@ -320,7 +321,9 @@ console.log(editingClass)
                 </select>
               </div>
               <div className="mb-4 col-span-2">
-                <label className="block mb-2 font-medium text-gray-700">Thời gian học:</label>
+                <label className="block mb-2 font-medium text-gray-700">
+                  Thời gian học:
+                </label>
                 <div className="flex items-center space-x-4">
                   <div className="relative flex-1">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -328,11 +331,11 @@ console.log(editingClass)
                       type="date"
                       disabled
                       value={startTime}
-                      onChange={(e) => handleTimeChange(e, 'start')}
+                      onChange={(e) => handleTimeChange(e, "start")}
                       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <span className="text-gray-500">đến</span>
+                  {/* <span className="text-gray-500">đến</span>
                   <div className="relative flex-1">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
@@ -342,7 +345,7 @@ console.log(editingClass)
                       onChange={(e) => handleTimeChange(e, 'end')}
                       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div>
