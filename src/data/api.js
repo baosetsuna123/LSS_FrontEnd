@@ -502,7 +502,26 @@ export const fetchUpdateClass = async ({ token, data }) => {
 
   return response.data;
 };
+export const fetchCreateClass = async (classDTO, image, token) => {
+  try {
+    const formData = new FormData();
+    formData.append("classDTO", JSON.stringify(classDTO));
+    if (image) {
+      formData.append("image", image);
+    }
 
+    const response = await api.post("/classes", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data || "An error occurred");
+  }
+};
 //
 export const createApplication = async ({ title, description }) => {
   return await api.post(
