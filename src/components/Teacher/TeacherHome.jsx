@@ -27,7 +27,7 @@ function TeacherHome() {
     slotId: "1",
     startDate: today,
     courseCode: "",
-    dayofWeek: "",
+    dayOfWeek: "",
   });
   const days = [
     "Thứ 2",
@@ -68,7 +68,7 @@ function TeacherHome() {
       8: "Chủ nhật",
     };
     return classes.reduce((timetable, classItem) => {
-      const day = daysOfWeekMap[classItem.dayofWeek];
+      const day = daysOfWeekMap[classItem.dayOfWeek];
       if (!timetable[day]) {
         timetable[day] = {};
       }
@@ -164,12 +164,12 @@ function TeacherHome() {
 
     const jsDayOfWeek = date.getDay();
     const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
-    const dayofWeek = dayOfWeekMapping[jsDayOfWeek];
+    const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
 
     setClassData((prevData) => ({
       ...prevData,
       startDate: formattedDate, // Use formatted date with time
-      dayofWeek,
+      dayOfWeek,
     }));
   };
 
