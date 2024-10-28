@@ -130,9 +130,10 @@ export default function FeedbackForm() {
     }
   };
   const navigate = useNavigate();
+
   const handleModalClose = () => {
     setShowSuccessModal(false);
-    navigate("/order");
+    navigate("/my-class");
   };
   return (
     <>
@@ -141,7 +142,7 @@ export default function FeedbackForm() {
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
-              { label: "Orders", link: "/order" },
+              { label: "Timetable", link: "/my-class" },
               { label: "Feedback" }, // No link for the current page
             ]}
           />

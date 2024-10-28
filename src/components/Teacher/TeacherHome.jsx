@@ -14,9 +14,9 @@ function TeacherHome() {
   const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date();
-  today.setDate(today.getDate() + 2); // Set minimum date to two days from today
+  today.setDate(today.getDate() + 2);
   const minDateString = today.toISOString().split("T")[0];
-  const [image, setImage] = useState(null); // Separate image state
+  const [image, setImage] = useState(null);
   const [classData, setClassData] = useState({
     name: "",
     code: "",
@@ -119,12 +119,12 @@ function TeacherHome() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Changing ${name} to ${value}`); // Log the name and value
+    console.log(`Changing ${name} to ${value}`);
     setClassData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setImage(e.target.files[0]); // Set the image in a separate state
+    setImage(e.target.files[0]);
   };
 
   const handleCreateClass = async () => {
@@ -137,10 +137,10 @@ function TeacherHome() {
 
     try {
       console.log("Creating class with data:", classData, image);
-      await fetchCreateClass(classData, image, token); // Use the separate image state
+      await fetchCreateClass(classData, image, token);
       toast.success("Class created successfully");
       setIsModalOpen(false);
-      setImage(null); // Reset image state
+      setImage(null);
       fetchTimetable();
     } catch (error) {
       toast.error(error.message || "Failed to create class");
@@ -150,7 +150,6 @@ function TeacherHome() {
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     const date = new Date(selectedDate);
-    const today = new Date();
     const minDate = new Date(today);
     minDate.setDate(today.getDate() + 2);
 
@@ -159,8 +158,7 @@ function TeacherHome() {
       return;
     }
 
-    // Format date as ISO string with time component
-    const formattedDate = `${selectedDate}T00:00:00`; // Add time component
+    const formattedDate = `${selectedDate}T00:00:00`;
 
     const jsDayOfWeek = date.getDay();
     const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
@@ -168,7 +166,7 @@ function TeacherHome() {
 
     setClassData((prevData) => ({
       ...prevData,
-      startDate: formattedDate, // Use formatted date with time
+      startDate: formattedDate,
       dayOfWeek,
     }));
   };

@@ -583,7 +583,20 @@ export const fetchOrdersByUser = async (token) => {
     throw error;
   }
 };
-
+//wallet-history
+export const fetchWalletHistory = async (token) => {
+  try {
+    const response = await api.get("/wallet/history", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 // Get Order by UserToken
 export const fetchOrderClasses = async (token) => {
   try {

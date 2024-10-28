@@ -1,8 +1,4 @@
-import {
-  fetchCoursesService,
-  fetchOrderClasses,
-  fetchOrdersByUser,
-} from "@/data/api";
+import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +15,6 @@ const MyClass = () => {
   ];
   const periods = Array.from({ length: 5 }, (_, i) => i + 1);
   const result = localStorage.getItem("result");
-
   let token;
   if (result) {
     try {
@@ -41,52 +36,71 @@ const MyClass = () => {
       8: "Chủ nhật",
     };
 
-    return classes.reduce((timetable, classItem) => {
-      const day = daysOfWeekMap[classItem.dayofWeek];
-      if (!timetable[day]) {
-        timetable[day] = {};
+    return classes.reduce((timetable, contentItem, index) => {
+      if (!contentItem || !contentItem.classDTO) {
+        console.log(
+          `Missing or undefined classDTO at index ${index}`,
+          contentItem
+        );
+        return timetable; // Skip this entry if classDTO is missing
       }
+      const classItem = contentItem.classDTO;
+      // Check if classItem and dayOfWeek exist
+      if (classItem && classItem.dayOfWeek && classItem.slotId) {
+        const day = daysOfWeekMap[classItem.dayOfWeek];
+        if (!timetable[day]) {
+          timetable[day] = {};
+        }
 
-      timetable[day][classItem.slotId] = {
-        subject: classItem.courseName,
-        code: classItem.courseCode,
-        class: classItem.code,
-        room: classItem.location,
-        id: classItem.classId,
-      };
+        timetable[day][classItem.slotId] = {
+          subject: classItem.name,
+          code: classItem.courseCode,
+          class: classItem.code,
+          room: classItem.location,
+          id: classItem.classId,
+          status: classItem.status,
+          orderId: contentItem.orderId, // Get orderId from parent object
+        };
+      }
 
       return timetable;
     }, {});
   };
+
   const navigate = useNavigate();
   const handleClick = (id) => {
     navigate(`/class/${id}`);
   };
-
   const fetchTimetable = async () => {
     try {
       const classes = await fetchOrderClasses(token);
-      console.log("Classes:", classes);
-      const orders = await fetchOrdersByUser(token);
-      console.log("Orders:", orders);
       const courses = await fetchCoursesService(token);
-      const updatedClasses = classes.data.content.map((classItem) => {
+
+      const updatedClasses = classes.data.content.map((contentItem) => {
+        const classItem = contentItem.classDTO;
         const matchedCourse = courses.find(
-          (c) => c.courseCode === classItem.courseCode
+          (course) => course.courseCode === classItem.courseCode
         );
-        if (matchedCourse) {
-          return { ...classItem, courseName: matchedCourse.name };
-        }
-        return classItem;
+
+        return {
+          ...contentItem,
+          classDTO: {
+            ...classItem,
+            courseName: matchedCourse ? matchedCourse.name : null,
+          },
+        };
       });
+
       setTimetable(convertClassesToTimetable(updatedClasses));
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching timetable:", error);
     }
   };
 
   useEffect(() => {
-    fetchTimetable();
+    if (token) {
+      fetchTimetable();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
@@ -105,19 +119,34 @@ const MyClass = () => {
           </p>
           <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
-          {lesson.room && (
-            <button
-              onClick={() => window.open(lesson.room, "_blank")}
-              className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
-            >
-              Meet URL
-            </button>
-          )}
+
+          {
+            lesson.status === "COMPLETED" ? (
+              // Case 1: If the lesson is COMPLETED, show the Feedback button
+              <button
+                onClick={() => {
+                  navigate(`/feedback/${lesson.orderId}`);
+                }}
+                className="mt-3 text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-1.5 px-4"
+              >
+                Feedback
+              </button>
+            ) : lesson.room ? (
+              // Case 2: If the lesson is NOT completed but has a Meet URL, show the Meet URL button
+              <button
+                onClick={() => window.open(lesson.room, "_blank")}
+                className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
+              >
+                Meet URL
+              </button>
+            ) : null // Case 3: Show nothing if none of the above conditions are met
+          }
         </div>
       );
     }
     return <div className="min-h-[80px]"></div>;
   };
+
   return (
     <div className="my-6 px-4">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">

@@ -13,48 +13,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import wallet from "../../assets/wallet.jpg"; // Ensure the path is correct
 import { useEffect, useState } from "react";
-import { fetchRecharge, fetchVNPayReturn, fetchBalance } from "../../data/api"; // Import the functions
+import {
+  fetchRecharge,
+  fetchVNPayReturn,
+  fetchBalance,
+  fetchWalletHistory,
+} from "../../data/api"; // Import the functions
 import { toast } from "react-hot-toast"; // Import toast
 import { useLocation, useNavigate } from "react-router-dom";
 
 export function MyWallet() {
   const [balance, setBalance] = useState(0); // Initial balance
   const [amount, setAmount] = useState(""); // Khởi tạo amount là chuỗi rỗng
-  const [transactions] = useState([
-    {
-      id: 1,
-      type: "credit",
-      amount: 50,
-      description: "Added funds",
-      date: "2023-06-15",
-    },
-    {
-      id: 2,
-      type: "debit",
-      amount: 15.5,
-      description: "Cafeteria payment",
-      date: "2023-06-14",
-    },
-    {
-      id: 3,
-      type: "debit",
-      amount: 25,
-      description: "Library fine",
-      date: "2023-06-12",
-    },
-    {
-      id: 4,
-      type: "credit",
-      amount: 100,
-      description: "Scholarship credit",
-      date: "2023-06-10",
-    },
-  ]);
+  const [transactions, setTransactions] = useState([]);
   const [errorMessage, setErrorMessage] = useState(""); // Thêm state để lưu thông báo lỗi
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   const location = useLocation();
   const navigate = useNavigate();
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const data = await fetchWalletHistory(token);
+        console.log("Transactions:", data);
+        setTransactions(data);
+      } catch (error) {
+        console.error("Failed to fetch transactions:", error);
+      }
+    };
 
+    fetchTransactions();
+  }, [token, location.state, transactions]);
   // Hàm định dạng số tiền sang tiền Việt Nam
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -240,7 +228,16 @@ export function MyWallet() {
       fetchPaymentReturn();
     }
   }, [location.search, token, navigate]);
+  const formatTransactionDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
 
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   const handleRecharge = async () => {
     if (amount <= 0) {
       setErrorMessage("Số tiền phải lớn hơn 0."); // Hiển thị thông báo lỗi
@@ -250,6 +247,15 @@ export function MyWallet() {
     try {
       const data = await fetchRecharge(amount, token);
       console.log("Recharge data:", data);
+      const newTransaction = {
+        id: Date.now(), // Use current timestamp as a temporary ID
+        amount: amount, // Amount credited (positive value)
+        transactionBalance: balance + amount, // New balance after credit
+        transactionDate: new Date().toISOString(), // Current date/time
+      };
+
+      // Update transactions state
+      setTransactions((prev) => [...prev, newTransaction]);
       window.open(data.paymentUrl, "_self"); // Mở trang thanh toán VNPay
     } catch (error) {
       console.error("Recharge failed:", error);
@@ -336,39 +342,57 @@ export function MyWallet() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {transactions.map((transaction) => (
-                <li
-                  key={transaction.id}
-                  className="flex items-center justify-between border-b pb-2"
-                >
-                  <div className="flex items-center">
-                    {transaction.type === "credit" ? (
-                      <ArrowUpRight className="mr-2 h-4 w-4 text-green-500" />
-                    ) : (
-                      <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
-                    )}
-                    <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-gray-500">
-                        {transaction.date}
+              {transactions.slice(0, 3).map((transaction) => {
+                const isCredit = transaction.amount >= 0; // If amount is positive or zero, it's credit
+                const formattedAmount = Math.abs(transaction.amount); // Use absolute value for display
+
+                return (
+                  <li
+                    key={transaction.id}
+                    className="flex items-center justify-between border-b pb-2"
+                  >
+                    <div className="flex items-center">
+                      {isCredit ? (
+                        <ArrowUpRight className="mr-2 h-4 w-4 text-green-500" />
+                      ) : (
+                        <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
+                      )}
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          {formatTransactionDate(transaction.transactionDate)}{" "}
+                          {/* Display formatted date */}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Transaction ID: {transaction.id}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <p
+                        className={`font-medium ${
+                          isCredit ? "text-green-500" : "text-red-500"
+                        }`}
+                      >
+                        {isCredit ? "+" : "-"}${formatCurrency(formattedAmount)}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        New Balance: $
+                        {formatCurrency(transaction.transactionBalance)}
                       </p>
                     </div>
-                  </div>
-                  <p
-                    className={`font-medium ${
-                      transaction.type === "credit"
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {transaction.type === "credit" ? "+" : "-"}$
-                    {formatCurrency(transaction.amount)}{" "}
-                    {/* Hiển thị số tiền đã định dạng */}
-                  </p>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </CardContent>
+          <CardFooter>
+            <Button
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+              onClick={() => navigate("/all-transactions")} // Navigate to all transactions
+            >
+              Show All Transactions
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>

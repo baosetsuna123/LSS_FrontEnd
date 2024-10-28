@@ -32,6 +32,7 @@ import { ViewAllClasses } from "./components/Student/All_Class";
 import { MyOrders } from "./components/Student/Order";
 import MyClass from "./components/Student/MyClass";
 import FeedbackForm from "./components/Student/Feedback";
+import { WalletHistory } from "./components/Student/All_Transactions";
 
 function App() {
   return (
@@ -95,6 +96,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/all-transactions" element={<WalletHistory />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/class" element={<ViewAllClasses />} />
