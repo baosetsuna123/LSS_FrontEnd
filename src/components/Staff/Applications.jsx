@@ -34,6 +34,7 @@ const ApplicationLayout = ({
       try {
         const data = await fetchApplicationStaff(token);
         const application = data.content;
+        console.log("Applications:", application);
         setApplications(application); // Set the fetched data to state
       } catch (error) {
         console.error("Failed to fetch applications:", error); // Log the error
@@ -81,7 +82,16 @@ const ApplicationLayout = ({
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
+                Major
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Experience
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Certificate
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                CV
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
@@ -106,11 +116,41 @@ const ApplicationLayout = ({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>{" "}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.description}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{app.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.major || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.experience || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.certificate || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.cv ? (
+                      <a
+                        href={app.cv}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View CV
+                      </a>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
+                      app.status === "APPROVE"
+                        ? " text-green-500"
+                        : app.status === "ASSIGNED"
+                        ? " text-yellow-500"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {app.status}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {app.teacherName}
@@ -123,7 +163,7 @@ const ApplicationLayout = ({
                           : "bg-blue-600 text-white hover:bg-blue-700"
                       }`}
                       onClick={() => handleClick(app.applicationId)}
-                      disabled={app.status === "APPROVE"}
+                      disabled={app.status === "Approved"}
                     >
                       {app.status === "APPROVE" ? "Approved" : "Approve"}
                     </button>
@@ -133,7 +173,7 @@ const ApplicationLayout = ({
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="9"
                   className="text-center text-red-600 py-4 font-semibold"
                 >
                   No Data

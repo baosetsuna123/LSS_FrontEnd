@@ -112,7 +112,7 @@ export const fetchForgotPassword = async (phoneNumber) => {
     }
   }
 };
-//verify-otp
+//verify-otp (forgot-password)
 export const fetchVerifyOtpApi = async (otp) => {
   try {
     const response = await api.post(
@@ -132,6 +132,21 @@ export const fetchVerifyOtpApi = async (otp) => {
     } else {
       throw new Error("An error occurred while verifying OTP.");
     }
+  }
+};
+//verify-otp (register)
+export const confirmOtp = async (otp) => {
+  try {
+    const response = await api.post("/auth/confirm-otp", null, {
+      params: { otp },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error confirming OTP:", error);
+    throw error.response?.data || error;
   }
 };
 //reset-password

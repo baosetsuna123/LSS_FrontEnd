@@ -26,7 +26,7 @@ export function Layout({ children }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredClasses, setFilteredClasses] = useState([]);
   const [hiddenHeader, setHiddenHeader] = useState(false);
-  const location = useLocation()
+  const location = useLocation();
   const result = localStorage.getItem("result");
 
   let role;
@@ -41,8 +41,8 @@ export function Layout({ children }) {
   }
   useEffect(() => {
     if (location.pathname) {
-      const paths = location.pathname.split('/');
-      if (paths.length > 1 && paths[1] === 'teacher') {
+      const paths = location.pathname.split("/");
+      if (paths.length > 1 && paths[1] === "teacher") {
         setHiddenHeader(true);
       } else {
         setHiddenHeader(false);
@@ -116,9 +116,6 @@ export function Layout({ children }) {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem("result");
-    localStorage.removeItem("classes");
-    localStorage.removeItem("activeCategory");
     setIsUserPopupVisible(false);
     clearClasses();
     setLoading(true);
@@ -128,10 +125,11 @@ export function Layout({ children }) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {
-        !hiddenHeader && <header
-          className={`px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50 transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
-            }`}
+      {!hiddenHeader && (
+        <header
+          className={`px-4 lg:px-6 h-14 flex items-center sticky top-0 bg-orange-500 z-50 transition-transform duration-300 ${
+            isVisible ? "translate-y-0" : "-translate-y-full"
+          }`}
         >
           <Link to="/" className="flex items-center justify-center">
             <BookOpen className="h-6 w-6 mr-2" />
@@ -234,16 +232,15 @@ export function Layout({ children }) {
                       <ShoppingBag className="h-4 w-4 mr-2" />
                       My Order
                     </Link>
-                    {
-                      role === "STUDENT" &&
+                    {role === "STUDENT" && (
                       <Link
                         to="/my-class"
                         className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                       >
                         <CalendarCheck className="h-4 w-4 mr-2" />
-                        My class
+                        My Class
                       </Link>
-                    }
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
@@ -264,7 +261,7 @@ export function Layout({ children }) {
             )}
           </nav>
         </header>
-      }
+      )}
       <main className="flex-1">{children}</main>
       <footer className="flex flex-col bg-orange-500 gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t font-semibold">
         <p className="text-xs">© 2024 EduCourse. All rights reserved.</p>

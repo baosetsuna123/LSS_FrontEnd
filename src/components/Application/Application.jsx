@@ -10,9 +10,11 @@ export function Application() {
     experience: "",
     cv: "",
     certificate: "",
-  })
+  });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const status = "PENDING";
+  const [isLoading, setIsLoading] = useState(false); // Loading state for button
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,16 +27,22 @@ export function Application() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const requestBody = { status: status, ...formData};
+    setIsLoading(true);
+    const requestBody = { status: status, ...formData };
     try {
       const response = await fetchCreateApplication(requestBody);
       console.log("Application created successfully:", response);
       toast.success("Application created successfully");
       setFormSubmitted(true);
-      setTimeout(() => navigate("/login"), 2000);
+      navigate("/login");
     } catch (error) {
-      console.error("Application creation failed:", error.response ? error.response.data : error.message);
+      console.error(
+        "Application creation failed:",
+        error.response ? error.response.data : error.message
+      );
       toast.error("Application creation failed");
+    } finally {
+      setIsLoading(false); // Stop loading after request completes
     }
   };
 
@@ -123,14 +131,18 @@ export function Application() {
           </div>
           <button
             type="submit"
-            className="w-full bg-gray-900 text-white font-semibold px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+            disabled={isLoading} // Disable button when loading
+            className={`w-full text-white font-semibold px-4 py-2 rounded transition-colors ${
+              isLoading ? "bg-gray-400" : "bg-gray-900 hover:bg-gray-600"
+            }`}
           >
-            Gửi đơn
+            {isLoading ? "Submitting..." : "Gửi đơn"}
           </button>
         </form>
         {formSubmitted && (
           <div className="mt-4 p-4 bg-green-100 text-green-700 rounded">
-            Đơn của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ lại với bạn sớm.
+            Đơn của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ
+            lại với bạn sớm.
           </div>
         )}
       </div>

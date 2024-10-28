@@ -148,7 +148,6 @@ export function Dashboard() {
   // Function to handle logout
   const handleLogout = (e) => {
     e.stopPropagation();
-    localStorage.removeItem("result");
     logout();
     toast.success("You have logged out successfully.");
     navigate("/login");

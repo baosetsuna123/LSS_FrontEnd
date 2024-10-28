@@ -13,11 +13,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { getClasses } = useClassContext();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetchLogin(username, password);
+
       localStorage.setItem("result", JSON.stringify(response.data));
       sessionStorage.setItem("token", response.data.token);
       login();
@@ -40,14 +40,38 @@ export default function Login() {
             classFetchError
           );
           toast.error("Failed to fetch classes. Please try again.");
-          return; // Prevent further execution if fetching classes fails
+          return;
         }
       }
 
       getClasses(response.data.token); // Optionally fetch classes based on the role
       toast.success("Login successful");
     } catch (error) {
-      toast.error("Login failed");
+      if (error.response) {
+        const status = error.response.status;
+
+        switch (status) {
+          case 404:
+            toast.error("Account does not exist. Please sign up.");
+            break;
+          case 401:
+            toast.error("Invalid username or password.");
+            break;
+          case 500:
+            toast.error("Server error. Please try again later.");
+            break;
+          default:
+            toast.error("Login failed. Please try again.");
+        }
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error(
+          "Unable to connect to the server. Please check your internet connection."
+        );
+      } else {
+        // Something else went wrong
+        toast.error("Login failed. Please try again.");
+      }
       console.error("Login failed:", error);
     }
   };

@@ -13,6 +13,9 @@ function TeacherHome() {
   const [slots, setSlots] = useState([]);
   const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const today = new Date();
+  today.setDate(today.getDate() + 2); // Set minimum date to two days from today
+  const minDateString = today.toISOString().split("T")[0];
   const [image, setImage] = useState(null); // Separate image state
   const [classData, setClassData] = useState({
     name: "",
@@ -22,7 +25,7 @@ function TeacherHome() {
     maxStudents: 15,
     price: 100000,
     slotId: "1",
-    startDate: "",
+    startDate: today,
     courseCode: "",
     dayofWeek: "",
   });
@@ -35,7 +38,13 @@ function TeacherHome() {
     "Thứ 7",
     "Chủ nhật",
   ];
-  const periods = Array.from({ length: 5 }, (_, i) => i + 1);
+  const periods = [
+    { id: 1, time: "7h00 - 9h15" },
+    { id: 2, time: "9h30 - 11h45" },
+    { id: 3, time: "12h30 - 14h45" },
+    { id: 4, time: "15h00 - 17h15" },
+    { id: 5, time: "17h45 - 20h00" },
+  ];
   const result = localStorage.getItem("result");
 
   let token;
@@ -164,19 +173,22 @@ function TeacherHome() {
     }));
   };
 
-  const today = new Date();
-  today.setDate(today.getDate() + 2); // Set minimum date to two days from today
-  const minDateString = today.toISOString().split("T")[0];
-
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
     if (lesson) {
       return (
-        <div className="p-2 bg-blue-100 h-full border border-blue-200 rounded">
-          <p className="font-bold text-sm">{lesson.subject}</p>
-          <p className="text-xs">Mã: {lesson.code}</p>
-          <p className="text-xs">Lớp: {lesson.class}</p>
-          <p className="text-xs">Phòng: {lesson.room}</p>
+        <div className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105">
+          <p className="font-bold text-base text-blue-800">{lesson.subject}</p>
+          <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
+          <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
+          {lesson.room && (
+            <button
+              onClick={() => window.open(lesson.room, "_blank")}
+              className="mt-3 inline-flex items-center text-xs font-semibold text-white bg-gray-600 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 py-1 px-3"
+            >
+              Meet URL
+            </button>
+          )}
         </div>
       );
     }
@@ -184,24 +196,24 @@ function TeacherHome() {
   };
 
   return (
-    <div>
+    <div className="p-6 bg-gray-50 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Thời khóa biểu</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Thời khóa biểu</h2>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
         >
           Create Class
         </button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
+        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-200 text-gray-700">
               <th className="py-2 px-4 border-b border-r">Ca học</th>
               {days.map((day) => (
-                <th key={day} className="py-2 px-4 border-b">
+                <th key={day} className="py-2 px-4 border-b text-center">
                   {day}
                 </th>
               ))}
@@ -209,16 +221,22 @@ function TeacherHome() {
           </thead>
           <tbody>
             {periods.map((period) => (
-              <tr key={period}>
-                <td className="py-2 px-4 border-b border-r font-bold text-center">
-                  Tiết {period}
+              <tr
+                key={period.id}
+                className="hover:bg-gray-100 transition duration-150"
+              >
+                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
+                  Tiết {period.id}
+                  <div className="text-xs text-gray-600">
+                    {"(" + period.time + ")"}
+                  </div>
                 </td>
                 {days.map((day) => (
                   <td
-                    key={`${day}-${period}`}
-                    className="border-b border-r p-2 max-w-[150px]"
+                    key={`${day}-${period.id}`}
+                    className="border-b border-r p-2 text-center max-w-[150px]"
                   >
-                    {renderTimetableCell(day, period)}
+                    {renderTimetableCell(day, period.id)}
                   </td>
                 ))}
               </tr>
@@ -234,7 +252,7 @@ function TeacherHome() {
         className="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <h2 className="text-xl font-bold mb-4">Create Class</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-800">Create Class</h2>
         <div className="grid grid-cols-2 gap-4">
           <input
             type="text"
@@ -242,7 +260,7 @@ function TeacherHome() {
             placeholder="Class Name"
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
@@ -250,18 +268,18 @@ function TeacherHome() {
             placeholder="Class Code"
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <textarea
             name="description"
             placeholder="Description"
             onChange={handleInputChange}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
             name="slotId"
             onChange={handleInputChange}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {slots.map((slot) => (
               <option key={slot.slotId} value={slot.slotId}>
@@ -272,7 +290,7 @@ function TeacherHome() {
           <select
             name="courseCode"
             onChange={handleInputChange}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Course</option>
             {courses.map((course) => (
@@ -289,7 +307,7 @@ function TeacherHome() {
             max={30}
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="number"
@@ -299,37 +317,25 @@ function TeacherHome() {
             max={500000}
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="date"
             min={minDateString}
             onChange={handleDateChange}
             required
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <select
-            name="dayOfWeek"
-            onChange={handleInputChange}
-            className="border p-2 rounded w-full"
-          >
-            <option value="">Select Day</option>
-            {days.map((day, index) => (
-              <option key={index} value={index + 2}>
-                {day}
-              </option>
-            ))}
-          </select>
           <input
             type="file"
             onChange={handleFileChange}
             accept="image/*"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <button
           onClick={handleCreateClass}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
         >
           Create
         </button>

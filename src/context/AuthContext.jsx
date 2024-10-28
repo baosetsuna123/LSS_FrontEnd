@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsLoggedIn(false);
-    sessionStorage.removeItem("token"); // Clear token on logout
+    sessionStorage.clear();
+    localStorage.clear();
   };
 
   useEffect(() => {}, [isLoggedIn]);

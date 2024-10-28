@@ -13,8 +13,10 @@ import {
   Coins,
   GraduationCap,
   User,
-  UserRound,
   AlertCircle,
+  MapPin,
+  Users,
+  UserCheck,
 } from "lucide-react"; // Icon for the modal header
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -78,6 +80,7 @@ export function ClassDetail() {
   useEffect(() => {
     const fetchClassDetail = async () => {
       const response = await fetchClassbyID(id, token); // Replace with your API
+      console.log(response);
       setClassDetail(response);
       const storedResult = localStorage.getItem("result");
       const currentUserName = storedResult
@@ -187,17 +190,21 @@ export function ClassDetail() {
                       <span>Start Date: {classDetail?.startDate}</span>
                     </div>
                     <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      <span>End Date: {classDetail?.endDate}</span>
+                      <Clock className="mr-2 h-4 w-4" />
+                      <span>Day of Week: {classDetail?.dayofWeek}</span>
                     </div>
                     <div className="flex items-center">
                       <Code className="mr-2 h-4 w-4" />
                       <span>Course Code: {classDetail?.courseCode}</span>
                     </div>
                     <div className="flex items-center">
-                      <UserRound className="mr-2 h-4 w-4" />
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Max Students: {classDetail?.maxStudents}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <UserCheck className="mr-2 h-4 w-4" />
                       <span>
-                        Student Joined: {classDetail?.students?.length || 0}
+                        Students Joined: {classDetail?.students?.length || 0}
                       </span>
                     </div>
                   </CardContent>
@@ -209,11 +216,25 @@ export function ClassDetail() {
                   <CardContent className="space-y-2">
                     <div className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
-                      <span>{classDetail?.fullName}</span>
+                      <span>Instructor Name: {classDetail?.fullName}</span>
                     </div>
                     <div className="flex items-center">
                       <GraduationCap className="mr-2 h-4 w-4" />
-                      <span>{classDetail?.teacherName}</span>
+                      <span>Teacher Username: {classDetail?.teacherName}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      <span>
+                        Location:{" "}
+                        <a
+                          href={classDetail?.location}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                        >
+                          Join Meeting
+                        </a>
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
