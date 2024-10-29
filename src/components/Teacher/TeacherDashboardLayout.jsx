@@ -9,6 +9,7 @@ import {
   FaList,
   FaBars,
   FaTimes,
+  FaDollarSign,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
@@ -68,6 +69,11 @@ function TeacherDashboardLayout() {
       path: "/teacher/class-list",
       label: "Xem danh sách lớp học",
       icon: FaList,
+    },
+    {
+      path: "/teacher/send-applications",
+      label: "Gửi đơn rút tiền",
+      icon: FaDollarSign,
     },
   ];
 

@@ -33,6 +33,7 @@ import { MyOrders } from "./components/Student/Order";
 import MyClass from "./components/Student/MyClass";
 import FeedbackForm from "./components/Student/Feedback";
 import { WalletHistory } from "./components/Student/All_Transactions";
+import { SendApplication } from "./components/send-application";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
             <Route path="qualification" element={<QualificationForm />} />
+            <Route path="send-applications" element={<SendApplication />} />
             <Route path="assign-classes" element={<AssignClasses />} />
             <Route path="update-schedule" element={<UpdateSchedule />} />
             <Route path="cancel-request" element={<CancelClassRequest />} />
@@ -97,6 +99,7 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/all-transactions" element={<WalletHistory />} />
+          <Route path="/send-applications" element={<SendApplication />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/class" element={<ViewAllClasses />} />

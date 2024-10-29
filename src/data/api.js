@@ -642,3 +642,77 @@ export const submitFeedback = async (orderId, feedbackData, token) => {
     throw error;
   }
 };
+//application form (withdraw)
+export const submitWithdrawal = async (withdrawalRequest, token) => {
+  try {
+    const response = await api.post(
+      `/applicationUser/submit/withdrawal`,
+      withdrawalRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting withdrawal:", error);
+    throw error;
+  }
+};
+
+export const submitOther = async (otherRequest, token) => {
+  try {
+    const response = await api.post(
+      `applicationUser/submit/other`,
+      otherRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting other request:", error);
+    throw error;
+  }
+};
+
+export const getApplicationsByType = async (applicationTypeId, token) => {
+  try {
+    const response = await api.get(
+      `applicationUser/applications/${applicationTypeId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching applications by type:", error);
+    throw error;
+  }
+};
+
+export const completeWithdrawalRequest = async (applicationUserId, token) => {
+  try {
+    const response = await api.post(
+      `applicationUser/complete`,
+      null,
+      {
+        params: { applicationUserId },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error completing withdrawal request:", error);
+    throw error;
+  }
+};

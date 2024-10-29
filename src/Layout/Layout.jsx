@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import {
   BookOpen,
   CalendarCheck,
+  Dock,
   LogOut,
   Search,
   ShoppingBag,
@@ -241,6 +242,13 @@ export function Layout({ children }) {
                         My Timetable
                       </Link>
                     )}
+                    <Link
+                      to="/send-applications"
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <Dock className="h-4 w-4 mr-2" />
+                      Send Applications
+                    </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
