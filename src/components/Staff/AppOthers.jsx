@@ -1,24 +1,24 @@
-import { useState, useEffect } from "react";
-import { fetchApplicationStaff, fetchApproveApplication } from "@/data/api"; // Import the API function
+import { completeWithdrawalRequest } from "@/data/api"; // Import the API function
 import { toast } from "react-hot-toast";
 import { Search } from "lucide-react";
 
-const ApplicationLayout = ({
+const AppOthers = ({
   currentPage,
   itemsPerPage,
   searchQuery,
   setSearchQuery,
+  appother,
+  setAppOther,
 }) => {
-  const [applications, setApplications] = useState([]); // State to hold application data
   const token = sessionStorage.getItem("token"); // Get the token from session storage
 
   const handleClick = async (id) => {
     try {
-      const response = await fetchApproveApplication(id, token);
+      const response = await completeWithdrawalRequest(id, token);
       console.log(response);
-      setApplications((prevApplications) =>
+      setAppOther((prevApplications) =>
         prevApplications.map((app) =>
-          app.applicationId === id ? { ...app, status: "APPROVE" } : app
+          app.applicationUserId === id ? { ...app, status: "completed" } : app
         )
       );
       toast.success("Application approved successfully");
@@ -28,26 +28,9 @@ const ApplicationLayout = ({
     }
   };
 
-  // Fetch application data on component mount
-  useEffect(() => {
-    const loadApplications = async () => {
-      try {
-        const data = await fetchApplicationStaff(token);
-        const application = data.content;
-        console.log("Applications:", application);
-        setApplications(application); // Set the fetched data to state
-      } catch (error) {
-        console.error("Failed to fetch applications:", error); // Log the error
-        toast.error("Failed to fetch applications."); // Show error message
-      }
-    };
-
-    loadApplications();
-  }, [token]);
-
   // Calculate the current data to display based on pagination and search query
-  const filteredApplications = applications.filter((app) =>
-    app.teacherName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredApplications = appother.filter((app) =>
+    app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const currentData = filteredApplications.slice(
@@ -82,25 +65,16 @@ const ApplicationLayout = ({
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Major
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Experience
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Certificate
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                CV
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+                Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Title
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Teacher Name
+                Reason
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Action
@@ -111,61 +85,48 @@ const ApplicationLayout = ({
             {currentData.length > 0 ? (
               currentData.map((app, index) => (
                 <tr
-                  key={app.applicationId}
+                  key={app.applicationUserId}
                   className="hover:bg-gray-100 transition duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.major || "N/A"}
+                    {app.name || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.experience || "N/A"}
+                    {app.title || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.certificate || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.cv ? (
-                      <a
-                        href={app.cv}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        View CV
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
+                    {
+                      app.description
+                        .split(", ")
+                        .find((part) => part.startsWith("Reason:"))
+                        .split(": ")[1]
+                    }
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
-                      app.status === "APPROVE"
+                      app.status === "completed"
                         ? " text-green-500"
-                        : app.status === "ASSIGNED"
+                        : app.status === "pending"
                         ? " text-yellow-500"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
                     {app.status}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.teacherName.slice(0, 20)} ...
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       className={`px-4 py-2 rounded-md transition duration-200 ${
-                        app.status === "APPROVE"
+                        app.status === "completed"
                           ? "bg-gray-400 text-white cursor-not-allowed"
                           : "bg-blue-600 text-white hover:bg-blue-700"
                       }`}
-                      onClick={() => handleClick(app.applicationId)}
-                      disabled={app.status === "Approved"}
+                      onClick={() => handleClick(app.applicationUserId)}
+                      disabled={app.status === "completed"}
                     >
-                      {app.status === "APPROVE" ? "Approved" : "Approve"}
+                      {app.status === "completed" ? "Approved" : "Approve"}
                     </button>
                   </td>
                 </tr>
@@ -187,4 +148,4 @@ const ApplicationLayout = ({
   );
 };
 
-export default ApplicationLayout;
+export default AppOthers;

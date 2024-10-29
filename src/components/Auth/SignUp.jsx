@@ -10,7 +10,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import backgroundImage from "../../assets/background2.png";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchSignUpStudent, fetchSignUpTeacher } from "@/data/api"; // Import the teacher registration API
 import { toast } from "react-hot-toast";
 
@@ -20,12 +20,13 @@ export default function SignUp() {
   const [fullName, setName] = useState("");
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const location = useLocation();
+  const initialUserType = location.state?.userType || "student"; // Default to 'student' if not provided
+  const [userType, setUserType] = useState(initialUserType);
   const [phoneNumber, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("student");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

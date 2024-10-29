@@ -33,7 +33,10 @@ import { MyOrders } from "./components/Student/Order";
 import MyClass from "./components/Student/MyClass";
 import FeedbackForm from "./components/Student/Feedback";
 import { WalletHistory } from "./components/Student/All_Transactions";
-import { SendApplication } from "./components/send-application";
+import { SendApplication } from "./components/Student/send-application";
+import { AdminLayout } from "./components/Admin/admin-layout";
+import AdminHome from "./components/Admin/AdminHome";
+import { AboutMe } from "./components/AboutMe";
 
 function App() {
   return (
@@ -43,7 +46,18 @@ function App() {
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
+        {/* Staff Dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
+        {/* Admin Dashboard */}
+        <Route
+          element={
+            <AdminLayout>
+              <Outlet />
+            </AdminLayout>
+          }
+        >
+          <Route path="/admin-dashboard" element={<AdminHome />} />
+        </Route>
 
         {/* Teacher Dashboard Routes */}
         <Route
@@ -101,6 +115,7 @@ function App() {
           <Route path="/all-transactions" element={<WalletHistory />} />
           <Route path="/send-applications" element={<SendApplication />} />
           <Route path="/" element={<CourseLandingPage />} />
+          <Route path="/about-me" element={<AboutMe />} />
           <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/class" element={<ViewAllClasses />} />
           <Route path="/feedback/:orderId" element={<FeedbackForm />} />

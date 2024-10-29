@@ -42,6 +42,8 @@ export default function Login() {
           toast.error("Failed to fetch classes. Please try again.");
           return;
         }
+      } else if (response.data.role === "ADMIN") {
+        navigate("/admin-dashboard");
       }
 
       getClasses(response.data.token); // Optionally fetch classes based on the role
