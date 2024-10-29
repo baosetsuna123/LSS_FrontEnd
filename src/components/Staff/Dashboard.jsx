@@ -20,9 +20,12 @@ import {
   fetchAllCategories,
   fetchAllCourses,
   fetchApplicationStaff,
+  getApplicationsByType,
   // fetchClasses,
 } from "@/data/api"; // Import the API function
 import { useAuth } from "@/context/AuthContext";
+import AppWithDraw from "./AppWithdraw";
+import AppOthers from "./AppOthers";
 
 export function Dashboard() {
   const { logout } = useAuth();
@@ -42,6 +45,9 @@ export function Dashboard() {
   const [searchQueryCategory, setSearchQueryCategory] = useState("");
   const [searchQueryApplication, setSearchQueryApplication] = useState("");
   const [searchQueryCourse, setSearchQueryCourse] = useState("");
+  const [searchQueryDraw, setSearchQueryDraw] = useState("");
+  const [searchQueryOther, setSearchQueryOther] = useState("");
+
   const [searchQueryClass] = useState("");
   const [totalCategories, setTotalCategories] = useState(0); // Track total categories
 
@@ -80,7 +86,40 @@ export function Dashboard() {
 
     loadCategories();
   }, []);
+  const [appwithdraw, setAppWithdraw] = useState([]);
+  const [isWithdrawMenuOpen, setIsWithdrawMenuOpen] = useState(false); // State for toggling Withdraw menu
 
+  const [appother, setAppOther] = useState([]);
+  useEffect(() => {
+    const loadAppWithdraws = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const data = await getApplicationsByType(1, token);
+        setAppWithdraw(data); // Ensure applications is always an array
+      } catch (error) {
+        console.error("Failed to fetch applications:", error);
+        toast.error("Failed to fetch applications.");
+        setApplications([]); // Set to an empty array on error
+      }
+    };
+
+    loadAppWithdraws();
+  }, []);
+  useEffect(() => {
+    const loadAppWOthers = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const data = await getApplicationsByType(2, token);
+        setAppOther(data); // Ensure applications is always an array
+      } catch (error) {
+        console.error("Failed to fetch applications:", error);
+        toast.error("Failed to fetch applications.");
+        setApplications([]); // Set to an empty array on error
+      }
+    };
+
+    loadAppWOthers();
+  }, []);
   // Fetch applications on component mount
   useEffect(() => {
     const loadApplications = async () => {
@@ -135,13 +174,18 @@ export function Dashboard() {
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
   const pageCountCourse = Math.ceil(courses.length / itemsPerPage);
   const pageCountClass = Math.ceil(classes.length / itemsPerPage);
+  const pageCountDraw = Math.ceil(appwithdraw.length / itemsPerPage);
+  const pageCountOther = Math.ceil(appother.length / itemsPerPage);
+
   // Function to check if any search query is active
   const isSearchActive = () => {
     return (
       searchQueryCategory.trim() !== "" ||
       searchQueryApplication.trim() !== "" ||
       searchQueryCourse.trim() !== "" ||
-      searchQueryClass.trim() !== ""
+      searchQueryClass.trim() !== "" ||
+      searchQueryDraw.trim() !== "" ||
+      searchQueryOther.trim() !== ""
     );
   };
 
@@ -229,6 +273,7 @@ export function Dashboard() {
               <LayoutGrid size={20} className="mr-2" />
               Category
             </button>
+
             <button
               onClick={() => {
                 setActiveCategory("application");
@@ -239,8 +284,51 @@ export function Dashboard() {
               }`}
             >
               <AppWindowMac size={20} className="mr-2" />
-              Application
+              Application (Register)
             </button>
+
+            {/* New Button for Application (Withdraw) */}
+            <button
+              onClick={() => {
+                setIsWithdrawMenuOpen(!isWithdrawMenuOpen); // Toggle Withdraw menu
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                activeCategory === "withdraw" ? "bg-gray-200" : ""
+              }`}
+            >
+              <AppWindowMac size={20} className="mr-2" />
+              Application (Withdraw)
+            </button>
+
+            {isWithdrawMenuOpen && ( // Show child buttons if menu is open
+              <div className="pl-4">
+                {" "}
+                {/* Indent child buttons */}
+                <button
+                  onClick={() => {
+                    setActiveCategory("withdraw");
+                    setCurrentPage(1); // Reset to page 1 when changing category
+                  }}
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                    activeCategory === "withdraw" ? "bg-gray-200" : ""
+                  }`}
+                >
+                  Withdraw
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveCategory("others");
+                    setCurrentPage(1); // Reset to page 1 when changing category
+                  }}
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                    activeCategory === "others" ? "bg-gray-200" : ""
+                  }`}
+                >
+                  Others
+                </button>
+              </div>
+            )}
+
             <button
               onClick={() => {
                 setActiveCategory("course");
@@ -370,6 +458,30 @@ export function Dashboard() {
               loading={loading}
             />
           )}
+          {activeCategory === "withdraw" && (
+            <AppWithDraw
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              setCurrentPage={setCurrentPage}
+              appwithdraw={appwithdraw}
+              setAppWithdraw={setAppWithdraw}
+              searchQuery={searchQueryDraw}
+              setSearchQuery={setSearchQueryDraw} // Pass down the search query state
+              loading={loading}
+            />
+          )}
+          {activeCategory === "others" && (
+            <AppOthers
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              setCurrentPage={setCurrentPage}
+              appother={appother}
+              setAppOther={setAppOther}
+              searchQuery={searchQueryOther}
+              setSearchQuery={setSearchQueryOther} // Pass down the search query state
+              loading={loading}
+            />
+          )}
           {/* {activeCategory === "class" && (
             // <ClassLayout
             //   currentPage={currentPage}
@@ -495,6 +607,62 @@ export function Dashboard() {
                   </button>
                 </div>
               )}
+              {activeCategory === "withdraw" &&
+                appwithdraw.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountDraw}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountDraw)
+                        )
+                      }
+                      disabled={currentPage === pageCountDraw}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              {activeCategory === "others" &&
+                appother.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountOther}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountOther)
+                        )
+                      }
+                      disabled={currentPage === pageCountOther}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
             </>
           )}
         </div>

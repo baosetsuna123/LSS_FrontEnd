@@ -698,21 +698,27 @@ export const getApplicationsByType = async (applicationTypeId, token) => {
 
 export const completeWithdrawalRequest = async (applicationUserId, token) => {
   try {
-    const response = await api.post(
-      `applicationUser/complete`,
-      null,
-      {
-        params: { applicationUserId },
+    const response = await api.post(`applicationUser/complete`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      params: {
+        applicationUserId: applicationUserId, // Pass the application ID as a request param
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error completing withdrawal request:", error);
+    throw error;
+  }
+};
+//admin-assign
+export const AssignApplication = async () => {
+  try {
+    const response = await api.post(`applications/admin/applications/assign`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching applications by type:", error);
     throw error;
   }
 };

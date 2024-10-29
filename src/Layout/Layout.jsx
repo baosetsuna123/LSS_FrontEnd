@@ -190,15 +190,9 @@ export function Layout({ children }) {
             </Link>
             <Link
               className="text-sm font-medium hover:underline underline-offset-4"
-              to="/about"
+              to="/about-me"
             >
               About
-            </Link>
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              to="/contact"
-            >
-              Contact
             </Link>
             {isLoggedIn ? (
               <div className="relative">
