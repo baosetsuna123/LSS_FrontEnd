@@ -324,7 +324,9 @@ function TeacherHome() {
           >
             {Array.from({ length: 7 - startDate }, (_, index) => (
               <option key={startDate + index + 2} value={startDate + index + 2}>
-                Thứ {startDate + index + 2}
+                {
+                  startDate + index + 2 === 8 ? "Chủ nhật" : `Thứ ${startDate + index + 2}`
+                }
               </option>
             ))}
           </select>
