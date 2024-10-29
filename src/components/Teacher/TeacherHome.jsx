@@ -25,7 +25,7 @@ function TeacherHome() {
     maxStudents: 15,
     price: 100000,
     slotId: "1",
-    startDate: today,
+    startDate: "",
     courseCode: "",
     dayOfWeek: "",
   });
@@ -105,6 +105,7 @@ function TeacherHome() {
     try {
       const fetchedSlots = await fetchSlots(token);
       const fetchedCourses = await fetchCoursesService(token);
+      console.log("Fetched slots:", fetchedSlots);
       setSlots(fetchedSlots);
       setCourses(fetchedCourses);
     } catch (error) {
@@ -150,8 +151,9 @@ function TeacherHome() {
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     const date = new Date(selectedDate);
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() + 2);
+
+    // Ensure selected date is at least two days from today
+    const minDate = new Date(minDateString);
 
     if (date < minDate) {
       toast.error("Start date must be at least 2 days from today");
@@ -159,7 +161,6 @@ function TeacherHome() {
     }
 
     const formattedDate = `${selectedDate}T00:00:00`;
-
     const jsDayOfWeek = date.getDay();
     const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
     const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import backgroundImage from "../../assets/background2.png";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -13,13 +13,7 @@ export default function VerifyOtp() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [showConfirm, setShowConfirm] = useState(false); // Added state for confirmation dialog
-  useEffect(() => {
-    const pendingSignupType = sessionStorage.getItem("pendingSignupType");
-    if (!pendingSignupType) {
-      // No pending signup, redirect to signup page
-      navigate("/signup");
-    }
-  }, [navigate]);
+
   const handleVerifyOtp = async (event) => {
     event.preventDefault();
     setIsLoading(true);
