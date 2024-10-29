@@ -1,6 +1,7 @@
 import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import WeekSelector from "../Teacher/WeekSelector";
 
 const MyClass = () => {
   const [timetable, setTimetable] = useState({});
@@ -13,6 +14,10 @@ const MyClass = () => {
     "Thứ 7",
     "Chủ nhật",
   ];
+  const [selectedWeekData, setSelectedWeekData] = useState({
+    week: null,
+    range: ""
+  });
   const periods = Array.from({ length: 5 }, (_, i) => i + 1);
   const result = localStorage.getItem("result");
   let token;
@@ -24,6 +29,9 @@ const MyClass = () => {
       console.error("Error parsing result from localStorage:", error);
     }
   }
+  const handleWeekChange = (week, range) => {
+    setSelectedWeekData({ week, range });
+  };
 
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
@@ -74,9 +82,16 @@ const MyClass = () => {
   const fetchTimetable = async () => {
     try {
       const classes = await fetchOrderClasses(token);
+      console.log(classes)
+      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" - ");
+      const startRange = new Date(startRangeStr);
+      const endRange = new Date(endRangeStr);
+      const filteredClasses = classes.data.content.filter(item => {
+        const classStartDate = new Date(item.classDTO.startDate);
+        return classStartDate >= startRange && classStartDate <= endRange;
+      });
       const courses = await fetchCoursesService(token);
-
-      const updatedClasses = classes.data.content.map((contentItem) => {
+      const updatedClasses = filteredClasses.map((contentItem) => {
         const classItem = contentItem.classDTO;
         const matchedCourse = courses.find(
           (course) => course.courseCode === classItem.courseCode
@@ -98,11 +113,9 @@ const MyClass = () => {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchTimetable();
-    }
+    fetchTimetable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token,selectedWeekData]);
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
@@ -152,6 +165,7 @@ const MyClass = () => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
         Thời khóa biểu của tôi
       </h2>
+      <WeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
           <thead>

@@ -171,13 +171,6 @@ function UpdateSchedule() {
 
   console.log(editingClass);
 
-  useEffect(() => {
-    if (editingClass && editingClass.startDate) {
-      setStartTime(editingClass.startDate.split("T")[0]);
-      setEndTime(editingClass.endDate.split("T")[0]);
-    }
-  }, [editingClass]);
-
   const filteredClasses = classesUpdated.filter(
     (cls) =>
       cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -321,11 +314,11 @@ function UpdateSchedule() {
                 </select>
               </div>
               <div className="mb-4 col-span-2">
-                <label className="block mb-2 font-medium text-gray-700">
+                {/* <label className="block mb-2 font-medium text-gray-700">
                   Thời gian học:
-                </label>
+                </label> */}
                 <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
+                  {/* <div className="relative flex-1">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       type="date"
@@ -334,7 +327,7 @@ function UpdateSchedule() {
                       onChange={(e) => handleTimeChange(e, "start")}
                       className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                  </div>
+                  </div> */}
                   {/* <span className="text-gray-500">đến</span>
                   <div className="relative flex-1">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />

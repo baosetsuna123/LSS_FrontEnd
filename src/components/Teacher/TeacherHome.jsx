@@ -7,6 +7,9 @@ import {
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
 import toast from "react-hot-toast";
+import ShowDetailTimeTable from "./ShowDetailTimeTable";
+import WeekSelector from "./WeekSelector";
+
 
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
@@ -16,7 +19,15 @@ function TeacherHome() {
   const today = new Date();
   today.setDate(today.getDate() + 2);
   const minDateString = today.toISOString().split("T")[0];
+  const [date, setDate] = useState(null);
   const [image, setImage] = useState(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [infoClass, setInfoClass] = useState(null);
+  const [classes, setClasses] = useState([]);
+  const [selectedWeekData, setSelectedWeekData] = useState({
+    week: null,
+    range: ""
+  });
   const [classData, setClassData] = useState({
     name: "",
     code: "",
@@ -46,7 +57,6 @@ function TeacherHome() {
     { id: 5, time: "17h45 - 20h00" },
   ];
   const result = localStorage.getItem("result");
-
   let token;
   if (result) {
     try {
@@ -82,11 +92,24 @@ function TeacherHome() {
     }, {});
   };
 
+
+  const handleWeekChange = (week, range) => {
+    setSelectedWeekData({ week, range });
+  };
+
   const fetchTimetable = async () => {
     try {
       const classes = await fetchClassbyteacher(token);
+      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" - ");
+      const startRange = new Date(startRangeStr);
+      const endRange = new Date(endRangeStr);
+      const filteredClasses = classes.filter(item => {
+        const classStartDate = new Date(item.startDate);
+        return classStartDate >= startRange && classStartDate <= endRange;
+      });
+      setClasses(filteredClasses);
       const courses = await fetchCoursesService(token);
-      const updatedClasses = classes.map((classItem) => {
+      const updatedClasses = filteredClasses.map((classItem) => {
         const matchedCourse = courses.find(
           (c) => c.courseCode === classItem.courseCode
         );
@@ -100,6 +123,7 @@ function TeacherHome() {
       console.log(error);
     }
   };
+
 
   const fetchDropdownData = async () => {
     try {
@@ -116,7 +140,7 @@ function TeacherHome() {
   useEffect(() => {
     fetchTimetable();
     fetchDropdownData();
-  }, [token]);
+  }, [token, selectedWeekData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -135,7 +159,7 @@ function TeacherHome() {
     if (classData.price < 100000 || classData.price > 500000) {
       return toast.error("Price must be between 100,000 and 500,000");
     }
-
+    console.log(classData)
     try {
       console.log("Creating class with data:", classData, image);
       await fetchCreateClass(classData, image, token);
@@ -164,7 +188,7 @@ function TeacherHome() {
     const jsDayOfWeek = date.getDay();
     const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
     const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
-
+    setDate(selectedDate)
     setClassData((prevData) => ({
       ...prevData,
       startDate: formattedDate,
@@ -172,11 +196,17 @@ function TeacherHome() {
     }));
   };
 
+  const handleShowDetail = (lesson) => {
+    const data = classes.find(c => c.code === lesson.class);
+    setShowDetail(true);
+    setInfoClass(data);
+  };
+
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
     if (lesson) {
       return (
-        <div className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105">
+        <div className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer" onClick={() => handleShowDetail(lesson)}>
           <p className="font-bold text-base text-blue-800">{lesson.subject}</p>
           <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
@@ -193,6 +223,16 @@ function TeacherHome() {
     }
     return null;
   };
+  const [startDate, setStartDate] = useState(null);
+  const getDayOfWeek = (dateString) => {
+    const dateObj = new Date(dateString);
+    return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  };
+
+  useEffect(() => {
+    setStartDate(getDayOfWeek(date))
+  }, [date])
+
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -205,7 +245,7 @@ function TeacherHome() {
           Create Class
         </button>
       </div>
-
+      <WeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
           <thead>
@@ -248,11 +288,11 @@ function TeacherHome() {
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         contentLabel="Create Class"
-        className="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto"
+        className="bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <h2 className="text-xl font-bold mb-4 text-gray-800">Create Class</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <h2 className="text-2xl text-center font-bold mb-4 text-gray-800">Create Class</h2>
+        <div className="grid grid-cols-2 gap-4 py-3">
           <input
             type="text"
             name="name"
@@ -269,12 +309,25 @@ function TeacherHome() {
             required
             className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <textarea
-            name="description"
-            placeholder="Description"
-            onChange={handleInputChange}
+          <input
+            type="date"
+            min={minDateString}
+            onChange={handleDateChange}
+            required
             className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <select
+            name="dayOfWeek"
+            onChange={handleInputChange}
+            disabled={date ? false : true}
+            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {Array.from({ length: 7 - startDate }, (_, index) => (
+              <option key={startDate + index + 2} value={startDate + index + 2}>
+                Thứ {startDate + index + 2}
+              </option>
+            ))}
+          </select>
           <select
             name="slotId"
             onChange={handleInputChange}
@@ -318,27 +371,45 @@ function TeacherHome() {
             required
             className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
           <input
-            type="date"
-            min={minDateString}
-            onChange={handleDateChange}
-            required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="file"
             onChange={handleFileChange}
             accept="image/*"
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            type="file" className="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-full file:border-0
+                file:text-sm file:font-semibold
+                file:bg-violet-50 file:text-violet-700
+                hover:file:bg-violet-100
+              "/>
+          <textarea
+            name="description"
+            placeholder="Description"
+            onChange={handleInputChange}
+            className="border p-2 rounded col-span-2 h-[120px] w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <button
-          onClick={handleCreateClass}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
-        >
-          Create
-        </button>
+        <div className="flex items-center gap-4 justify-center">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="mt-4 bg-white text-[#333] border px-4 py-2 rounded hover:bg-white transition duration-200"
+          >
+            Create
+          </button>
+          <button
+            onClick={handleCreateClass}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
+          >
+            Create
+          </button>
+        </div>
       </Modal>
+
+      <ShowDetailTimeTable
+        isOpen={showDetail}
+        setIsOpen={setShowDetail}
+        data={infoClass}
+      />
     </div>
   );
 }
