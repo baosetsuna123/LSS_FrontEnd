@@ -14,7 +14,6 @@ import {
   GraduationCap,
   User,
   AlertCircle,
-  MapPin,
   Users,
   UserCheck,
 } from "lucide-react"; // Icon for the modal header
@@ -221,20 +220,6 @@ export function ClassDetail() {
                     <div className="flex items-center">
                       <GraduationCap className="mr-2 h-4 w-4" />
                       <span>Teacher Username: {classDetail?.teacherName}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <MapPin className="mr-2 h-4 w-4" />
-                      <span>
-                        Location:{" "}
-                        <a
-                          href={classDetail?.location}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline"
-                        >
-                          Join Meeting
-                        </a>
-                      </span>
                     </div>
                   </CardContent>
                 </Card>

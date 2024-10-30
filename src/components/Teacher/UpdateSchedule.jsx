@@ -5,6 +5,7 @@ import {
   fetchUpdateClass,
 } from "@/data/api";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { FaClock } from "react-icons/fa";
 
 function UpdateSchedule() {
@@ -13,8 +14,6 @@ function UpdateSchedule() {
   const [editingClass, setEditingClass] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [startTime, setStartTime] = useState("");
-  const [, setEndTime] = useState("");
   const [courses, setCourses] = useState([]);
   const [slots, setSlots] = useState([]);
   const result = localStorage.getItem("result");
@@ -44,13 +43,13 @@ function UpdateSchedule() {
   // ];
 
   const daysOfWeek = [
-    { value: 2, name: "Thứ 2" },
-    { value: 3, name: "Thứ 3" },
-    { value: 4, name: "Thứ 4" },
-    { value: 5, name: "Thứ 5" },
-    { value: 6, name: "Thứ 6" },
-    { value: 7, name: "Thứ 7" },
-    { value: 8, name: "Chủ nhật" },
+    { value: 2, name: "Monday" },
+    { value: 3, name: "Tuesday" },
+    { value: 4, name: "Wednesday" },
+    { value: 5, name: "Thursday" },
+    { value: 6, name: "Friday" },
+    { value: 7, name: "Saturday" },
+    { value: 8, name: "Sunday" },
   ];
   // const formatSchedule = (startDate, endDate) => {
 
@@ -145,7 +144,7 @@ function UpdateSchedule() {
       fetchClasses();
       setIsPopupOpen(false);
       setEditingClass(null);
-      alert("Thông tin lớp học đã được cập nhật thành công!");
+      toast.success("Lớp học đã được cập nhật thành công!");
     } catch (error) {
       console.error(error);
     }
@@ -160,16 +159,6 @@ function UpdateSchedule() {
     const { name, value } = e.target;
     setEditingClass((prev) => ({ ...prev, [name]: value }));
   };
-
-  const handleTimeChange = (e, type) => {
-    if (type === "start") {
-      setStartTime(e.target.value);
-    } else {
-      setEndTime(e.target.value);
-    }
-  };
-
-  console.log(editingClass);
 
   const filteredClasses = classesUpdated.filter(
     (cls) =>
@@ -203,8 +192,10 @@ function UpdateSchedule() {
                 <p className="text-gray-600">Môn học: {cls.courseName}</p>
                 <p className="text-gray-600">Số học sinh: {cls.maxStudents}</p>
                 <p className="mt-2">
-                  <span className="font-medium"></span> Thứ 4 - {cls.slotStart}{" "}
-                  - {cls.slotEnd}
+                  <span className="font-medium"></span>
+                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))
+                    ?.name || "Unknown"}{" "}
+                  - {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
               <button
@@ -368,7 +359,7 @@ function UpdateSchedule() {
                   id="dayofWeek"
                   name="dayofWeek"
                   disabled
-                  value={editingClass.dayofWeek}
+                  value={editingClass.dayOfWeek}
                   onChange={handleInputChange}
                   className="w-full px-2 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >

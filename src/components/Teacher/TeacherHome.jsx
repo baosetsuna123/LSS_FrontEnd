@@ -10,7 +10,6 @@ import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
 import WeekSelector from "./WeekSelector";
 
-
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
   const [slots, setSlots] = useState([]);
@@ -26,7 +25,7 @@ function TeacherHome() {
   const [classes, setClasses] = useState([]);
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
-    range: ""
+    range: "",
   });
   const [classData, setClassData] = useState({
     name: "",
@@ -92,19 +91,28 @@ function TeacherHome() {
     }, {});
   };
 
-
   const handleWeekChange = (week, range) => {
     setSelectedWeekData({ week, range });
   };
-
+  const formatDateToYMD = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}`;
+  };
   const fetchTimetable = async () => {
     try {
       const classes = await fetchClassbyteacher(token);
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" - ");
-      const startRange = new Date(startRangeStr);
-      const endRange = new Date(endRangeStr);
-      const filteredClasses = classes.filter(item => {
-        const classStartDate = new Date(item.startDate);
+      const startRange = formatDateToYMD(new Date(startRangeStr));
+      const endRange = formatDateToYMD(new Date(endRangeStr));
+      const filteredClasses = classes.filter((item) => {
+        const classStartDate = formatDateToYMD(new Date(item.startDate));
+        console.log(classStartDate);
+        console.log(startRange);
+        console.log(endRange);
+        // So sánh ngày ở dạng chuỗi "YYYY-MM-DD"
         return classStartDate >= startRange && classStartDate <= endRange;
       });
       setClasses(filteredClasses);
@@ -123,7 +131,6 @@ function TeacherHome() {
       console.log(error);
     }
   };
-
 
   const fetchDropdownData = async () => {
     try {
@@ -159,7 +166,7 @@ function TeacherHome() {
     if (classData.price < 100000 || classData.price > 500000) {
       return toast.error("Price must be between 100,000 and 500,000");
     }
-    console.log(classData)
+    console.log(classData);
     try {
       console.log("Creating class with data:", classData, image);
       await fetchCreateClass(classData, image, token);
@@ -183,21 +190,19 @@ function TeacherHome() {
       toast.error("Start date must be at least 2 days from today");
       return;
     }
-
-    const formattedDate = `${selectedDate}T00:00:00`;
     const jsDayOfWeek = date.getDay();
     const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
     const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
-    setDate(selectedDate)
+    setDate(selectedDate);
     setClassData((prevData) => ({
       ...prevData,
-      startDate: formattedDate,
+      startDate: formatDateToYMD(date),
       dayOfWeek,
     }));
   };
 
   const handleShowDetail = (lesson) => {
-    const data = classes.find(c => c.code === lesson.class);
+    const data = classes.find((c) => c.code === lesson.class);
     setShowDetail(true);
     setInfoClass(data);
   };
@@ -206,7 +211,10 @@ function TeacherHome() {
     const lesson = timetable[day] && timetable[day][period];
     if (lesson) {
       return (
-        <div className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer" onClick={() => handleShowDetail(lesson)}>
+        <div
+          className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer"
+          onClick={() => handleShowDetail(lesson)}
+        >
           <p className="font-bold text-base text-blue-800">{lesson.subject}</p>
           <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
@@ -225,7 +233,6 @@ function TeacherHome() {
   };
   const [startDate, setStartDate] = useState(null);
 
-
   const getPreviousDay = (dateString, daysBefore = 1) => {
     const dateObj = new Date(dateString);
     dateObj.setDate(dateObj.getDate() - daysBefore);
@@ -233,9 +240,8 @@ function TeacherHome() {
   };
 
   useEffect(() => {
-    setStartDate(getPreviousDay(date))
-  }, [date])
-
+    setStartDate(getPreviousDay(date));
+  }, [date]);
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -294,7 +300,9 @@ function TeacherHome() {
         className="bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <h2 className="text-2xl text-center font-bold mb-4 text-gray-800">Create Class</h2>
+        <h2 className="text-2xl text-center font-bold mb-4 text-gray-800">
+          Create Class
+        </h2>
         <div className="grid grid-cols-2 gap-4 py-3">
           <input
             type="text"
@@ -327,9 +335,9 @@ function TeacherHome() {
           >
             {Array.from({ length: 7 - startDate }, (_, index) => (
               <option key={startDate + index + 2} value={startDate + index + 2}>
-                {
-                  startDate + index + 2 === 8 ? "Chủ nhật" : `Thứ ${startDate + index + 2}`
-                }
+                {startDate + index + 2 === 8
+                  ? "Chủ nhật"
+                  : `Thứ ${startDate + index + 2}`}
               </option>
             ))}
           </select>
@@ -380,13 +388,15 @@ function TeacherHome() {
           <input
             onChange={handleFileChange}
             accept="image/*"
-            type="file" className="block w-full text-sm text-slate-500
+            type="file"
+            className="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
                 file:bg-violet-50 file:text-violet-700
                 hover:file:bg-violet-100
-              "/>
+              "
+          />
           <textarea
             name="description"
             placeholder="Description"
