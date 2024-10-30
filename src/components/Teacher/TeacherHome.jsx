@@ -224,13 +224,16 @@ function TeacherHome() {
     return null;
   };
   const [startDate, setStartDate] = useState(null);
-  const getDayOfWeek = (dateString) => {
+
+
+  const getPreviousDay = (dateString, daysBefore = 1) => {
     const dateObj = new Date(dateString);
+    dateObj.setDate(dateObj.getDate() - daysBefore);
     return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   };
 
   useEffect(() => {
-    setStartDate(getDayOfWeek(date))
+    setStartDate(getPreviousDay(date))
   }, [date])
 
 
