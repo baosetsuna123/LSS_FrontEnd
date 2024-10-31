@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, BookOpen, Users, UserPlus, Laptop } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Collaborate from "../assets/collaborator.jpg";
+import Collaborate from "../../assets/collaborator.jpg";
 export function AboutMe() {
   const navigate = useNavigate();
   return (

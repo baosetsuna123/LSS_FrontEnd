@@ -9,6 +9,7 @@ import Modal from "react-modal";
 import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
 import WeekSelector from "./WeekSelector";
+import { FaSpinner } from "react-icons/fa";
 
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
@@ -16,10 +17,11 @@ function TeacherHome() {
   const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date();
-  today.setDate(today.getDate() + 2);
+  today.setDate(today.getDate() + 3);
   const minDateString = today.toISOString().split("T")[0];
   const [date, setDate] = useState(null);
   const [image, setImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [infoClass, setInfoClass] = useState(null);
   const [classes, setClasses] = useState([]);
@@ -109,10 +111,6 @@ function TeacherHome() {
       const endRange = formatDateToYMD(new Date(endRangeStr));
       const filteredClasses = classes.filter((item) => {
         const classStartDate = formatDateToYMD(new Date(item.startDate));
-        console.log(classStartDate);
-        console.log(startRange);
-        console.log(endRange);
-        // So sánh ngày ở dạng chuỗi "YYYY-MM-DD"
         return classStartDate >= startRange && classStartDate <= endRange;
       });
       setClasses(filteredClasses);
@@ -136,7 +134,6 @@ function TeacherHome() {
     try {
       const fetchedSlots = await fetchSlots(token);
       const fetchedCourses = await fetchCoursesService(token);
-      console.log("Fetched slots:", fetchedSlots);
       setSlots(fetchedSlots);
       setCourses(fetchedCourses);
     } catch (error) {
@@ -160,15 +157,37 @@ function TeacherHome() {
   };
 
   const handleCreateClass = async () => {
+    const requiredFields = [
+      "name",
+      "code",
+      "startDate",
+      "dayOfWeek",
+      "slotId",
+      "courseCode",
+      "maxStudents",
+      "price",
+      "description",
+    ];
+
+    for (const field of requiredFields) {
+      if (!classData[field]) {
+        toast.error(
+          `Please fill out the ${field
+            .replace(/([A-Z])/g, " $1")
+            .toLowerCase()}.`
+        );
+        return;
+      }
+    }
+
     if (classData.maxStudents < 15 || classData.maxStudents > 30) {
       return toast.error("Max students must be between 15 and 30");
     }
     if (classData.price < 100000 || classData.price > 500000) {
       return toast.error("Price must be between 100,000 and 500,000");
     }
-    console.log(classData);
     try {
-      console.log("Creating class with data:", classData, image);
+      setIsLoading(true);
       await fetchCreateClass(classData, image, token);
       toast.success("Class created successfully");
       setIsModalOpen(false);
@@ -176,6 +195,8 @@ function TeacherHome() {
       fetchTimetable();
     } catch (error) {
       toast.error(error.message || "Failed to create class");
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -297,20 +318,20 @@ function TeacherHome() {
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         contentLabel="Create Class"
-        className="bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto"
+        className="bg-white p-4 rounded-lg shadow-lg max-w-2xl mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
-        <h2 className="text-2xl text-center font-bold mb-4 text-gray-800">
+        <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
           Create Class
         </h2>
-        <div className="grid grid-cols-2 gap-4 py-3">
+        <div className="grid grid-cols-2 gap-4 py-2">
           <input
             type="text"
             name="name"
             placeholder="Class Name"
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <input
             type="text"
@@ -318,33 +339,33 @@ function TeacherHome() {
             placeholder="Class Code"
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <input
             type="date"
             min={minDateString}
             onChange={handleDateChange}
             required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <select
             name="dayOfWeek"
             onChange={handleInputChange}
             disabled={date ? false : true}
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             {Array.from({ length: 7 - startDate }, (_, index) => (
               <option key={startDate + index + 2} value={startDate + index + 2}>
                 {startDate + index + 2 === 8
-                  ? "Chủ nhật"
-                  : `Thứ ${startDate + index + 2}`}
+                  ? "Chủ nhật"
+                  : `Thứ ${startDate + index + 2}`}
               </option>
             ))}
           </select>
           <select
             name="slotId"
             onChange={handleInputChange}
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             {slots.map((slot) => (
               <option key={slot.slotId} value={slot.slotId}>
@@ -355,7 +376,7 @@ function TeacherHome() {
           <select
             name="courseCode"
             onChange={handleInputChange}
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
             <option value="">Select Course</option>
             {courses.map((course) => (
@@ -372,7 +393,7 @@ function TeacherHome() {
             max={30}
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <input
             type="number"
@@ -382,7 +403,7 @@ function TeacherHome() {
             max={500000}
             onChange={handleInputChange}
             required
-            className="border p-2 rounded w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
 
           <input
@@ -390,32 +411,41 @@ function TeacherHome() {
             accept="image/*"
             type="file"
             className="block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-violet-50 file:text-violet-700
-                hover:file:bg-violet-100
-              "
+          file:mr-4 file:py-1 file:px-2
+          file:rounded-full file:border-0
+          file:text-sm file:font-semibold
+          file:bg-violet-50 file:text-violet-700
+          hover:file:bg-violet-100
+          transition duration-200
+        "
           />
           <textarea
             name="description"
             placeholder="Description"
             onChange={handleInputChange}
-            className="border p-2 rounded col-span-2 h-[120px] w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-2 rounded-lg col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
-        <div className="flex items-center gap-4 justify-center">
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="mt-4 bg-white text-[#333] border px-4 py-2 rounded hover:bg-white transition duration-200"
-          >
-            Create
-          </button>
+        <div className="flex items-center gap-6 justify-center">
           <button
             onClick={handleCreateClass}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
+            disabled={isLoading}
+            className="mt-4 bg-blue-600 text-white px-5 py-1 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
           >
-            Create
+            {isLoading ? (
+              <>
+                <FaSpinner className="animate-spin mr-2" />
+                Creating...
+              </>
+            ) : (
+              "Create Class"
+            )}
+          </button>
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="mt-4 bg-white text-gray-800 border border-gray-300 px-5 py-1 rounded-lg hover:bg-gray-100 transition duration-200 shadow-md"
+          >
+            Cancel
           </button>
         </div>
       </Modal>

@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Users,
   UserCheck,
+  ChevronsLeftRightEllipsis,
 } from "lucide-react"; // Icon for the modal header
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -59,7 +60,7 @@ export function ClassDetail() {
           <div className="flex justify-between space-x-4">
             <Button
               onClick={onConfirm}
-              className="bg-green-500 hover:bg-green-600 px-6 py-3 text-lg"
+              className="bg-green-500 hover:bg-green-600 px-10 py-3 text-lg"
             >
               Có
             </Button>
@@ -75,7 +76,28 @@ export function ClassDetail() {
       </div>
     );
   }
-
+  const getDayOfWeek = (dayOfWeek) => {
+    const days = {
+      2: "Monday",
+      3: "Tuesday",
+      4: "Wednesday",
+      5: "Thursday",
+      6: "Friday",
+      7: "Saturday",
+      8: "Sunday",
+    };
+    return days[dayOfWeek] || "Unknown Day";
+  };
+  const getSlotTime = (slotId) => {
+    const slots = {
+      1: "1 (7h00 - 9h15)",
+      2: "2 (9h30 - 11h45)",
+      3: "3 (12h30 - 14h45)",
+      4: "4 (15h00 - 17h15)",
+      5: "5 (17h45 - 20h00)",
+    };
+    return slots[slotId] || "Unknown Slot";
+  };
   useEffect(() => {
     const fetchClassDetail = async () => {
       const response = await fetchClassbyID(id, token); // Replace with your API
@@ -127,112 +149,149 @@ export function ClassDetail() {
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)} // Close modal if "Không" is clicked
-        onConfirm={handleConfirmEnroll} // Trigger API call if "Có" is clicked
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleConfirmEnroll}
       />
 
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900">
         <div className="container px-4 md:px-6">
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
               { label: "Class", link: "/class" },
-              { label: "Detail" }, // No link for the current page
+              { label: "Detail" },
             ]}
           />
         </div>
       </section>
-      <div className="container mx-auto p-4 max-w-4xl">
-        <Card>
-          <CardContent className="p-6">
+
+      <div className="container mx-auto p-6 max-w-4xl">
+        <Card className="shadow-lg border rounded-lg overflow-hidden">
+          <CardContent className="p-8 bg-white rounded-t-lg">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <img
                   src={classDetail?.imageUrl}
                   alt={classDetail?.name}
-                  className="w-full rounded-lg object-cover"
+                  className="w-full h-64 object-cover rounded-lg border border-gray-200 shadow-md"
                 />
               </div>
               <div className="md:w-1/2 space-y-4">
-                <h1 className="text-3xl font-bold">{classDetail?.name}</h1>
-                <p className="text-lg text-zinc-500 dark:text-zinc-400">
-                  Class Code: {classDetail?.code}
+                <h1 className="text-3xl font-bold text-gray-800">
+                  {classDetail?.name}
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Class Code:{" "}
+                  <span className="font-semibold">{classDetail?.code}</span>
                 </p>
-                <p className="text-lg text-zinc-500 dark:text-zinc-400">
-                  Course Code: {classDetail?.courseCode}
+                <p className="text-lg text-gray-600">
+                  Course Code:{" "}
+                  <span className="font-semibold">
+                    {classDetail?.courseCode}
+                  </span>
                 </p>
-                <div className="flex items-center justify-between">
-                  <p className="text-2xl font-bold">
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-2xl font-bold text-green-600">
                     {formatCurrency(classDetail?.price)}
                   </p>
-                  <Button onClick={handleEnrollClick} disabled={isEnrolled}>
+                  <Button
+                    className={`px-6 py-2 font-semibold rounded-lg ${
+                      isEnrolled
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    } text-white`}
+                    onClick={handleEnrollClick}
+                    disabled={isEnrolled}
+                  >
                     {isEnrolled ? "Enrolled" : "Enroll Now"}
                   </Button>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 space-y-6">
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Description</h3>
-                <p>{classDetail?.description}</p>
-              </div>
+            <div className="mt-10">
+              <h3 className="text-xl font-semibold mb-4 text-gray-700">
+                Description
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                {classDetail?.description}
+              </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Class Details</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      <span>Start Date: {classDetail?.startDate}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4" />
-                      <span>Day of Week: {classDetail?.dayofWeek}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Code className="mr-2 h-4 w-4" />
-                      <span>Course Code: {classDetail?.courseCode}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>Max Students: {classDetail?.maxStudents}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <UserCheck className="mr-2 h-4 w-4" />
-                      <span>
-                        Students Joined: {classDetail?.students?.length || 0}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Instructor</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Instructor Name: {classDetail?.fullName}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <GraduationCap className="mr-2 h-4 w-4" />
-                      <span>Teacher Username: {classDetail?.teacherName}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="bg-gray-50 border border-gray-200 shadow-md">
+                <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
+                  <CardTitle className="text-lg">Class Details</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center">
+                    <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Start Date: {classDetail?.startDate}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Day of Week: {getDayOfWeek(classDetail?.dayOfWeek)}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Code className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Course Code: {classDetail?.courseCode}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Max Students: {classDetail?.maxStudents}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <ChevronsLeftRightEllipsis className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Slot: {getSlotTime(classDetail?.slotId)}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <UserCheck className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Students Joined: {classDetail?.students?.length || 0}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-50 border border-gray-200 shadow-md">
+                <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
+                  <CardTitle className="text-lg">Instructor</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center">
+                    <User className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Instructor Name: {classDetail?.fullName}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <GraduationCap className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700">
+                      Teacher Username: {classDetail?.teacherName}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between items-center">
-            <div className="flex items-center">
-              <Clock className="mr-2 h-4 w-4" />
-              <span>Duration: 3 hours</span>
+
+          <CardFooter className="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center text-gray-700">
+              <Clock className="mr-2 h-5 w-5 text-blue-600" />
+              <span>Duration: 2 hours 15 minutes</span>
             </div>
-            <div className="flex items-center">
-              <Coins className="mr-2 h-4 w-4" />
+            <div className="flex items-center text-gray-700">
+              <Coins className="mr-2 h-5 w-5 text-blue-600" />
               <span>Price: {formatCurrency(classDetail?.price)}</span>
             </div>
           </CardFooter>

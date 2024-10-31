@@ -153,7 +153,9 @@ const ApplicationLayout = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.teacherName.slice(0, 20)} ...
+                    {app.teacherName.length > 20
+                      ? `${app.teacherName.slice(0, 20)}...`
+                      : app.teacherName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button

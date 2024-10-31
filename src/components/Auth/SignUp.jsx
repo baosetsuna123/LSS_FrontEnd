@@ -38,6 +38,8 @@ export default function SignUp() {
     setIsLoading(true);
     try {
       if (userType === "student") {
+        toast.success("Please verify your email with OTP");
+        navigate("/verify-otp");
         await fetchSignUpStudent(
           username,
           password,
@@ -45,8 +47,6 @@ export default function SignUp() {
           fullName,
           phoneNumber
         );
-        toast.success("Please verify your email with OTP");
-        navigate("/verify-otp");
       } else if (userType === "teacher") {
         await fetchSignUpTeacher(
           username,

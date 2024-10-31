@@ -36,7 +36,7 @@ import { WalletHistory } from "./components/Student/All_Transactions";
 import { SendApplication } from "./components/Student/send-application";
 import { AdminLayout } from "./components/Admin/admin-layout";
 import AdminHome from "./components/Admin/AdminHome";
-import { AboutMe } from "./components/AboutMe";
+import { AboutMe } from "./components/Home/AboutMe";
 
 function App() {
   return (

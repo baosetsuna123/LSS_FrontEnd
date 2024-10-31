@@ -11,7 +11,7 @@ import {
   LogOut,
   UserPlus,
 } from "lucide-react";
-import Modal from "@/components/Modal"; // Adjust the import path
+import Modal from "@/components/Helper/Modal"; // Adjust the import path
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
