@@ -16,6 +16,7 @@ function UpdateSchedule() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [courses, setCourses] = useState([]);
   const [slots, setSlots] = useState([]);
+  const [classShow, setClassShow] = useState(null);
   const result = localStorage.getItem("result");
   let token;
   if (result) {
@@ -131,13 +132,20 @@ function UpdateSchedule() {
     }
   }, [classes, courses, slots]);
 
+
   const handleEdit = (classInfo) => {
+    setClassShow(classInfo)
     setEditingClass({ ...classInfo });
     setIsPopupOpen(true);
   };
 
   const handleSave = async (updatedClass) => {
     try {
+      if(updatedClass.maxStudents < classShow.maxStudents){
+        toast.error(`Số học sinh đang chỉnh sửa không được nhỏ hơn số học sinh hiện tại`)
+        return;
+      }
+
       await fetchUpdateClass({ data: { ...updatedClass }, token });
 
       fetchCourses();
@@ -275,6 +283,7 @@ function UpdateSchedule() {
                   type="number"
                   id="maxStudents"
                   name="maxStudents"
+                  placeholder={`Số học sinh hiện tại là ${classShow.maxStudents}`}
                   value={editingClass.maxStudents}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
