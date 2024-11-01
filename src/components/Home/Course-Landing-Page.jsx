@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import home1 from "../../assets/home-carousel-1.png";
@@ -65,7 +65,16 @@ export function CourseLandingPage() {
       currency: "VND",
     }).format(amount);
   };
+  const carouselRef = useRef();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (carouselRef.current) {
+        carouselRef.current.next(); // Assuming your Carousel component exposes a `next` method
+      }
+    }, 3000); // 3000 ms = 3 seconds
 
+    return () => clearInterval(interval); // Clear the interval on component unmount
+  }, []);
   const carouselItems = [
     {
       imageUrl: home1,
@@ -89,10 +98,10 @@ export function CourseLandingPage() {
       setCurrentIndex((prevIndex) =>
         prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
       );
-    }, 4000); // Slide every 4 seconds
+    }, 3000); // Slide every 4 seconds
 
     return () => clearInterval(interval); // Cleanup interval on unmount
-  }, [carouselItems.length]);
+  }, []);
   return (
     <>
       <div className="w-full overflow-x-hidden">
@@ -104,7 +113,7 @@ export function CourseLandingPage() {
             arrows={false}
             infinite={true}
             autoPlay={true} // Enable auto-play
-            autoPlaySpeed={4000} // Set the speed of auto-play
+            autoPlaySpeed={3000} // Set the speed of auto-play
             customTransition="transform 0.5s ease-in-out" // Smooth transition
             transitionDuration={500} // Transition duration
             itemClass="carousel-item-padding-40-px"
@@ -196,12 +205,16 @@ export function CourseLandingPage() {
                   <Loader className="w-10 h-10 animate-spin" />
                 </div>
               ) : (
-                <Carousel responsive={responsive} arrows={true}>
+                <Carousel
+                  ref={carouselRef}
+                  responsive={responsive}
+                  arrows={true}
+                >
                   {classes.map((course, index) => (
                     <Card
                       key={index}
                       onClick={() => handleClassClick(course.classId)}
-                      className="transition-transform transform hover:scale-105"
+                      className="transition-transform transform hover:scale-105 mx-2" // Add margin here
                     >
                       <img
                         src={course.imageUrl}
