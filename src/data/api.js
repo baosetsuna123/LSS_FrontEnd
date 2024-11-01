@@ -537,7 +537,7 @@ export const fetchCreateClass = async (classDTO, image, token) => {
     throw new Error(error.response?.data || "An error occurred");
   }
 };
-//
+// applications
 export const createApplication = async ({ title, description }) => {
   return await api.post(
     `/applications/create-application`,
@@ -552,6 +552,25 @@ export const createApplication = async ({ title, description }) => {
       withCredentials: true,
     }
   );
+};
+export const rejectApplication = async (id, rejectionReason, token) => {
+  try {
+    const response = await api.post(
+      `/applications/reject_application`,
+      rejectionReason,
+      {
+        params: { id },
+        headers: {
+          "Content-Type": "text/plain",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
 };
 
 // get all slots
