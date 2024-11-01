@@ -8,8 +8,16 @@ import { useState, useEffect } from "react";
 import Modal from "react-modal";
 import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
-import WeekSelector from "./WeekSelector";
 import { FaSpinner } from "react-icons/fa";
+import YearSelector from "./YearSelector";
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
@@ -17,14 +25,17 @@ function TeacherHome() {
   const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date();
-  today.setDate(today.getDate() + 3);
+  today.setDate(today.getDate() + 4);
   const minDateString = today.toISOString().split("T")[0];
-  const [date, setDate] = useState(null);
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [infoClass, setInfoClass] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [dayOfWeek, setDayOfWeek] = useState(0);
+  const [date, setDate] = useState(null)
+  const [classesCreate, setClassCreate] = useState([]);
+  const [selectedSlots, setSelectedSlots] = useState([])
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
     range: "",
@@ -106,7 +117,9 @@ function TeacherHome() {
   const fetchTimetable = async () => {
     try {
       const classes = await fetchClassbyteacher(token);
-      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" - ");
+      setClassCreate(classes)
+      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
+      console.log(startRangeStr)
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
       const filteredClasses = classes.filter((item) => {
@@ -200,27 +213,33 @@ function TeacherHome() {
     }
   };
 
-  const handleDateChange = (e) => {
-    const selectedDate = e.target.value;
-    const date = new Date(selectedDate);
+  const handleDateChange = async (e) => {
+    try {
+      const selectedDate = e.target.value;
+      const date = new Date(selectedDate);
+      setDate(date)
+      const classList = classesCreate.filter(c => c.startDate === formatDate(date));
+      setSelectedSlots(classList.map(item => item.slotId))
+      // Ensure selected date is at least two days from today
+      const minDate = new Date(minDateString);
 
-    // Ensure selected date is at least two days from today
-    const minDate = new Date(minDateString);
+      if (date < minDate) {
+        toast.error("Start date must be at least 3 days from today");
+        return;
+      }
+      const jsDayOfWeek = date.getDay();
+      const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
+      const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
+      setDayOfWeek(dayOfWeek - 2)
 
-    if (date < minDate) {
-      toast.error("Start date must be at least 2 days from today");
-      return;
-    }
-    const jsDayOfWeek = date.getDay();
-    const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
-    const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
-    setDate(selectedDate);
-    setClassData((prevData) => ({
-      ...prevData,
-      startDate: formatDateToYMD(date),
-      dayOfWeek,
-    }));
+      setClassData((prevData) => ({
+        ...prevData,
+        startDate: formatDateToYMD(date),
+        dayOfWeek,
+      }));
+    } catch { /* empty */ }
   };
+
 
   const handleShowDetail = (lesson) => {
     const data = classes.find((c) => c.code === lesson.class);
@@ -252,17 +271,13 @@ function TeacherHome() {
     }
     return null;
   };
-  const [startDate, setStartDate] = useState(null);
 
-  const getPreviousDay = (dateString, daysBefore = 1) => {
-    const dateObj = new Date(dateString);
-    dateObj.setDate(dateObj.getDate() - daysBefore);
-    return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  };
+  // const getPreviousDay = (dateString, daysBefore = 1) => {
+  //   const dateObj = new Date(dateString);
+  //   dateObj.setDate(dateObj.getDate() - daysBefore);
+  //   return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  // };
 
-  useEffect(() => {
-    setStartDate(getPreviousDay(date));
-  }, [date]);
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -275,7 +290,7 @@ function TeacherHome() {
           Create Class
         </button>
       </div>
-      <WeekSelector onWeekChange={handleWeekChange} />
+      <YearSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
           <thead>
@@ -318,7 +333,7 @@ function TeacherHome() {
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         contentLabel="Create Class"
-        className="bg-white p-4 rounded-lg shadow-lg max-w-2xl mx-auto"
+        className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
@@ -348,27 +363,25 @@ function TeacherHome() {
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
-          <select
+          <input
+            type="text"
             name="dayOfWeek"
+            disabled
+            value={
+              ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][dayOfWeek]
+            }
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+
+          <select
+            name="slotId"
             onChange={handleInputChange}
             disabled={date ? false : true}
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           >
-            {Array.from({ length: 7 - startDate }, (_, index) => (
-              <option key={startDate + index + 2} value={startDate + index + 2}>
-                {startDate + index + 2 === 8
-                  ? "Chủ nhật"
-                  : `Thứ ${startDate + index + 2}`}
-              </option>
-            ))}
-          </select>
-          <select
-            name="slotId"
-            onChange={handleInputChange}
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          >
+            <option value="">Select Slot</option>
             {slots.map((slot) => (
-              <option key={slot.slotId} value={slot.slotId}>
+              <option key={slot.slotId} value={slot.slotId} disabled={selectedSlots.some(item => item === slot.slotId)}>
                 {`${slot.period} (${slot.start} - ${slot.end})`}
               </option>
             ))}
@@ -407,6 +420,20 @@ function TeacherHome() {
           />
 
           <input
+            type="text"
+            name="location"
+            placeholder="meeting url..."
+            onChange={handleInputChange}
+            required
+            className="border col-span-2 p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+          <textarea
+            name="description"
+            placeholder="Description"
+            onChange={handleInputChange}
+            className="border p-2 rounded-lg col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          />
+          <input
             onChange={handleFileChange}
             accept="image/*"
             type="file"
@@ -418,12 +445,6 @@ function TeacherHome() {
           hover:file:bg-violet-100
           transition duration-200
         "
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            onChange={handleInputChange}
-            className="border p-2 rounded-lg col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
         </div>
         <div className="flex items-center gap-6 justify-center">

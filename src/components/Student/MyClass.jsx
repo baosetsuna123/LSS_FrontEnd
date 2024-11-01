@@ -1,7 +1,7 @@
 import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import WeekSelector from "../Teacher/WeekSelector";
+import YearWeekSelector from "../Teacher/YearSelector";
 
 const MyClass = () => {
   const [timetable, setTimetable] = useState({});
@@ -82,8 +82,7 @@ const MyClass = () => {
   const fetchTimetable = async () => {
     try {
       const classes = await fetchOrderClasses(token);
-      console.log(classes)
-      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" - ");
+      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
       const filteredClasses = classes.data.content.filter(item => {
@@ -165,11 +164,11 @@ const MyClass = () => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">
         Thời khóa biểu của tôi
       </h2>
-      <WeekSelector onWeekChange={handleWeekChange} />
+      <YearWeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
           <thead>
-            <tr className="bg-gray-200">
+            <tr className="bg-gray-200 *:text-center">
               <th className="py-3 px-4 border-b border-r text-left text-gray-700 font-semibold">
                 Ca học
               </th>
