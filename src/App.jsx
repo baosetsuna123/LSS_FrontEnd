@@ -19,7 +19,6 @@ import { Dashboard } from "./components/Staff/Dashboard";
 
 // Import các component Teacher Dashboard
 import TeacherDashboardLayout from "./components/Teacher/TeacherDashboardLayout";
-import QualificationForm from "./components/Teacher/QualificationForm";
 import AssignClasses from "./components/Teacher/AssignClasses";
 import UpdateSchedule from "./components/Teacher/UpdateSchedule";
 import CancelClassRequest from "./components/Teacher/CancelClassRequest";
@@ -69,7 +68,6 @@ function App() {
         >
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
-            <Route path="qualification" element={<QualificationForm />} />
             <Route path="send-applications" element={<SendApplication />} />
             <Route path="assign-classes" element={<AssignClasses />} />
             <Route path="update-schedule" element={<UpdateSchedule />} />

@@ -46,11 +46,6 @@ function TeacherDashboardLayout() {
   const navItems = [
     { path: "/teacher", label: "Trang chủ", icon: FaChalkboardTeacher },
     {
-      path: "/teacher/qualification",
-      label: "Gửi đơn đăng ký trình độ",
-      icon: FaChalkboardTeacher,
-    },
-    {
       path: "/teacher/assign-classes",
       label: "Phân công lớp học",
       icon: FaBookOpen,

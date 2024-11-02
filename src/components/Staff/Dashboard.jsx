@@ -72,9 +72,8 @@ export function Dashboard() {
   // Fetch all categories on component mount
   useEffect(() => {
     const loadCategories = async () => {
-      const token = sessionStorage.getItem("token");
       try {
-        const data = await fetchAllCategories(token);
+        const data = await fetchAllCategories();
         setCategories(data || []); // Ensure categories is always an array
         setTotalCategories(data.length); // Track total categories
       } catch (error) {

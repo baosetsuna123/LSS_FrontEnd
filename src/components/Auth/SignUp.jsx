@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Eye,
   EyeOff,
@@ -9,9 +9,21 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
+import {
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Checkbox,
+  ListItemText,
+} from "@mui/material";
 import backgroundImage from "../../assets/background2.png";
 import { useLocation, useNavigate } from "react-router-dom";
-import { fetchSignUpStudent, fetchSignUpTeacher } from "@/data/api"; // Import the teacher registration API
+import {
+  fetchSignUpStudent,
+  fetchSignUpTeacher,
+  fetchAllCategories,
+} from "@/data/api"; // Import the teacher registration API
 import { toast } from "react-hot-toast";
 
 export default function SignUp() {
@@ -27,8 +39,29 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
+  const [categoryIds, setCategoryIds] = useState([]); // To hold selected category IDs
+  const [allCategories, setAllCategories] = useState([]);
   const navigate = useNavigate();
-
+  const handleCategoryChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setCategoryIds(value);
+    console.log("Selected categories:", value);
+  };
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await fetchAllCategories();
+        console.log("Fetched categories:", data); // Check the response here
+        setAllCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmpassword) {
@@ -45,7 +78,8 @@ export default function SignUp() {
           password,
           email,
           fullName,
-          phoneNumber
+          phoneNumber,
+          categoryIds
         );
       } else if (userType === "teacher") {
         await fetchSignUpTeacher(
@@ -53,7 +87,8 @@ export default function SignUp() {
           password,
           email,
           fullName,
-          phoneNumber
+          phoneNumber,
+          categoryIds
         );
         toast.success("Please complete your application form");
         navigate("/create-application");
@@ -107,6 +142,37 @@ export default function SignUp() {
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
+            <div className="relative">
+              <InputLabel id="category-label">Choose your major</InputLabel>
+              <FormControl fullWidth variant="outlined">
+                <Select
+                  labelId="category-label"
+                  multiple
+                  value={categoryIds}
+                  onChange={handleCategoryChange}
+                  renderValue={(selected) => {
+                    const selectedNames = allCategories
+                      .filter((category) =>
+                        selected.includes(category.categoryId)
+                      )
+                      .map((category) => category.name);
+                    return selectedNames.join(", ");
+                  }}
+                >
+                  {allCategories.map((category) => (
+                    <MenuItem
+                      key={category.categoryId}
+                      value={category.categoryId}
+                    >
+                      <Checkbox
+                        checked={categoryIds.indexOf(category.categoryId) > -1}
+                      />
+                      <ListItemText primary={category.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
             <div>
               <label htmlFor="username" className="sr-only">
                 Username
