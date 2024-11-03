@@ -27,7 +27,7 @@ const ApplicationLayout = ({
       console.log(response);
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
-          app.applicationId === id ? { ...app, status: "APPROVE" } : app
+          app.applicationId === id ? { ...app, status: "APPROVED" } : app
         )
       );
       toast.success("Application approved successfully");
@@ -115,17 +115,18 @@ const ApplicationLayout = ({
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Major
+                Title
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Experience
+                Description
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Certificate
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
+
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Teacher Name
               </th>
@@ -145,17 +146,24 @@ const ApplicationLayout = ({
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.major || "N/A"}
+                    {app.title || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {app.cv ? (
+                    {app.description && typeof app.description === "string"
+                      ? app.description.length > 20
+                        ? `${app.description.slice(0, 20)}...`
+                        : app.description
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {app.certificate ? (
                       <a
-                        href={app.cv}
+                        href={app.certificate}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        View CV
+                        View Certificate
                       </a>
                     ) : (
                       "N/A"
@@ -163,7 +171,7 @@ const ApplicationLayout = ({
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
-                      app.status === "APPROVE"
+                      app.status === "APPROVED"
                         ? " text-green-500"
                         : app.status === "ASSIGNED"
                         ? " text-yellow-500"
@@ -174,7 +182,6 @@ const ApplicationLayout = ({
                   >
                     {app.status}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{app.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {app.teacherName.length > 20
                       ? `${app.teacherName.slice(0, 20)}...`
@@ -200,7 +207,7 @@ const ApplicationLayout = ({
                         </button>
                       </>
                     )}
-                    {app.status === "APPROVE" && (
+                    {app.status === "APPROVED" && (
                       <button
                         className="px-4 py-2 rounded-md bg-gray-400 text-white cursor-not-allowed"
                         disabled
