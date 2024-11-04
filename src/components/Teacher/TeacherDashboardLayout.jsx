@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaChalkboardTeacher,
+  FaBookOpen,
   FaCalendarAlt,
   FaBan,
   // FaDoorOpen,
@@ -45,9 +46,9 @@ function TeacherDashboardLayout() {
   const navItems = [
     { path: "/teacher", label: "Trang chủ", icon: FaChalkboardTeacher },
     {
-      path: "/teacher/qualification",
-      label: "Đăng ký giảng dạy",
-      icon: FaChalkboardTeacher,
+      path: "/teacher/assign-classes",
+      label: "Phân công lớp học",
+      icon: FaBookOpen,
     },
     {
       path: "/teacher/update-schedule",
