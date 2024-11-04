@@ -1,4 +1,4 @@
-import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
+import { fetchCoursesService, fetchOrderClasses, fetchSlots } from "@/data/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import YearWeekSelector from "../Teacher/YearSelector";
@@ -6,6 +6,7 @@ import { useFeedback } from "@/context/FeedbackContext";
 
 const MyClass = () => {
   const [timetable, setTimetable] = useState({});
+  const [datesInTheWeek, setDatesInTheWeek] = useState([])
   const days = [
     "Thứ 2",
     "Thứ 3",
@@ -19,7 +20,7 @@ const MyClass = () => {
     week: null,
     range: "",
   });
-  const periods = Array.from({ length: 5 }, (_, i) => i + 1);
+  const [slots, setSlots] = useState([]);
   const result = localStorage.getItem("result");
   let token;
   if (result) {
@@ -33,6 +34,20 @@ const MyClass = () => {
   const handleWeekChange = (week, range) => {
     setSelectedWeekData({ week, range });
   };
+
+  const fetchAllSlots = async () => {
+    try {
+      const fetchedSlots = await fetchSlots(token);
+      setSlots(fetchedSlots);
+    } catch (error) {
+      console.error("Error fetching dropdown data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllSlots();
+  }, [token, selectedWeekData])
+
 
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
@@ -78,6 +93,21 @@ const MyClass = () => {
   const { submittedFeedbackOrderIds } = useFeedback();
   console.log("submittedFeedbackOrderIds:", submittedFeedbackOrderIds);
 
+
+  const getDatesInRange = (startDate, endDate) => {
+    const dates = [];
+    let currentDate = new Date(startDate);
+    let endCurrentDate = new Date(endDate);
+    while (currentDate <= endCurrentDate) {
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      dates.push(`${day}/${month}`);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  };
+
   const navigate = useNavigate();
   const handleClick = (id) => {
     navigate(`/class/${id}`);
@@ -88,6 +118,7 @@ const MyClass = () => {
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
+      setDatesInTheWeek(getDatesInRange(startRange, endRange))
       const filteredClasses = classes.data.content.filter((item) => {
         const classStartDate = new Date(item.classDTO.startDate);
         return classStartDate >= startRange && classStartDate <= endRange;
@@ -137,7 +168,7 @@ const MyClass = () => {
 
           {
             lesson.status === "COMPLETED" &&
-            !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
               <button
                 key={lesson.orderId}
                 onClick={() => {
@@ -176,42 +207,36 @@ const MyClass = () => {
         <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
           <thead>
             <tr className="bg-gray-200 *:text-center">
-              <th className="py-3 px-4 border-b border-r text-left text-gray-700 font-semibold">
-                Ca học
-              </th>
-              {days.map((day) => (
-                <th
-                  key={day}
-                  className="py-3 px-4 border-b text-left text-gray-700 font-semibold"
-                >
-                  {day}
-                </th>
-              ))}
+              <th className="py-2 px-4 border-b border-r">Ca học</th>
+              {
+                datesInTheWeek.map((date, index) => {
+                  const dayOfWeek = days[index % 7];
+                  return <th key={index} className="py-2 px-4 border-b text-center">
+                    <p>{dayOfWeek}</p>
+                    <p>{date}</p>
+                  </th>;
+                })
+              }
             </tr>
           </thead>
           <tbody>
-            {periods.map((period) => (
+            {slots.map((slot, index) => (
               <tr
-                key={period}
-                className="hover:bg-gray-50 transition-colors duration-200"
+                key={index}
+                className="hover:bg-gray-100 transition duration-150"
               >
-                <td className="py-3 px-4 border-b border-r font-bold text-center text-gray-800">
-                  Tiết {period}
-                  <br />
-                  <span className="text-xs font-medium text-gray-600">
-                    {period === 1 && "(7h00 - 9h15)"}
-                    {period === 2 && "(9h30 - 11h45)"}
-                    {period === 3 && "(12h30 - 14h45)"}
-                    {period === 4 && "(15h00 - 17h15)"}
-                    {period === 5 && "(17h45 - 20h00)"}
-                  </span>
+                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
+                  Tiết {slot.period}
+                  <div className="text-xs text-gray-600">
+                    {"(" + slot.start + " - " + slot.end + ")"}
+                  </div>
                 </td>
                 {days.map((day) => (
                   <td
-                    key={`${day}-${period}`}
-                    className="border-b border-r p-2 max-w-[150px] text-gray-700"
+                    key={`${day}-${slot.period}`}
+                    className="border-b border-r p-2 text-center max-w-[150px]"
                   >
-                    {renderTimetableCell(day, period)}
+                    {renderTimetableCell(day, slot.period)}
                   </td>
                 ))}
               </tr>

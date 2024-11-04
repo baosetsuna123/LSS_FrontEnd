@@ -41,6 +41,8 @@ function TeacherHome() {
     week: null,
     range: "",
   });
+  const [datesInTheWeek, setDatesInTheWeek] = useState([])
+
   useEffect(() => {
     const fetchCousesMajor = async () => {
       try {
@@ -76,13 +78,9 @@ function TeacherHome() {
     "Thứ 7",
     "Chủ nhật",
   ];
-  const periods = [
-    { id: 1, time: "7h00 - 9h15" },
-    { id: 2, time: "9h30 - 11h45" },
-    { id: 3, time: "12h30 - 14h45" },
-    { id: 4, time: "15h00 - 17h15" },
-    { id: 5, time: "17h45 - 20h00" },
-  ];
+
+
+
   const result = localStorage.getItem("result");
   let token;
   if (result) {
@@ -122,6 +120,20 @@ function TeacherHome() {
   const handleWeekChange = (week, range) => {
     setSelectedWeekData({ week, range });
   };
+  const getDatesInRange = (startDate, endDate) => {
+    const dates = [];
+    let currentDate = new Date(startDate);
+    let endCurrentDate = new Date(endDate);
+    while (currentDate <= endCurrentDate) {
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      dates.push(`${day}/${month}`);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  };
+
   const formatDateToYMD = (date) => {
     const d = new Date(date);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -134,9 +146,9 @@ function TeacherHome() {
       const classes = await fetchClassbyteacher(token);
       setClassCreate(classes);
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
-      console.log(startRangeStr);
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
+      setDatesInTheWeek(getDatesInRange(startRange, endRange))
       const filteredClasses = classes.filter((item) => {
         const classStartDate = formatDateToYMD(new Date(item.startDate));
         return classStartDate >= startRange && classStartDate <= endRange;
@@ -293,7 +305,6 @@ function TeacherHome() {
   //   dateObj.setDate(dateObj.getDate() - daysBefore);
   //   return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   // };
-
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
@@ -311,31 +322,35 @@ function TeacherHome() {
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               <th className="py-2 px-4 border-b border-r">Ca học</th>
-              {days.map((day) => (
-                <th key={day} className="py-2 px-4 border-b text-center">
-                  {day}
-                </th>
-              ))}
+              {
+                datesInTheWeek.map((date, index) => {
+                  const dayOfWeek = days[index % 7];
+                  return <th key={index} className="py-2 px-4 border-b text-center">
+                    <p>{dayOfWeek}</p>
+                    <p>{date}</p>
+                  </th>;
+                })
+              }
             </tr>
           </thead>
           <tbody>
-            {periods.map((period) => (
+            {slots.map((slot,index) => (
               <tr
-                key={period.id}
+                key={index}
                 className="hover:bg-gray-100 transition duration-150"
               >
                 <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
-                  Tiết {period.id}
+                  Tiết {slot.period}
                   <div className="text-xs text-gray-600">
-                    {"(" + period.time + ")"}
+                    {"(" + slot.start + " - " + slot.end + ")"}
                   </div>
                 </td>
                 {days.map((day) => (
                   <td
-                    key={`${day}-${period.id}`}
+                    key={`${day}-${slot.period}`}
                     className="border-b border-r p-2 text-center max-w-[150px]"
                   >
-                    {renderTimetableCell(day, period.id)}
+                    {renderTimetableCell(day, slot.period)}
                   </td>
                 ))}
               </tr>
