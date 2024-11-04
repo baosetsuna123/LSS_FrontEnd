@@ -6,7 +6,7 @@ import { useFeedback } from "@/context/FeedbackContext";
 
 const MyClass = () => {
   const [timetable, setTimetable] = useState({});
-  const [datesInTheWeek, setDatesInTheWeek] = useState([])
+  const [datesInTheWeek, setDatesInTheWeek] = useState([]);
   const days = [
     "Thứ 2",
     "Thứ 3",
@@ -46,8 +46,7 @@ const MyClass = () => {
 
   useEffect(() => {
     fetchAllSlots();
-  }, [token, selectedWeekData])
-
+  }, [token, selectedWeekData]);
 
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
@@ -93,14 +92,13 @@ const MyClass = () => {
   const { submittedFeedbackOrderIds } = useFeedback();
   console.log("submittedFeedbackOrderIds:", submittedFeedbackOrderIds);
 
-
   const getDatesInRange = (startDate, endDate) => {
     const dates = [];
     let currentDate = new Date(startDate);
     let endCurrentDate = new Date(endDate);
     while (currentDate <= endCurrentDate) {
-      const day = currentDate.getDate().toString().padStart(2, '0');
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDate.getDate().toString().padStart(2, "0");
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
       dates.push(`${day}/${month}`);
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -118,7 +116,7 @@ const MyClass = () => {
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
-      setDatesInTheWeek(getDatesInRange(startRange, endRange))
+      setDatesInTheWeek(getDatesInRange(startRange, endRange));
       const filteredClasses = classes.data.content.filter((item) => {
         const classStartDate = new Date(item.classDTO.startDate);
         return classStartDate >= startRange && classStartDate <= endRange;
@@ -166,31 +164,34 @@ const MyClass = () => {
           <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
 
-          {
-            lesson.status === "COMPLETED" &&
-              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-              <button
-                key={lesson.orderId}
-                onClick={() => {
-                  navigate(`/feedback/${lesson.orderId}`);
-                }}
-                className="mt-3 text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-1.5 px-4"
-              >
-                Feedback
-              </button>
-            ) : lesson.room &&
-              (lesson.status === "PENDING" ||
-                lesson.status === "ONGOING" ||
-                lesson.status === "ACTIVE") ? (
-              // Case 2: If the lesson has a Meet URL and status is PENDING, ONGOING, or ACTIVE, show the Meet URL button
-              <button
-                onClick={() => window.open(lesson.room, "_blank")}
-                className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
-              >
-                Meet URL
-              </button>
-            ) : null // Case 3: Show nothing if none of the above conditions are met
-          }
+          {lesson.status === "COMPLETED" &&
+          !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+            <button
+              key={lesson.orderId}
+              onClick={() => {
+                navigate(`/feedback/${lesson.orderId}`);
+              }}
+              className="mt-3 text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-1.5 px-4"
+            >
+              Feedback
+            </button>
+          ) : lesson.room &&
+            (lesson.status === "PENDING" ||
+              lesson.status === "ONGOING" ||
+              lesson.status === "ACTIVE") ? (
+            // Case 2: If the lesson has a Meet URL and status is PENDING, ONGOING, or ACTIVE, show the Meet URL button
+            <button
+              onClick={() => window.open(lesson.room, "_blank")}
+              className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
+            >
+              Meet URL
+            </button>
+          ) : (
+            // Case 3: Show "Ended" if none of the above conditions are met
+            <div className="mt-3 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-1.5 px-4">
+              Ended
+            </div>
+          )}
         </div>
       );
     }
@@ -208,15 +209,15 @@ const MyClass = () => {
           <thead>
             <tr className="bg-gray-200 *:text-center">
               <th className="py-2 px-4 border-b border-r">Ca học</th>
-              {
-                datesInTheWeek.map((date, index) => {
-                  const dayOfWeek = days[index % 7];
-                  return <th key={index} className="py-2 px-4 border-b text-center">
+              {datesInTheWeek.map((date, index) => {
+                const dayOfWeek = days[index % 7];
+                return (
+                  <th key={index} className="py-2 px-4 border-b text-center">
                     <p>{dayOfWeek}</p>
                     <p>{date}</p>
-                  </th>;
-                })
-              }
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>

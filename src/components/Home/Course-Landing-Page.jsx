@@ -212,7 +212,7 @@ export function CourseLandingPage() {
             </div>
           </div>
         </section>
-        {isLoggedIn && (
+        {isLoggedIn && majorClasses.length > 0 && (
           <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 mx-auto md:px-6">
               <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
