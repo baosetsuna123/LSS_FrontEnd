@@ -75,6 +75,7 @@ function UpdateSchedule() {
   const fetchClasses = async () => {
     try {
       const res = await fetchClassbyteacher(token);
+      console.log(res);
       setClasses(res);
     } catch (error) {
       console.log(error);
@@ -131,15 +132,40 @@ function UpdateSchedule() {
       setClassesUpdated(newClasses);
     }
   }, [classes, courses, slots]);
+  const [initialMaxStudents, setInitialMaxStudents] = useState(null);
 
 
   const handleEdit = (classInfo) => {
     setClassShow(classInfo)
     setEditingClass({ ...classInfo });
+    setInitialMaxStudents(classInfo.maxStudents);
+    setMaxStudentsError("");
     setIsPopupOpen(true);
   };
+  const [maxStudentsError, setMaxStudentsError] = useState("");
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    if (name === "maxStudents") {
+      const newMaxStudents = Number(value);
+
+      if (value && newMaxStudents < initialMaxStudents) {
+        console.log(newMaxStudents, initialMaxStudents);
+        setMaxStudentsError(
+          "Số học sinh không được nhỏ hơn số học sinh hiện tại"
+        );
+      } else {
+        setMaxStudentsError("");
+      }
+    }
+    setEditingClass((prev) => ({ ...prev, [name]: value }));
+  };
   const handleSave = async (updatedClass) => {
+    if (maxStudentsError) {
+      toast.error(maxStudentsError);
+      return;
+    }
     try {
       if(updatedClass.maxStudents < classShow.maxStudents){
         toast.error(`Số học sinh đang chỉnh sửa không được nhỏ hơn số học sinh hiện tại`)
@@ -162,12 +188,6 @@ function UpdateSchedule() {
     setIsPopupOpen(false);
     setEditingClass(null);
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditingClass((prev) => ({ ...prev, [name]: value }));
-  };
-
   const filteredClasses = classesUpdated.filter(
     (cls) =>
       cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -198,12 +218,15 @@ function UpdateSchedule() {
               <div>
                 <h3 className="font-bold text-lg">Lớp {cls.name}</h3>
                 <p className="text-gray-600">Môn học: {cls.courseName}</p>
-                <p className="text-gray-600">Số học sinh: {cls.maxStudents}</p>
+                <p className="text-gray-600">
+                  Số học sinh tối đa: {cls.maxStudents}
+                </p>
+                <p className="text-gray-600">Ngày học: {cls.startDate}</p>
                 <p className="mt-2">
                   <span className="font-medium"></span>
                   {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))
-                    ?.name || "Unknown"}{" "}
-                  - {cls.slotStart} - {cls.slotEnd}
+                    ?.name || "Unknown"}
+                  : {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
               <button
@@ -288,6 +311,11 @@ function UpdateSchedule() {
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {maxStudentsError && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {maxStudentsError}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -400,22 +428,6 @@ function UpdateSchedule() {
                       ))}
                     </select>
                   </div>
-                </div>
-              </div>
-              <div className="mb-4 col-span-2">
-                <label className="block mb-2 font-medium text-gray-700">
-                  Mô tả:
-                </label>
-                <div className="flex items-center space-x-4">
-                  <textarea
-                    type="text"
-                    id="description"
-                    name="description"
-                    disabled
-                    className="min-w-[620px] p-3 border rounded-lg outline-none min-h-[120px]"
-                    value={editingClass.description}
-                    onChange={handleInputChange}
-                  />
                 </div>
               </div>
               {/* <div>

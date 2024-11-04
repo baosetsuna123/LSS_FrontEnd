@@ -18,7 +18,7 @@ import {
   UserCheck,
   ChevronsLeftRightEllipsis,
 } from "lucide-react"; // Icon for the modal header
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchClassbyID, fetchCreateOrder } from "@/data/api"; // Assume createOrder is the API to create an order
 import Breadcrumb from "../Home/Breadcrumb";
@@ -127,6 +127,7 @@ export function ClassDetail() {
     // Open the modal when "Enroll Now" is clicked
     setModalOpen(true);
   };
+  const navigate = useNavigate();
 
   const handleConfirmEnroll = async () => {
     // Close the modal and create the order
@@ -137,7 +138,19 @@ export function ClassDetail() {
       console.log(result);
       setIsEnrolled(true); // Update enrollment status after successful enrollment
     } catch (error) {
-      alert(error.message || "Failed to create order");
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        toast.error(
+          `${error.response.data?.message || "Failed to create order"}`
+        );
+        navigate("/wallet");
+      } else if (error.request) {
+        // The request was made but no response was received
+        toast.error("No response received from the server.");
+      } else {
+        // Something happened in setting up the request
+        toast.error(error.message || "Failed to create order");
+      }
     } finally {
       setIsProcessing(false);
       setModalOpen(false); // Close the modal after the process

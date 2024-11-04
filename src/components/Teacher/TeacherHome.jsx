@@ -3,7 +3,7 @@ import {
   fetchCoursesService,
   fetchSlots,
   fetchCreateClass,
-  fetchAllCategories,
+  fetchCourseByMajor,
 } from "@/data/api";
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
@@ -15,15 +15,14 @@ import YearSelector from "./YearSelector";
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
   const [slots, setSlots] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const today = new Date();
   today.setDate(today.getDate() + 4);
@@ -34,16 +33,28 @@ function TeacherHome() {
   const [infoClass, setInfoClass] = useState(null);
   const [classes, setClasses] = useState([]);
   const [dayOfWeek, setDayOfWeek] = useState(0);
-  const [date, setDate] = useState(null)
+  const [date, setDate] = useState(null);
   const [classesCreate, setClassCreate] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [coursesUpdate, setCoursesUpdate] = useState([])
-
-  const [selectedSlots, setSelectedSlots] = useState([])
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [courseCodes, setCourseCodes] = useState([]);
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
     range: "",
   });
+  useEffect(() => {
+    const fetchCousesMajor = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const data = await fetchCourseByMajor(token);
+        const codes = data.map((course) => course.courseCode);
+        setCourseCodes(codes);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCousesMajor();
+  }, []);
   const [classData, setClassData] = useState({
     name: "",
     code: "",
@@ -121,9 +132,9 @@ function TeacherHome() {
   const fetchTimetable = async () => {
     try {
       const classes = await fetchClassbyteacher(token);
-      setClassCreate(classes)
+      setClassCreate(classes);
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
-      console.log(startRangeStr)
+      console.log(startRangeStr);
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
       const filteredClasses = classes.filter((item) => {
@@ -146,36 +157,15 @@ function TeacherHome() {
       console.log(error);
     }
   };
-  const fetchDropdownDataCategories = async () => {
-    try {
-      const categories = await fetchAllCategories(token);
-      setCategories(categories)
-    } catch (error) {
-      console.error("Error fetching dropdown data:", error);
-    }
-  };
 
-
-
-  useEffect(() => {
-    fetchDropdownDataCategories();
-  }, [token])
   const fetchDropdownData = async () => {
     try {
       const fetchedSlots = await fetchSlots(token);
-      const fetchedCourses = await fetchCoursesService(token);
       setSlots(fetchedSlots);
-      setCourses(fetchedCourses);
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
     }
   };
-
-  useEffect(() => {
-    if (classData.categoryId) {
-      setCoursesUpdate(courses.filter(course => course.categoryId == classData.categoryId))
-    }
-  }, [classData.categoryId, courses])
 
   useEffect(() => {
     fetchTimetable();
@@ -196,7 +186,6 @@ function TeacherHome() {
     const requiredFields = [
       "name",
       "code",
-      'categoryId',
       "startDate",
       "dayOfWeek",
       "slotId",
@@ -241,9 +230,11 @@ function TeacherHome() {
     try {
       const selectedDate = e.target.value;
       const date = new Date(selectedDate);
-      setDate(date)
-      const classList = classesCreate.filter(c => c.startDate === formatDate(date));
-      setSelectedSlots(classList.map(item => item.slotId))
+      setDate(date);
+      const classList = classesCreate.filter(
+        (c) => c.startDate === formatDate(date)
+      );
+      setSelectedSlots(classList.map((item) => item.slotId));
       // Ensure selected date is at least two days from today
       const minDate = new Date(minDateString);
 
@@ -254,16 +245,17 @@ function TeacherHome() {
       const jsDayOfWeek = date.getDay();
       const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
       const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
-      setDayOfWeek(dayOfWeek - 2)
+      setDayOfWeek(dayOfWeek - 2);
 
       setClassData((prevData) => ({
         ...prevData,
         startDate: formatDateToYMD(date),
         dayOfWeek,
       }));
-    } catch { /* empty */ }
+    } catch {
+      /* empty */
+    }
   };
-
 
   const handleShowDetail = (lesson) => {
     const data = classes.find((c) => c.code === lesson.class);
@@ -301,7 +293,6 @@ function TeacherHome() {
   //   dateObj.setDate(dateObj.getDate() - daysBefore);
   //   return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   // };
-
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
@@ -380,31 +371,6 @@ function TeacherHome() {
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
-          <select
-            name="categoryId"
-            onChange={handleInputChange}
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          >
-            <option value="">Select Category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.categoryId}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <select
-            name="courseCode"
-            onChange={handleInputChange}
-            disabled={coursesUpdate.length > 0 ? false : true}
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          >
-            <option value="">Select Course</option>
-            {coursesUpdate.length > 0 && coursesUpdate?.map((course) => (
-              <option key={course.id} value={course.courseCode}>
-                {course.courseCode}
-              </option>
-            ))}
-          </select>
           <input
             type="date"
             min={minDateString}
@@ -417,7 +383,15 @@ function TeacherHome() {
             name="dayOfWeek"
             disabled
             value={
-              ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][dayOfWeek]
+              [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+              ][dayOfWeek]
             }
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
@@ -430,12 +404,27 @@ function TeacherHome() {
           >
             <option value="">Select Slot</option>
             {slots.map((slot) => (
-              <option key={slot.slotId} value={slot.slotId} disabled={selectedSlots.some(item => item === slot.slotId)}>
+              <option
+                key={slot.slotId}
+                value={slot.slotId}
+                disabled={selectedSlots.some((item) => item === slot.slotId)}
+              >
                 {`${slot.period} (${slot.start} - ${slot.end})`}
               </option>
             ))}
           </select>
-
+          <select
+            name="courseCode"
+            onChange={handleInputChange}
+            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+          >
+            <option value="">Select Course</option>
+            {courseCodes.map((courseCode) => (
+              <option key={courseCode} value={courseCode}>
+                {courseCode}{" "}
+              </option>
+            ))}
+          </select>
           <input
             type="number"
             name="maxStudents"

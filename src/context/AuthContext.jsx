@@ -20,7 +20,18 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setIsLoggedIn(false);
     sessionStorage.clear();
-    localStorage.clear();
+
+    const submittedFeedbackOrderIds = localStorage.getItem(
+      "submittedFeedbackOrderIds"
+    );
+    localStorage.clear(); // Clear everything first
+
+    if (submittedFeedbackOrderIds) {
+      localStorage.setItem(
+        "submittedFeedbackOrderIds",
+        submittedFeedbackOrderIds
+      );
+    }
   };
 
   useEffect(() => {}, [isLoggedIn]);

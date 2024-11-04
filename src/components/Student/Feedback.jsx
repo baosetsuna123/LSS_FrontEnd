@@ -23,6 +23,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CheckCircle } from "lucide-react";
 import Breadcrumb from "../Home/Breadcrumb";
+import { useFeedback } from "@/context/FeedbackContext";
 
 const ratingOptions = [
   { value: 1, label: "Extremely dissatisfied" },
@@ -41,7 +42,7 @@ export default function FeedbackForm() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { submittedFeedbackOrderIds, addFeedbackOrderId } = useFeedback();
   const { orderId } = useParams();
   const [questions, setQuestions] = useState([]);
   const token = sessionStorage.getItem("token");
@@ -111,7 +112,7 @@ export default function FeedbackForm() {
 
       // Submit the feedback using the id from useParams
       await submitFeedback(orderId, submissionData, token);
-
+      addFeedbackOrderId(orderId.toString());
       setShowSuccessModal(true);
 
       // Reset form
@@ -132,8 +133,11 @@ export default function FeedbackForm() {
   const navigate = useNavigate();
 
   const handleModalClose = () => {
+    const feedbackIds = Array.from(submittedFeedbackOrderIds);
     setShowSuccessModal(false);
-    navigate("/my-class");
+    navigate("/my-class", {
+      submittedFeedbackOrderIds: feedbackIds,
+    });
   };
   return (
     <>

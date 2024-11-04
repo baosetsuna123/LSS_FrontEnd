@@ -49,7 +49,7 @@ export default function CourseLayout({
   useEffect(() => {
     const fetchCate = async () => {
       try {
-        const data = await fetchAllCategories(token);
+        const data = await fetchAllCategories();
         setCategories(data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);

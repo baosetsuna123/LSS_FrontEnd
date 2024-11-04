@@ -18,7 +18,8 @@ export const fetchSignUpStudent = async (
   password,
   email,
   fullName,
-  phoneNumber
+  phoneNumber,
+  categoryIds
 ) => {
   return await api.post("/auth/register-student", {
     username,
@@ -26,6 +27,7 @@ export const fetchSignUpStudent = async (
     email,
     fullName,
     phoneNumber,
+    categoryIds,
   });
 };
 //register-teacher
@@ -34,7 +36,8 @@ export const fetchSignUpTeacher = async (
   password,
   email,
   fullName,
-  phoneNumber
+  phoneNumber,
+  categoryIds
 ) => {
   return await api.post(
     "/auth/register-teacher",
@@ -44,42 +47,55 @@ export const fetchSignUpTeacher = async (
       email,
       fullName,
       phoneNumber,
+      categoryIds,
     },
     {
       withCredentials: true, // Quan trọng để gửi cookie session
     }
   );
 };
+//Get major class by student
+export const fetchMajorClassByStudent = async (token) => {
+  try {
+    const response = await api.get("/classes/by-major", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //create-application
-export const fetchCreateApplication = async (data) => {
+export const createApplication = async (applicationData, certificate) => {
+  const formData = new FormData();
+
+  // Append application data and certificate to FormData
+  formData.append("applicationDTO", JSON.stringify(applicationData));
+  if (certificate) {
+    formData.append("certificate", certificate);
+  }
+
+  // Make the API call
   try {
     const response = await api.post(
       "/applications/create-application",
+      formData,
       {
-        ...data,
-      },
-      {
-        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
     return response.data;
   } catch (error) {
+    // Handle errors appropriately
     if (error.response) {
-      console.error("Error response:", error.response);
-      if (error.response.status === 401) {
-        throw new Error("You are not logged in as a teacher.");
-      } else if (error.response.status === 400) {
-        throw new Error("Invalid request.");
-      } else if (error.response.status === 500) {
-        throw new Error("Internal server error.");
-      }
-    } else if (error.request) {
-      console.error("No response from server:", error.request);
-      throw new Error("No response from server.");
-    } else {
-      console.error("Error setting up request:", error.message);
-      throw new Error("Error setting up request.");
+      throw new Error(error.response.data || "Failed to create application");
     }
+    throw new Error("An error occurred while creating the application");
   }
 };
 //forgot-password
@@ -187,6 +203,20 @@ export const fetchCategoryById = async (id, token) => {
     throw error;
   }
 };
+//course-by-major
+export const fetchCourseByMajor = async (token) => {
+  try {
+    const response = await api.get(`/courses/courses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    throw error;
+  }
+};
 //create-category
 export const fetchCreateCategory = async (categoryDTO, token) => {
   try {
@@ -218,13 +248,9 @@ export const fetchUpdateCategory = async (id, categoryDTO, token) => {
   }
 };
 //get all categories
-export const fetchAllCategories = async (token) => {
+export const fetchAllCategories = async () => {
   try {
-    const response = await api.get("/categories", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("/categories");
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -537,21 +563,25 @@ export const fetchCreateClass = async (classDTO, image, token) => {
     throw new Error(error.response?.data || "An error occurred");
   }
 };
-//
-export const createApplication = async ({ title, description }) => {
-  return await api.post(
-    `/applications/create-application`,
-    {
-      title,
-      description,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      },
-      withCredentials: true,
-    }
-  );
+
+export const rejectApplication = async (id, rejectionReason, token) => {
+  try {
+    const response = await api.post(
+      `/applications/reject_application`,
+      rejectionReason,
+      {
+        params: { id },
+        headers: {
+          "Content-Type": "text/plain",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
 };
 
 // get all slots

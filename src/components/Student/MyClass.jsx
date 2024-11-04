@@ -2,6 +2,7 @@ import { fetchCoursesService, fetchOrderClasses } from "@/data/api";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import YearWeekSelector from "../Teacher/YearSelector";
+import { useFeedback } from "@/context/FeedbackContext";
 
 const MyClass = () => {
   const [timetable, setTimetable] = useState({});
@@ -16,7 +17,7 @@ const MyClass = () => {
   ];
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
-    range: ""
+    range: "",
   });
   const periods = Array.from({ length: 5 }, (_, i) => i + 1);
   const result = localStorage.getItem("result");
@@ -74,6 +75,8 @@ const MyClass = () => {
       return timetable;
     }, {});
   };
+  const { submittedFeedbackOrderIds } = useFeedback();
+  console.log("submittedFeedbackOrderIds:", submittedFeedbackOrderIds);
 
   const navigate = useNavigate();
   const handleClick = (id) => {
@@ -85,7 +88,7 @@ const MyClass = () => {
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
-      const filteredClasses = classes.data.content.filter(item => {
+      const filteredClasses = classes.data.content.filter((item) => {
         const classStartDate = new Date(item.classDTO.startDate);
         return classStartDate >= startRange && classStartDate <= endRange;
       });
@@ -114,7 +117,7 @@ const MyClass = () => {
   useEffect(() => {
     fetchTimetable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token,selectedWeekData]);
+  }, [token, selectedWeekData]);
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
@@ -133,9 +136,10 @@ const MyClass = () => {
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
 
           {
-            lesson.status === "COMPLETED" ? (
-              // Case 1: If the lesson is COMPLETED, show the Feedback button
+            lesson.status === "COMPLETED" &&
+            !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
               <button
+                key={lesson.orderId}
                 onClick={() => {
                   navigate(`/feedback/${lesson.orderId}`);
                 }}
@@ -143,8 +147,11 @@ const MyClass = () => {
               >
                 Feedback
               </button>
-            ) : lesson.room ? (
-              // Case 2: If the lesson is NOT completed but has a Meet URL, show the Meet URL button
+            ) : lesson.room &&
+              (lesson.status === "PENDING" ||
+                lesson.status === "ONGOING" ||
+                lesson.status === "ACTIVE") ? (
+              // Case 2: If the lesson has a Meet URL and status is PENDING, ONGOING, or ACTIVE, show the Meet URL button
               <button
                 onClick={() => window.open(lesson.room, "_blank")}
                 className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
