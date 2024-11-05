@@ -6,14 +6,17 @@ import { Toaster } from "react-hot-toast";
 import { ClassProvider } from "./context/ClassContext.jsx";
 import { WalletProvider } from "./context/WalletContext.jsx";
 import { FeedbackProvider } from "./context/FeedbackContext.jsx";
+import { QuestionProvider } from "./context/QuestionContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <ClassProvider>
       <WalletProvider>
         <FeedbackProvider>
-          <Toaster />
-          <App />
+          <QuestionProvider>
+            <Toaster />
+            <App />
+          </QuestionProvider>
         </FeedbackProvider>
       </WalletProvider>
     </ClassProvider>

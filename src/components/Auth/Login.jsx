@@ -46,7 +46,7 @@ export default function Login() {
         navigate("/admin-dashboard");
       }
 
-      getClasses(response.data.token); // Optionally fetch classes based on the role
+      getClasses(response.data.token, response.data.role); // Optionally fetch classes based on the role
       toast.success("Login successful");
     } catch (error) {
       if (error.response) {

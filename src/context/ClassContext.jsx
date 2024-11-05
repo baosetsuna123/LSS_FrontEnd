@@ -15,13 +15,16 @@ export const ClassProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Function to fetch classes
-  const getClasses = async (token) => {
+  const getClasses = async (token, role) => {
+    if (role !== "STUDENT") return;
     try {
       const localClasses = localStorage.getItem("classes");
 
       // Load from localStorage if available
       if (localClasses) {
         setClasses(JSON.parse(localClasses));
+        setLoading(false);
+        return;
       }
 
       const response = await fetchClasses(token);
@@ -29,10 +32,9 @@ export const ClassProvider = ({ children }) => {
         setClasses(response);
         localStorage.setItem("classes", JSON.stringify(response)); // Cache fresh data
       }
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching classes:", error);
-      setLoading(true);
+      setLoading(false);
     }
   };
   const clearClasses = () => {
@@ -41,11 +43,13 @@ export const ClassProvider = ({ children }) => {
   };
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    if (token) {
-      getClasses(token);
-      setLoading(false);
+    const result = JSON.parse(localStorage.getItem("result") || "{}");
+    const role = result.role;
+    console.log(role);
+    if (token && role === "STUDENT") {
+      getClasses(token, role);
     } else {
-      setLoading(true); // Stop loading if no token
+      setLoading(false);
     }
   }, []); // Run only once when the component mounts
 

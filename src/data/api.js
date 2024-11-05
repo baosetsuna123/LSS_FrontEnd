@@ -203,6 +203,33 @@ export const fetchCategoryById = async (id, token) => {
     throw error;
   }
 };
+//feedback/classid
+export const fetchFeedbackByclassid = async (token, id) => {
+  try {
+    const response = await api.get(`/feedback/class/${id}/summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    throw error;
+  }
+};
+export const fetchFeedbackDetail = async (token, id) => {
+  try {
+    const response = await api.get(`/feedback/class/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    throw error;
+  }
+};
 //course-by-major
 export const fetchCourseByMajor = async (token) => {
   try {
@@ -430,7 +457,7 @@ export const fetchClasses = async (token) => {
 //get by id
 export const fetchClassbyID = async (id, token) => {
   try {
-    const response = await api.get(`/classes/${id}`, {
+    const response = await api.get(`/classes/getByClassId/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -642,9 +669,18 @@ export const fetchOrderClasses = async (token) => {
   }
 };
 //-----------------Feedback-----------------
-export const fetchQuestionFeedback = async (token) => {
+export const fetchQuestionFeedback = async () => {
   try {
-    const response = await api.get("/api/feedback-question", {
+    const response = await api.get("/api/feedback-question");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const fetchClassStaff = async (token) => {
+  try {
+    const response = await api.get("/classes/StatusCompleted", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

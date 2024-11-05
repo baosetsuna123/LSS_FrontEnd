@@ -14,25 +14,30 @@ import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
 // import ClassLayout from "./Class";
 import CategoryLayout from "./Category";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   fetchAllCategories,
   fetchAllCourses,
   fetchApplicationStaff,
+  fetchClassStaff,
+  fetchFeedbackByclassid,
   getApplicationsByType,
   // fetchClasses,
 } from "@/data/api"; // Import the API function
 import { useAuth } from "@/context/AuthContext";
 import AppWithDraw from "./AppWithdraw";
 import AppOthers from "./AppOthers";
+import ClassLayout from "./Class";
+import { useQuestionContext } from "@/context/QuestionContext";
 
 export function Dashboard() {
   const { logout } = useAuth();
+  const { questions } = useQuestionContext();
   const [sidebarWidth, setSidebarWidth] = useState(250);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [classes] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const user = JSON.parse(localStorage.getItem("result"));
   const itemsPerPage = 4;
@@ -48,7 +53,7 @@ export function Dashboard() {
   const [searchQueryDraw, setSearchQueryDraw] = useState("");
   const [searchQueryOther, setSearchQueryOther] = useState("");
 
-  const [searchQueryClass] = useState("");
+  const [searchQueryClass, setSearchQueryClass] = useState("");
   const [totalCategories, setTotalCategories] = useState(0); // Track total categories
 
   const navigate = useNavigate();
@@ -60,7 +65,7 @@ export function Dashboard() {
       setActiveCategory(savedCategory);
     }
   }, []);
-
+  const isFeedbackRoute = location.pathname.includes("/dashboard/feedback");
   // Save active category to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeCategory", activeCategory);
@@ -87,7 +92,21 @@ export function Dashboard() {
   }, []);
   const [appwithdraw, setAppWithdraw] = useState([]);
   const [isWithdrawMenuOpen, setIsWithdrawMenuOpen] = useState(false); // State for toggling Withdraw menu
+  const [feedback, setFeedback] = useState({});
+  const token = sessionStorage.getItem("token");
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        const fetchedFeedback = await fetchFeedbackByclassid(token, 5);
+        console.log("Fetched Feedback API response:", fetchedFeedback);
+        setFeedback(fetchedFeedback);
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+      }
+    };
 
+    fetchFeedback();
+  }, [token]);
   const [appother, setAppOther] = useState([]);
   useEffect(() => {
     const loadAppWithdraws = async () => {
@@ -153,21 +172,21 @@ export function Dashboard() {
     };
     loadCourses();
   }, []);
-  // useEffect(() => {
-  //   const loadClasses = async () => {
-  //     const token = sessionStorage.getItem("token");
-  //     try {
-  //       const data = await fetchClasses(token);
-  //       console.log(data);
-  //       setClasses(data || []);
-  //     } catch (error) {
-  //       console.error("Failed to fetch classes:", error);
-  //       // toast.error("Failed to fetch classes.");
-  //       setCourses([]);
-  //     }
-  //   };
-  //   loadClasses();
-  // }, []);
+  useEffect(() => {
+    const loadClasses = async () => {
+      const token = sessionStorage.getItem("token");
+      try {
+        const data = await fetchClassStaff(token);
+        console.log("Classes", data);
+        setClasses(data || []);
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+        // toast.error("Failed to fetch classes.");
+        setCourses([]);
+      }
+    };
+    loadClasses();
+  }, []);
   // Calculate page counts based on data lengths
   const pageCountCate = Math.ceil(totalCategories / itemsPerPage);
   const pageCountApp = Math.ceil(applications.length / itemsPerPage);
@@ -421,77 +440,84 @@ export function Dashboard() {
               </div>
             </div>
           )}
-
-          {/* Render the active category layout */}
-          {activeCategory === "category" && (
-            <CategoryLayout
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              setCurrentPage={setCurrentPage}
-              onUpdatePagination={handleUpdatePagination}
-              initialCategories={categories} // Pass categories to CategoryLayout
-              searchQuery={searchQueryCategory}
-              setSearchQuery={setSearchQueryCategory} // Pass down the search query state
-            />
+          {isFeedbackRoute ? (
+            <Outlet />
+          ) : (
+            <>
+              {/* Render the active category layout */}
+              {activeCategory === "category" && (
+                <CategoryLayout
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  onUpdatePagination={handleUpdatePagination}
+                  initialCategories={categories}
+                  searchQuery={searchQueryCategory}
+                  setSearchQuery={setSearchQueryCategory}
+                />
+              )}
+              {activeCategory === "application" && (
+                <ApplicationLayout
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  applications={applications}
+                  searchQuery={searchQueryApplication}
+                  setSearchQuery={setSearchQueryApplication}
+                  onDelete={resetCurrentPage}
+                />
+              )}
+              {activeCategory === "course" && (
+                <CourseLayout
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  courses={courses}
+                  setCourses={setCourses}
+                  searchQuery={searchQueryCourse}
+                  setSearchQuery={setSearchQueryCourse}
+                  onDelete={resetCurrentPage}
+                  loading={loading}
+                />
+              )}
+              {activeCategory === "withdraw" && (
+                <AppWithDraw
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  appwithdraw={appwithdraw}
+                  setAppWithdraw={setAppWithdraw}
+                  searchQuery={searchQueryDraw}
+                  setSearchQuery={setSearchQueryDraw}
+                  loading={loading}
+                />
+              )}
+              {activeCategory === "others" && (
+                <AppOthers
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  setCurrentPage={setCurrentPage}
+                  appother={appother}
+                  setAppOther={setAppOther}
+                  searchQuery={searchQueryOther}
+                  setSearchQuery={setSearchQueryOther}
+                  loading={loading}
+                />
+              )}
+              {activeCategory === "class" && (
+                <ClassLayout
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  classes={classes}
+                  feedback={feedback}
+                  questions={questions}
+                  setClasses={setClasses}
+                  searchQuery={searchQueryClass}
+                  onDelete={resetCurrentPage}
+                  setSearchQuery={setSearchQueryClass}
+                />
+              )}
+            </>
           )}
-          {activeCategory === "application" && (
-            <ApplicationLayout
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              applications={applications} // Pass applications to ApplicationLayout
-              searchQuery={searchQueryApplication}
-              setSearchQuery={setSearchQueryApplication} // Pass down the search query state
-              onDelete={resetCurrentPage} // Pass down the reset function
-            />
-          )}
-          {activeCategory === "course" && (
-            <CourseLayout
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              setCurrentPage={setCurrentPage}
-              courses={courses}
-              setCourses={setCourses}
-              searchQuery={searchQueryCourse}
-              setSearchQuery={setSearchQueryCourse} // Pass down the search query state
-              onDelete={resetCurrentPage}
-              loading={loading}
-            />
-          )}
-          {activeCategory === "withdraw" && (
-            <AppWithDraw
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              setCurrentPage={setCurrentPage}
-              appwithdraw={appwithdraw}
-              setAppWithdraw={setAppWithdraw}
-              searchQuery={searchQueryDraw}
-              setSearchQuery={setSearchQueryDraw} // Pass down the search query state
-              loading={loading}
-            />
-          )}
-          {activeCategory === "others" && (
-            <AppOthers
-              currentPage={currentPage}
-              itemsPerPage={itemsPerPage}
-              setCurrentPage={setCurrentPage}
-              appother={appother}
-              setAppOther={setAppOther}
-              searchQuery={searchQueryOther}
-              setSearchQuery={setSearchQueryOther} // Pass down the search query state
-              loading={loading}
-            />
-          )}
-          {/* {activeCategory === "class" && (
-            // <ClassLayout
-            //   currentPage={currentPage}
-            //   itemsPerPage={itemsPerPage}
-            //   classes={classes}
-            //   setClasses={setClasses}
-            //   searchQuery={searchQueryClass}
-            //   setSearchQuery={setSearchQueryClass} // Pass down the search query state
-            //   onDelete={resetCurrentPage} // Pass down the reset function
-            // />
-          )} */}
 
           {/* Pagination Controls */}
           {!isSearchActive() && ( // Only show pagination if no search query is active
