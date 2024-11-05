@@ -9,9 +9,18 @@ const NotFound = () => {
   useEffect(() => {
     toast.error("The page you are looking for does not exist."); // Show toast notification
   }, []);
-
+  const result = localStorage.getItem("result");
+  const role = result ? JSON.parse(result).role : null;
   const handleBackToHome = () => {
-    navigate("/"); // Navigate to the homepage
+    if (role === "STAFF") {
+      navigate("/dashboard");
+    } else if (role === "ADMIN") {
+      navigate("/admin-dashboard");
+    } else if (role === "TEACHER") {
+      navigate("/teacher");
+    } else {
+      navigate("/");
+    }
   };
 
   return (

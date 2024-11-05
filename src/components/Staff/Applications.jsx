@@ -111,26 +111,29 @@ const ApplicationLayout = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Title
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Description
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ">
                 Certificate
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Status
               </th>
-
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Teacher Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+                Reason
+              </th>{" "}
+              {/* New column */}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Action
               </th>
             </tr>
@@ -142,20 +145,20 @@ const ApplicationLayout = ({
                   key={app.applicationId}
                   className="hover:bg-gray-100 transition duration-200"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.title || "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.description && typeof app.description === "string"
                       ? app.description.length > 20
                         ? `${app.description.slice(0, 20)}...`
                         : app.description
                       : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.certificate ? (
                       <a
                         href={app.certificate}
@@ -170,24 +173,35 @@ const ApplicationLayout = ({
                     )}
                   </td>
                   <td
-                    className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
+                    className={`px-6 py-4 whitespace-nowrap font-semibold cursor-pointer text-sm rounded-lg ${
                       app.status === "APPROVED"
-                        ? " text-green-500"
+                        ? "text-green-500"
                         : app.status === "ASSIGNED"
-                        ? " text-yellow-500"
+                        ? "text-yellow-500"
                         : app.status === "REJECTED"
-                        ? " text-red-500"
+                        ? "text-red-500"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
                     {app.status}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.teacherName.length > 20
                       ? `${app.teacherName.slice(0, 20)}...`
                       : app.teacherName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={app.rejectionReason}
+                  >
+                    {app.status === "REJECTED"
+                      ? app.rejectionReason.length > 17
+                        ? `${app.rejectionReason.slice(0, 17)}...`
+                        : app.rejectionReason
+                      : "-"}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.status === "ASSIGNED" && (
                       <>
                         <button
@@ -239,6 +253,7 @@ const ApplicationLayout = ({
           </tbody>
         </table>
       </div>
+
       <RejectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

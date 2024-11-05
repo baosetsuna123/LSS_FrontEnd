@@ -11,11 +11,11 @@ const AppWithDraw = ({
   setSearchQuery,
 }) => {
   const token = sessionStorage.getItem("token"); // Get the token from session storage
-
+  console.log(appwithdraw);
   const handleClick = async (id) => {
     try {
       const response = await completeWithdrawalRequest(id, token);
-      console.log(response);
+      console.log("Withdraw", response);
       setAppWithdraw((prevApplications) =>
         prevApplications.map((app) =>
           app.applicationUserId === id ? { ...app, status: "completed" } : app
