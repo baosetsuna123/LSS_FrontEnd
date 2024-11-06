@@ -41,7 +41,7 @@ function TeacherHome() {
     week: null,
     range: "",
   });
-  const [datesInTheWeek, setDatesInTheWeek] = useState([])
+  const [datesInTheWeek, setDatesInTheWeek] = useState([]);
 
   useEffect(() => {
     const fetchCousesMajor = async () => {
@@ -63,7 +63,7 @@ function TeacherHome() {
     description: "",
     status: "ACTIVE",
     maxStudents: 15,
-    price: 100000,
+    price: "",
     slotId: "1",
     startDate: "",
     courseCode: "",
@@ -79,8 +79,6 @@ function TeacherHome() {
     "Chủ nhật",
   ];
 
-
-
   const result = localStorage.getItem("result");
   let token;
   if (result) {
@@ -91,7 +89,19 @@ function TeacherHome() {
       console.error("Error parsing result from localStorage:", error);
     }
   }
+  const handleInput = (e) => {
+    let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
+    if (!isNaN(value) || value === "") {
+      setClassData((prevData) => ({ ...prevData, price: value })); // Update state with the raw number
+    }
+  };
+
+  // Format the input value with commas
+  const formatWithCommas = (num) => {
+    if (!num) return "";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Convert num to string and add commas
+  };
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
       2: "Thứ 2",
@@ -125,8 +135,8 @@ function TeacherHome() {
     let currentDate = new Date(startDate);
     let endCurrentDate = new Date(endDate);
     while (currentDate <= endCurrentDate) {
-      const day = currentDate.getDate().toString().padStart(2, '0');
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDate.getDate().toString().padStart(2, "0");
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
       dates.push(`${day}/${month}`);
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -141,6 +151,7 @@ function TeacherHome() {
       "0"
     )}-${String(d.getDate()).padStart(2, "0")}`;
   };
+
   const fetchTimetable = async () => {
     try {
       const classes = await fetchClassbyteacher(token);
@@ -148,7 +159,7 @@ function TeacherHome() {
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
-      setDatesInTheWeek(getDatesInRange(startRange, endRange))
+      setDatesInTheWeek(getDatesInRange(startRange, endRange));
       const filteredClasses = classes.filter((item) => {
         const classStartDate = formatDateToYMD(new Date(item.startDate));
         return classStartDate >= startRange && classStartDate <= endRange;
@@ -322,19 +333,19 @@ function TeacherHome() {
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               <th className="py-2 px-4 border-b border-r">Ca học</th>
-              {
-                datesInTheWeek.map((date, index) => {
-                  const dayOfWeek = days[index % 7];
-                  return <th key={index} className="py-2 px-4 border-b text-center">
+              {datesInTheWeek.map((date, index) => {
+                const dayOfWeek = days[index % 7];
+                return (
+                  <th key={index} className="py-2 px-4 border-b text-center">
                     <p>{dayOfWeek}</p>
                     <p>{date}</p>
-                  </th>;
-                })
-              }
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {slots.map((slot,index) => (
+            {slots.map((slot, index) => (
               <tr
                 key={index}
                 className="hover:bg-gray-100 transition duration-150"
@@ -451,12 +462,13 @@ function TeacherHome() {
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <input
-            type="number"
+            type="text"
             name="price"
             placeholder="Price (100,000 - 500,000)"
             min={100000}
             max={500000}
-            onChange={handleInputChange}
+            value={formatWithCommas(classData.price)}
+            onChange={handleInput}
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />

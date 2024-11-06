@@ -12,6 +12,7 @@ const AppWithDraw = ({
 }) => {
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   console.log(appwithdraw);
+
   const handleClick = async (id) => {
     try {
       const response = await completeWithdrawalRequest(id, token);
@@ -33,6 +34,16 @@ const AppWithDraw = ({
       style: "currency",
       currency: "VND",
     }).format(amount);
+  };
+
+  // Function to extract account number and bank from description
+  const extractAccountInfo = (description) => {
+    const accountMatch = description.match(/Account number: (\d+)/);
+    const bankMatch = description.match(/Bank: ([^,]+)/);
+    return {
+      accountNumber: accountMatch ? accountMatch[1] : "N/A",
+      bank: bankMatch ? bankMatch[1] : "N/A",
+    };
   };
 
   // Calculate the current data to display based on pagination and search query
@@ -75,13 +86,16 @@ const AppWithDraw = ({
                 Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
+                Account Number
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bank
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
+                Amount
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Action
@@ -90,54 +104,60 @@ const AppWithDraw = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.length > 0 ? (
-              currentData.map((app, index) => (
-                <tr
-                  key={app.applicationUserId}
-                  className="hover:bg-gray-100 transition duration-200"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.name || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.title || "N/A"}
-                  </td>
-                  <td
-                    className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
-                      app.status === "completed"
-                        ? " text-green-500"
-                        : app.status === "pending"
-                        ? " text-yellow-500"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+              currentData.map((app, index) => {
+                const { accountNumber, bank } = extractAccountInfo(
+                  app.description
+                );
+                return (
+                  <tr
+                    key={app.applicationUserId}
+                    className="hover:bg-gray-100 transition duration-200"
                   >
-                    {app.status}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {formatCurrency(app.amountFromDescription) || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {/* Approve Button */}
-                    <button
-                      onClick={() => handleClick(app.applicationUserId)}
-                      disabled={app.status === "completed"} // Disable if already approved
-                      className={`px-4 py-2 text-white rounded-md transition duration-200 ${
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {app.name || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {accountNumber}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{bank}</td>
+                    <td
+                      className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
                         app.status === "completed"
-                          ? "bg-gray-400 cursor-not-allowed" // Disabled style
-                          : "bg-blue-500 hover:bg-blue-600"
+                          ? " text-green-500"
+                          : app.status === "pending"
+                          ? " text-yellow-500"
+                          : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {app.status === "completed" ? "Approved" : "Approve"}
-                    </button>
-                  </td>
-                </tr>
-              ))
+                      {app.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {formatCurrency(app.amountFromDescription) || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {/* Approve Button */}
+                      <button
+                        onClick={() => handleClick(app.applicationUserId)}
+                        disabled={app.status === "completed"} // Disable if already approved
+                        className={`px-4 py-2 text-white rounded-md transition duration-200 ${
+                          app.status === "completed"
+                            ? "bg-gray-400 cursor-not-allowed" // Disabled style
+                            : "bg-blue-500 hover:bg-blue-600"
+                        }`}
+                      >
+                        {app.status === "completed" ? "Approved" : "Approve"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td
-                  colSpan="9"
+                  colSpan="7"
                   className="text-center text-red-600 py-4 font-semibold"
                 >
                   No Data

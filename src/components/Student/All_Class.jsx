@@ -12,7 +12,7 @@ import Breadcrumb from "../Home/Breadcrumb";
 export function ViewAllClasses() {
   const { classes: contextClasses } = useClassContext();
   const [searchTerm, setSearchTerm] = useState("");
-  const [maxPrice, setMaxPrice] = useState(200000);
+  const [maxPrice, setMaxPrice] = useState(250000);
   const [selectedCourseCodes, setSelectedCourseCodes] = useState([]);
   const [filteredClasses, setFilteredClasses] = useState(contextClasses);
 
@@ -61,7 +61,7 @@ export function ViewAllClasses() {
 
   const clearAllFilters = () => {
     setSearchTerm("");
-    setMaxPrice(200000);
+    setMaxPrice(250000);
     setSelectedCourseCodes([]);
   };
 
