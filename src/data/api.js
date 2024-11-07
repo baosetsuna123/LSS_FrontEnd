@@ -862,3 +862,164 @@ export const AssignApplication = async () => {
     throw error;
   }
 };
+
+export const getSystemWalletBalance = async (token) => {
+  try {
+    const response = await api.get(`/admin/system-wallet/balance`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching system wallet balance:", error);
+    throw error;
+  }
+};
+
+export const getSystemWalletTransactionHistory = async (token) => {
+  try {
+    const response = await api.get(`/admin/system-wallet/transactions`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching system wallet transaction history:", error);
+    throw error;
+  }
+};
+
+export const getUserCountByRole = async (token) => {
+  try {
+    const response = await api.get(`/admin/user-count`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user count by role:", error);
+    throw error;
+  }
+};
+
+export const getTotalOrdersAndAmount = async (startDate, endDate, token) => {
+  try {
+    const response = await api.get(`/admin/total`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { startDate, endDate },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching total orders and amount:", error);
+    throw error;
+  }
+};
+
+export const getTotalClasses = async (token) => {
+  try {
+    const response = await api.get(`/admin/totalClass`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching total classes:", error);
+    throw error;
+  }
+};
+
+export const getActiveClassesByMonth = async (year, token) => {
+  try {
+    const response = await api.get(`/admin/statistics/active`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching active classes by month:", error);
+    throw error;
+  }
+};
+
+export const getOngoingClassesByMonth = async (year,token) => {
+  try {
+    const response = await api.get(`/admin/statistics/ongoing`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching ongoing classes by month:", error);
+    throw error;
+  }
+};
+
+export const getCompletedClassesByMonth = async (year,token) => {
+  try {
+    const response = await api.get(`/admin/statistics/completed`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching completed classes by month:", error);
+    throw error;
+  }
+};
+
+export const getActiveClassesByMonthDetailed = async (year, month, token) => {
+  try {
+    const response = await api.get(`/admin/details/active`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year, month },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching active classes by month (detailed):", error);
+    throw error;
+  }
+};
+
+export const getOngoingClassesByMonthDetailed = async (year, month, token) => {
+  try {
+    const response = await api.get(`/admin/details/ongoing`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year, month },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching ongoing classes by month (detailed):", error);
+    throw error;
+  }
+};
+
+export const getCompletedClassesByMonthDetailed = async (year, month, token) => {
+  try {
+    const response = await api.get(`/admin/details/completed`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year, month },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching completed classes by month (detailed):", error);
+    throw error;
+  }
+};
