@@ -36,6 +36,7 @@ import { SendApplication } from "./components/Student/send-application";
 import { AdminLayout } from "./components/Admin/admin-layout";
 import AdminHome from "./components/Admin/AdminHome";
 import { AboutMe } from "./components/Home/AboutMe";
+import { ApplicationManagement } from "./components/Student/ViewApplication";
 
 function App() {
   return (
@@ -113,6 +114,10 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/all-transactions" element={<WalletHistory />} />
+          <Route
+            path="/view-applications"
+            element={<ApplicationManagement />}
+          />
           <Route path="/send-applications" element={<SendApplication />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/about-me" element={<AboutMe />} />

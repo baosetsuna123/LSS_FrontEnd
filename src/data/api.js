@@ -622,7 +622,56 @@ export const rejectApplication = async (id, rejectionReason, token) => {
     throw error;
   }
 };
-
+export const viewAllApplications = async (token) => {
+  try {
+    const response = await api.get(
+      `/applicationUser/getApplicationUserByUserName`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const fetchCancelApplication = async (id, token) => {
+  try {
+    const response = await api.put(
+      `/applicationUser/cancelWithdrawal/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const rejectAppOther = async (id, token) => {
+  try {
+    const response = await api.put(
+      `/applicationUser/reject/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
 // get all slots
 export const fetchSlots = async (token) => {
   try {
@@ -782,6 +831,19 @@ export const completeWithdrawalRequest = async (applicationUserId, token) => {
       },
       params: {
         applicationUserId: applicationUserId, // Pass the application ID as a request param
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error completing withdrawal request:", error);
+    throw error;
+  }
+};
+export const approveOtherApp = async (id, token) => {
+  try {
+    const response = await api.put(`applicationUser/approve/${id}`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
