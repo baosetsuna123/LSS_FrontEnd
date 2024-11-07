@@ -198,7 +198,7 @@ export function WalletHistory() {
             </div>
           ) : (
             <ul className="space-y-4">
-              {filteredTransactions.map((transaction) => {
+              {filteredTransactions.map((transaction, index) => {
                 const isCredit = transaction.amount >= 0;
                 const formattedAmount = Math.abs(transaction.amount);
                 const transactionDate = formatTransactionDate(
@@ -221,7 +221,10 @@ export function WalletHistory() {
                           {transactionDate}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Transaction ID: {transaction.id}
+                          Transaction ID: {index + 1}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Type: {transaction.note} {/* Display the note */}
                         </p>
                       </div>
                     </div>

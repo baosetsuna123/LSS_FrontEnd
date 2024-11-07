@@ -60,15 +60,16 @@ const MyClass = () => {
     };
 
     return classes.reduce((timetable, contentItem, index) => {
-      if (!contentItem || !contentItem.classDTO) {
+      if (!contentItem || !contentItem.classDTO || !contentItem.orderDTO) {
         console.log(
-          `Missing or undefined classDTO at index ${index}`,
+          `Missing or undefined classDTO/orderDTO at index ${index}`,
           contentItem
         );
-        return timetable; // Skip this entry if classDTO is missing
+        return timetable; // Skip this entry if classDTO or orderDTO is missing
       }
       const classItem = contentItem.classDTO;
-      // Check if classItem and dayOfWeek exist
+      const orderItem = contentItem.orderDTO;
+
       if (classItem && classItem.dayOfWeek && classItem.slotId) {
         const day = daysOfWeekMap[classItem.dayOfWeek];
         if (!timetable[day]) {
@@ -81,14 +82,15 @@ const MyClass = () => {
           class: classItem.code,
           room: classItem.location,
           id: classItem.classId,
-          status: classItem.status,
-          orderId: contentItem.orderId, // Get orderId from parent object
+          orderId: orderItem.orderId, // Get orderId from orderDTO
+          orderStatus: orderItem.status, // Get status from orderDTO
         };
       }
 
       return timetable;
     }, {});
   };
+
   const { submittedFeedbackOrderIds } = useFeedback();
   console.log("submittedFeedbackOrderIds:", submittedFeedbackOrderIds);
 
@@ -150,7 +152,13 @@ const MyClass = () => {
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
+
+    if (lesson && lesson.orderStatus === "CANCELLED") {
+      return <div className="min-h-[80px]"></div>; // Empty cell for cancelled classes
+    }
+
     if (lesson) {
+      const lessonStatus = lesson.orderStatus; // Use status from orderDTO
       return (
         <div className="p-4 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <p
@@ -164,7 +172,7 @@ const MyClass = () => {
           <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
           <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
 
-          {lesson.status === "COMPLETED" &&
+          {lessonStatus === "COMPLETED" &&
           !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
             <button
               key={lesson.orderId}
@@ -176,10 +184,10 @@ const MyClass = () => {
               Feedback
             </button>
           ) : lesson.room &&
-            (lesson.status === "PENDING" ||
-              lesson.status === "ONGOING" ||
-              lesson.status === "ACTIVE") ? (
-            // Case 2: If the lesson has a Meet URL and status is PENDING, ONGOING, or ACTIVE, show the Meet URL button
+            (lessonStatus === "PENDING" ||
+              lessonStatus === "ONGOING" ||
+              lessonStatus === "ACTIVE") ? (
+            // Case 2: Show Meet URL button for status PENDING, ONGOING, or ACTIVE
             <button
               onClick={() => window.open(lesson.room, "_blank")}
               className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
@@ -195,6 +203,7 @@ const MyClass = () => {
         </div>
       );
     }
+
     return <div className="min-h-[80px]"></div>;
   };
 

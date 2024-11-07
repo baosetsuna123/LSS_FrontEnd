@@ -526,7 +526,19 @@ export const fetchCreateOrder = async (classId, token) => {
     throw error;
   }
 };
-
+export const CancelOrder = async (orderId, token) => {
+  try {
+    const response = await api.put(`/orders/cancel/${orderId}`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //update class
 export const fetchUpdateClass = async ({ token, data }) => {
   const formData = new FormData();

@@ -141,7 +141,7 @@ export function ClassDetail() {
         const errorMessage =
           error.response.data?.message || "Failed to create order";
 
-        if (errorMessage === "User has already registered for this schedule.") {
+        if (errorMessage === "User has already registered for this class.") {
           toast.error(errorMessage);
         } else {
           toast.error(errorMessage);

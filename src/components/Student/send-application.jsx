@@ -236,12 +236,11 @@ export function SendApplication() {
       result = result.trim() + " đồng"; // Ensure "đồng" is added if there are no remainder
     }
 
-    return result.trim(); // Remove extra spaces
+    return result.trim();
   };
   const handleWithdrawalSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure account number is valid before submitting
     if (
       withdrawalData.accountNumber.length < 8 ||
       withdrawalData.accountNumber.length > 15
@@ -254,8 +253,7 @@ export function SendApplication() {
       return;
     }
     try {
-      const response = await submitWithdrawal(withdrawalData, token);
-      console.log("Withdrawal Application Submitted:", response);
+      await submitWithdrawal(withdrawalData, token);
       toast.success("Withdrawal application submitted successfully!");
       setWithdrawalData({
         accountHolderName: "",
@@ -265,8 +263,17 @@ export function SendApplication() {
         applicationTypeId: 1,
       });
     } catch (error) {
-      console.error("Error submitting withdrawal:", error);
-      toast.error("Can't withdraw amount higher than current balance.");
+      if (error.response && typeof error.response.data === "string") {
+        const errorMessage = error.response.data;
+
+        if (errorMessage.includes("Số dư không đủ để rút tiền")) {
+          toast.error("Your current balance is not enough to withdraw money");
+        } else {
+          toast.error("An error occurred while processing the withdrawal.");
+        }
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     }
   };
 

@@ -129,6 +129,8 @@ const AppWithDraw = ({
                           ? " text-green-500"
                           : app.status === "pending"
                           ? " text-yellow-500"
+                          : app.status === "Canceled"
+                          ? " text-red-500"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
@@ -141,14 +143,22 @@ const AppWithDraw = ({
                       {/* Approve Button */}
                       <button
                         onClick={() => handleClick(app.applicationUserId)}
-                        disabled={app.status === "completed"} // Disable if already approved
+                        disabled={
+                          app.status === "completed" ||
+                          app.status === "Canceled"
+                        } // Disable if completed or canceled
                         className={`px-4 py-2 text-white rounded-md transition duration-200 ${
-                          app.status === "completed"
+                          app.status === "completed" ||
+                          app.status === "Canceled"
                             ? "bg-gray-400 cursor-not-allowed" // Disabled style
                             : "bg-blue-500 hover:bg-blue-600"
                         }`}
                       >
-                        {app.status === "completed" ? "Approved" : "Approve"}
+                        {app.status === "completed"
+                          ? "Approved"
+                          : app.status === "Canceled"
+                          ? "Cancelled"
+                          : "Approve"}
                       </button>
                     </td>
                   </tr>
