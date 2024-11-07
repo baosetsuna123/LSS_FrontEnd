@@ -69,7 +69,7 @@ export default function TransactionHistory() {
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder='search by username'
-                className="my-4 w-full max-w-xs"
+                className="my-4 w-full max-w-xs "
             />
             <div className="my-2">
                 <TableContainer component={Paper}>
@@ -80,6 +80,7 @@ export default function TransactionHistory() {
                                 <TableCell>Transaction Date</TableCell>
                                 <TableCell>Balance After Transaction</TableCell>
                                 <TableCell>Username</TableCell>
+                                <TableCell>Note</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -94,6 +95,7 @@ export default function TransactionHistory() {
                                     <TableCell>{new Date(row.transactionDate).toLocaleString()}</TableCell>
                                     <TableCell>{row.balanceAfterTransaction.toLocaleString()} VND</TableCell>
                                     <TableCell>{row.username}</TableCell>
+                                    <TableCell>{row.note}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

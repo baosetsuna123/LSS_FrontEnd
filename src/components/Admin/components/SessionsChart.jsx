@@ -1,4 +1,4 @@
-import { getActiveClassesByMonth, getCompletedClassesByMonth, getOngoingClassesByMonth, getTotalClasses } from '@/data/api';
+import { getActiveClassesByMonth, getCompletedClassesByMonth, getOngoingClassesByMonth } from '@/data/api';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { LineChart } from '@mui/x-charts';
 import { useEffect, useState } from 'react'
@@ -16,7 +16,6 @@ export default function SessionsChart() {
     const [dataClasses, setDataClasses] = useState([])
     const [selectedStatus, setSelectedStatus] = useState(optionsStatus[0]);
     const [selectedYear, setSelectedYear] = useState(getCurrentYear());
-    const [totalClasses, setTotalClasses] = useState(0)
     const result = localStorage.getItem("result");
     let token;
     if (result) {
@@ -65,19 +64,7 @@ export default function SessionsChart() {
         }
     }
 
-    const getClasses = async () => {
-        try {
-            const res = await getTotalClasses(token);
-            setTotalClasses(res)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    useEffect(() => {
-        getClasses()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token]);
+    
 
     useEffect(() => {
         getActiveClasses()
@@ -94,11 +81,8 @@ export default function SessionsChart() {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg py-3 rounded-lg px-4">
+        <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg py-6 rounded-lg px-4">
             <h1 className="font-semibold text-2xl tracking-wider uppercase text-center">Review Sessions Chart</h1>
-            <div className='py-3 text-blue-800 items-center gap-6 text-2xl'>
-                <span className='font-semibold '>Total Classes:</span> <span>{totalClasses}</span>
-            </div>
             <div>
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small-label">Year</InputLabel>
