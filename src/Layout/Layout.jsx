@@ -29,7 +29,6 @@ export function Layout({ children }) {
   const [hiddenHeader, setHiddenHeader] = useState(false);
   const location = useLocation();
   const result = localStorage.getItem("result");
-
   let role;
 
   if (result) {
@@ -182,12 +181,14 @@ export function Layout({ children }) {
           </div>
 
           <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Link
-              className="text-sm font-medium hover:underline underline-offset-4"
-              to="/class"
-            >
-              Classes
-            </Link>
+            {isLoggedIn && (
+              <Link
+                className="text-sm font-medium hover:underline underline-offset-4"
+                to="/class"
+              >
+                Classes
+              </Link>
+            )}
             <Link
               className="text-sm font-medium hover:underline underline-offset-4"
               to="/about-me"

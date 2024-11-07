@@ -47,6 +47,8 @@ function App() {
         <Route path="/create-application" element={<Application />} />
         {/* Staff Dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<NotFound />} />
+
         {/* Admin Dashboard */}
         <Route
           element={
@@ -118,7 +120,6 @@ function App() {
           <Route path="/class" element={<ViewAllClasses />} />
           <Route path="/feedback/:orderId" element={<FeedbackForm />} />
           <Route path="/my-class" element={<MyClass />} />
-          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Router>

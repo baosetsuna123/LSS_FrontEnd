@@ -42,7 +42,7 @@ export function MyWallet() {
     };
 
     fetchTransactions();
-  }, [token, location.state, transactions]);
+  }, [token, location.state]);
   // Hàm định dạng số tiền sang tiền Việt Nam
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -342,7 +342,7 @@ export function MyWallet() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {transactions.slice(0, 3).map((transaction) => {
+              {transactions.slice(0, 3).map((transaction, index) => {
                 const isCredit = transaction.amount >= 0; // If amount is positive or zero, it's credit
                 const formattedAmount = Math.abs(transaction.amount); // Use absolute value for display
 
@@ -363,7 +363,10 @@ export function MyWallet() {
                           {/* Display formatted date */}
                         </p>
                         <p className="text-xs text-gray-400">
-                          Transaction ID: {transaction.id}
+                          Transaction ID: {index + 1}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Type: {transaction.note} {/* Display the note */}
                         </p>
                       </div>
                     </div>
@@ -373,10 +376,11 @@ export function MyWallet() {
                           isCredit ? "text-green-500" : "text-red-500"
                         }`}
                       >
-                        {isCredit ? "+" : "-"}${formatCurrency(formattedAmount)}
+                        {isCredit ? "+ " : "- "}
+                        {formatCurrency(formattedAmount)}
                       </p>
                       <p className="text-sm text-gray-400">
-                        New Balance: $
+                        New Balance:{" "}
                         {formatCurrency(transaction.transactionBalance)}
                       </p>
                     </div>
@@ -385,14 +389,16 @@ export function MyWallet() {
               })}
             </ul>
           </CardContent>
-          <CardFooter>
-            <Button
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
-              onClick={() => navigate("/all-transactions")} // Navigate to all transactions
-            >
-              Show All Transactions
-            </Button>
-          </CardFooter>
+          {transactions.length > 0 && (
+            <CardFooter>
+              <Button
+                className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                onClick={() => navigate("/all-transactions")} // Navigate to all transactions
+              >
+                Show All Transactions
+              </Button>
+            </CardFooter>
+          )}
         </Card>
       </div>
     </div>

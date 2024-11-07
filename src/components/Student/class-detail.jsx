@@ -133,27 +133,28 @@ export function ClassDetail() {
     // Close the modal and create the order
     try {
       setIsProcessing(true);
-      const result = await fetchCreateOrder(id, token); // Call the API
+      await fetchCreateOrder(id, token);
       toast.success("Đăng ký lớp học thành công!");
-      console.log(result);
-      setIsEnrolled(true); // Update enrollment status after successful enrollment
+      setIsEnrolled(true);
     } catch (error) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        toast.error(
-          `${error.response.data?.message || "Failed to create order"}`
-        );
-        navigate("/wallet");
+        const errorMessage =
+          error.response.data?.message || "Failed to create order";
+
+        if (errorMessage === "User has already registered for this class.") {
+          toast.error(errorMessage);
+        } else {
+          toast.error(errorMessage);
+          navigate("/wallet");
+        }
       } else if (error.request) {
-        // The request was made but no response was received
         toast.error("No response received from the server.");
       } else {
-        // Something happened in setting up the request
         toast.error(error.message || "Failed to create order");
       }
     } finally {
       setIsProcessing(false);
-      setModalOpen(false); // Close the modal after the process
+      setModalOpen(false);
     }
   };
 

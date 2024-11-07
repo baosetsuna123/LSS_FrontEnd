@@ -438,25 +438,25 @@ export default function CourseLayout({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Image
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Category Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Course Code
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Description
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer tracking-wider">
                 Action
               </th>
             </tr>
@@ -466,7 +466,7 @@ export default function CourseLayout({
               currentData.map((course, index) => (
                 <tr
                   key={course.courseId}
-                  className="hover:bg-gray-100 transition duration-200"
+                  className="hover:bg-gray-100 transition duration-200 cursor-pointer"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     {(currentPage - 1) * itemsPerPage + index + 1}
@@ -479,25 +479,31 @@ export default function CourseLayout({
                       onClick={() => handleImageClick(course.image)}
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {categories.find(
                       (cat) => cat.categoryId === course.categoryId
                     )?.name || "Unknown"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {course.courseCode}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={course.name}
+                  >
                     {course.name.length > 17
                       ? `${course.name.slice(0, 17)}...`
                       : course.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={course.description}
+                  >
                     {course.description.length > 17
                       ? `${course.description.slice(0, 17)}...`
                       : course.description}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     <button
                       className="px-4 py-2 bg-yellow-500 text-white rounded-md mr-2"
                       onClick={() => handleUpdateCourse(course.courseCode)}

@@ -227,12 +227,15 @@ export function CourseLandingPage() {
                   ref={carouselRef}
                   responsive={responsive}
                   arrows={true}
+                  className={
+                    majorClasses.length <= 2 ? "flex justify-center" : ""
+                  }
                 >
                   {majorClasses.map((course, index) => (
                     <Card
                       key={index}
                       onClick={() => handleClassClick(course.classId)}
-                      className="transition-transform transform hover:scale-105 mx-2" // Add margin here
+                      className="transition-transform transform hover:scale-105 mx-2"
                     >
                       <img
                         src={course.imageUrl}
@@ -274,7 +277,11 @@ export function CourseLandingPage() {
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => navigate("/class")}
-                  className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                  className={`${
+                    majorClasses.length <= 2
+                      ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                      : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                  }`}
                 >
                   Xem tất cả
                 </Button>
@@ -282,6 +289,7 @@ export function CourseLandingPage() {
             </div>
           </section>
         )}
+
         {isLoggedIn && (
           <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 mx-auto md:px-6">
@@ -297,12 +305,13 @@ export function CourseLandingPage() {
                   ref={carouselRef}
                   responsive={responsive}
                   arrows={true}
+                  className={classes.length <= 2 ? "flex justify-center" : ""}
                 >
                   {classes.map((course, index) => (
                     <Card
                       key={index}
                       onClick={() => handleClassClick(course.classId)}
-                      className="transition-transform transform hover:scale-105 mx-2" // Add margin here
+                      className="transition-transform transform hover:scale-105 mx-2"
                     >
                       <img
                         src={course.imageUrl}
@@ -344,7 +353,11 @@ export function CourseLandingPage() {
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => navigate("/class")}
-                  className="w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                  className={`${
+                    classes.length <= 2
+                      ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                      : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                  }`}
                 >
                   Xem tất cả
                 </Button>
