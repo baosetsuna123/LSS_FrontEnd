@@ -7,6 +7,7 @@ import {
   Dock,
   LayoutGrid,
   LogOut,
+  Newspaper,
   Search,
   ShoppingBag,
   User,
@@ -206,7 +207,7 @@ export function Layout({ children }) {
                 {isUserPopupVisible && (
                   <div
                     ref={popupRef}
-                    className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+                    className="absolute right-0 mt-2 w-96 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-2 grid grid-cols-2 gap-2"
                   >
                     <Link
                       to="/profile"
@@ -251,6 +252,13 @@ export function Layout({ children }) {
                     >
                       <Dock className="h-4 w-4 mr-2" />
                       View Applications
+                    </Link>
+                    <Link
+                      to="/news"
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <Newspaper className="h-4 w-4 mr-2" />
+                      News
                     </Link>
                     <button
                       onClick={handleLogout}

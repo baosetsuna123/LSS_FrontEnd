@@ -37,6 +37,8 @@ import { AdminLayout } from "./components/Admin/admin-layout";
 import AdminHome from "./components/Admin/AdminHome";
 import { AboutMe } from "./components/Home/AboutMe";
 import { ApplicationManagement } from "./components/Student/ViewApplication";
+import News from "./components/Student/News";
+import NewsDetail from "./components/Student/NewsDetail";
 
 function App() {
   return (
@@ -119,6 +121,8 @@ function App() {
             element={<ApplicationManagement />}
           />
           <Route path="/send-applications" element={<SendApplication />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/about-me" element={<AboutMe />} />
           <Route path="/class/:id" element={<ClassDetail />} />

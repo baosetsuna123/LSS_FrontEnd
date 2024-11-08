@@ -9,12 +9,13 @@ import {
   ArrowDown,
   LogOut,
   School,
+  Newspaper,
 } from "lucide-react";
 import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
 // import ClassLayout from "./Class";
 import CategoryLayout from "./Category";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
   fetchAllCategories,
@@ -22,6 +23,7 @@ import {
   fetchApplicationStaff,
   fetchClassStaff,
   fetchFeedbackByclassid,
+  getAllNews,
   getApplicationsByType,
   // fetchClasses,
 } from "@/data/api"; // Import the API function
@@ -30,6 +32,7 @@ import AppWithDraw from "./AppWithdraw";
 import AppOthers from "./AppOthers";
 import ClassLayout from "./Class";
 import { useQuestionContext } from "@/context/QuestionContext";
+import News from "./News";
 
 export function Dashboard() {
   const { logout } = useAuth();
@@ -47,7 +50,9 @@ export function Dashboard() {
   const [categories, setCategories] = useState([]);
   const [applications, setApplications] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [news, setNews] = useState([]);
   const [searchQueryCategory, setSearchQueryCategory] = useState("");
+  const [searchQueryNews, setSearchQueryNews] = useState("");
   const [searchQueryApplication, setSearchQueryApplication] = useState("");
   const [searchQueryCourse, setSearchQueryCourse] = useState("");
   const [searchQueryDraw, setSearchQueryDraw] = useState("");
@@ -65,7 +70,6 @@ export function Dashboard() {
       setActiveCategory(savedCategory);
     }
   }, []);
-  const isFeedbackRoute = location.pathname.includes("/dashboard/feedback");
   // Save active category to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeCategory", activeCategory);
@@ -89,6 +93,21 @@ export function Dashboard() {
     };
 
     loadCategories();
+  }, []);
+  useEffect(() => {
+    const loadNews = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const data = await getAllNews(token);
+        setNews(data || []);
+      } catch (error) {
+        console.error("Failed to fetch news:", error);
+        toast.error("Failed to fetch news.");
+        setCategories([]); // Set to an empty array on error
+      }
+    };
+
+    loadNews();
   }, []);
   const [appwithdraw, setAppWithdraw] = useState([]);
   const [isWithdrawMenuOpen, setIsWithdrawMenuOpen] = useState(false); // State for toggling Withdraw menu
@@ -194,6 +213,7 @@ export function Dashboard() {
   const pageCountClass = Math.ceil(classes.length / itemsPerPage);
   const pageCountDraw = Math.ceil(appwithdraw.length / itemsPerPage);
   const pageCountOther = Math.ceil(appother.length / itemsPerPage);
+  const pageCountNews = Math.ceil(news.length / itemsPerPage);
 
   // Function to check if any search query is active
   const isSearchActive = () => {
@@ -203,7 +223,8 @@ export function Dashboard() {
       searchQueryCourse.trim() !== "" ||
       searchQueryClass.trim() !== "" ||
       searchQueryDraw.trim() !== "" ||
-      searchQueryOther.trim() !== ""
+      searchQueryOther.trim() !== "" ||
+      searchQueryNews.trim() !== ""
     );
   };
 
@@ -371,6 +392,18 @@ export function Dashboard() {
               <School size={20} className="mr-2" />
               Class
             </button>
+            <button
+              onClick={() => {
+                setActiveCategory("news");
+                setCurrentPage(1); // Reset to page 1 when changing category
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                activeCategory === "news" ? "bg-gray-200" : ""
+              }`}
+            >
+              <Newspaper size={20} className="mr-2" />
+              News
+            </button>
           </nav>
         </div>
         {/* Main Content */}
@@ -440,85 +473,90 @@ export function Dashboard() {
               </div>
             </div>
           )}
-          {isFeedbackRoute ? (
-            <Outlet />
-          ) : (
-            <>
-              {/* Render the active category layout */}
-              {activeCategory === "category" && (
-                <CategoryLayout
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  setCurrentPage={setCurrentPage}
-                  onUpdatePagination={handleUpdatePagination}
-                  initialCategories={categories}
-                  searchQuery={searchQueryCategory}
-                  setSearchQuery={setSearchQueryCategory}
-                />
-              )}
-              {activeCategory === "application" && (
-                <ApplicationLayout
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  applications={applications}
-                  searchQuery={searchQueryApplication}
-                  setSearchQuery={setSearchQueryApplication}
-                  onDelete={resetCurrentPage}
-                />
-              )}
-              {activeCategory === "course" && (
-                <CourseLayout
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  setCurrentPage={setCurrentPage}
-                  courses={courses}
-                  setCourses={setCourses}
-                  searchQuery={searchQueryCourse}
-                  setSearchQuery={setSearchQueryCourse}
-                  onDelete={resetCurrentPage}
-                  loading={loading}
-                />
-              )}
-              {activeCategory === "withdraw" && (
-                <AppWithDraw
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  setCurrentPage={setCurrentPage}
-                  appwithdraw={appwithdraw}
-                  setAppWithdraw={setAppWithdraw}
-                  searchQuery={searchQueryDraw}
-                  setSearchQuery={setSearchQueryDraw}
-                  loading={loading}
-                />
-              )}
-              {activeCategory === "others" && (
-                <AppOthers
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  setCurrentPage={setCurrentPage}
-                  appother={appother}
-                  setAppOther={setAppOther}
-                  searchQuery={searchQueryOther}
-                  setSearchQuery={setSearchQueryOther}
-                  loading={loading}
-                />
-              )}
-              {activeCategory === "class" && (
-                <ClassLayout
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  classes={classes}
-                  feedback={feedback}
-                  questions={questions}
-                  setClasses={setClasses}
-                  searchQuery={searchQueryClass}
-                  onDelete={resetCurrentPage}
-                  setSearchQuery={setSearchQueryClass}
-                />
-              )}
-            </>
-          )}
-
+          <>
+            {/* Render the active category layout */}
+            {activeCategory === "category" && (
+              <CategoryLayout
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                onUpdatePagination={handleUpdatePagination}
+                initialCategories={categories}
+                searchQuery={searchQueryCategory}
+                setSearchQuery={setSearchQueryCategory}
+              />
+            )}
+            {activeCategory === "application" && (
+              <ApplicationLayout
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                applications={applications}
+                searchQuery={searchQueryApplication}
+                setSearchQuery={setSearchQueryApplication}
+                onDelete={resetCurrentPage}
+              />
+            )}
+            {activeCategory === "news" && (
+              <News
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                news={news}
+                setNews={setNews}
+                searchQuery={searchQueryNews}
+                setSearchQuery={setSearchQueryNews}
+              />
+            )}
+            {activeCategory === "course" && (
+              <CourseLayout
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                courses={courses}
+                setCourses={setCourses}
+                searchQuery={searchQueryCourse}
+                setSearchQuery={setSearchQueryCourse}
+                onDelete={resetCurrentPage}
+                loading={loading}
+              />
+            )}
+            {activeCategory === "withdraw" && (
+              <AppWithDraw
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                appwithdraw={appwithdraw}
+                setAppWithdraw={setAppWithdraw}
+                searchQuery={searchQueryDraw}
+                setSearchQuery={setSearchQueryDraw}
+                loading={loading}
+              />
+            )}
+            {activeCategory === "others" && (
+              <AppOthers
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                appother={appother}
+                setAppOther={setAppOther}
+                searchQuery={searchQueryOther}
+                setSearchQuery={setSearchQueryOther}
+                loading={loading}
+              />
+            )}
+            {activeCategory === "class" && (
+              <ClassLayout
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                classes={classes}
+                feedback={feedback}
+                questions={questions}
+                setClasses={setClasses}
+                searchQuery={searchQueryClass}
+                onDelete={resetCurrentPage}
+                setSearchQuery={setSearchQueryClass}
+              />
+            )}
+          </>
           {/* Pagination Controls */}
           {!isSearchActive() && ( // Only show pagination if no search query is active
             <>
@@ -599,6 +637,33 @@ export function Dashboard() {
                       )
                     }
                     disabled={currentPage === pageCountCourse}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+              {activeCategory === "news" && news.length > itemsPerPage && (
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <span className="text-sm text-gray-700">
+                    Page {currentPage} of {pageCountNews}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, pageCountNews)
+                      )
+                    }
+                    disabled={currentPage === pageCountNews}
                     className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                   >
                     <ChevronRight size={20} />

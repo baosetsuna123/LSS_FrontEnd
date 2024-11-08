@@ -852,6 +852,64 @@ export const approveOtherApp = async (id, token) => {
     throw error;
   }
 };
+//news-management
+export const createNews = async (newsData, token) => {
+  try {
+    const response = await api.post(`/news/create`, newsData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating news:", error);
+    throw error;
+  }
+};
+
+export const updateNews = async (id, newsData, token) => {
+  try {
+    const response = await api.put(`/news/update/${id}`, newsData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating news with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Function to get all news items
+export const getAllNews = async (token) => {
+  try {
+    const response = await api.get(`/news/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all news:", error);
+    throw error;
+  }
+};
+
+// Function to get a news item by ID
+export const getNewsById = async (id, token) => {
+  try {
+    const response = await api.get(`/news/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching news with ID ${id}:`, error);
+    throw error;
+  }
+};
 //admin-assign
 export const AssignApplication = async () => {
   try {
@@ -949,7 +1007,7 @@ export const getActiveClassesByMonth = async (year, token) => {
   }
 };
 
-export const getOngoingClassesByMonth = async (year,token) => {
+export const getOngoingClassesByMonth = async (year, token) => {
   try {
     const response = await api.get(`/admin/statistics/ongoing`, {
       headers: {
@@ -964,7 +1022,7 @@ export const getOngoingClassesByMonth = async (year,token) => {
   }
 };
 
-export const getCompletedClassesByMonth = async (year,token) => {
+export const getCompletedClassesByMonth = async (year, token) => {
   try {
     const response = await api.get(`/admin/statistics/completed`, {
       headers: {
@@ -1009,7 +1067,11 @@ export const getOngoingClassesByMonthDetailed = async (year, month, token) => {
   }
 };
 
-export const getCompletedClassesByMonthDetailed = async (year, month, token) => {
+export const getCompletedClassesByMonthDetailed = async (
+  year,
+  month,
+  token
+) => {
   try {
     const response = await api.get(`/admin/details/completed`, {
       headers: {
@@ -1019,7 +1081,10 @@ export const getCompletedClassesByMonthDetailed = async (year, month, token) => 
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching completed classes by month (detailed):", error);
+    console.error(
+      "Error fetching completed classes by month (detailed):",
+      error
+    );
     throw error;
   }
 };
