@@ -215,7 +215,7 @@ export function ApplicationManagement() {
           )}
 
           {/* Pagination Controls */}
-          {searchQuery === "" && (
+          {withdrawApplications.length > 0 && searchQuery === "" && (
             <div className="flex justify-end items-center mt-4">
               <div className="flex items-center">
                 <Button
@@ -300,7 +300,7 @@ export function ApplicationManagement() {
           )}
 
           {/* Pagination Controls */}
-          {searchQuery === "" && (
+          {otherApplications.length > 0 && searchQuery === "" && (
             <div className="flex justify-end items-center mt-4">
               <div className="flex items-center">
                 <Button

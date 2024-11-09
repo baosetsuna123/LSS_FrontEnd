@@ -8,9 +8,10 @@ import { Search, X } from "lucide-react";
 import { useClassContext } from "@/context/ClassContext";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../Home/Breadcrumb";
+import toast from "react-hot-toast";
 
 export function ViewAllClasses() {
-  const { classes: contextClasses } = useClassContext();
+  const { classes: contextClasses, getClasses } = useClassContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [maxPrice, setMaxPrice] = useState(250000);
   const [selectedCourseCodes, setSelectedCourseCodes] = useState([]);
@@ -50,7 +51,23 @@ export function ViewAllClasses() {
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
   };
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
+  const handleRefresh = async () => {
+    const token = sessionStorage.getItem("token");
+    const result = JSON.parse(localStorage.getItem("result") || "{}");
+    const role = result.role;
+    setIsButtonDisabled(true);
+    if (token && role === "STUDENT") {
+      sessionStorage.removeItem("classes");
+
+      getClasses(token, role);
+    }
+    toast.success("Classes refreshed successfully!");
+    setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 10000);
+  };
   const handleCourseCodeChange = (courseCode) => {
     setSelectedCourseCodes((prev) =>
       prev.includes(courseCode)
@@ -158,6 +175,14 @@ export function ViewAllClasses() {
             >
               <X className="mr-2 h-4 w-4" /> Clear All Filters
             </Button>
+            <Button
+              onClick={handleRefresh} // Trigger the refresh
+              variant="outline"
+              className="w-full mt-4 bg-cyan-600 text-white hover:bg-cyan-700 transition duration-200"
+              disabled={isButtonDisabled} // Disable the button while refreshing
+            >
+              {isButtonDisabled ? "Refreshed" : "Refresh Classes"}
+            </Button>
           </div>
 
           <div className="md:col-span-3">
@@ -208,32 +233,29 @@ export function ViewAllClasses() {
               )}
             </div>
             {/* Pagination Controls only when there is no search term */}
-            {!searchTerm &&
-              selectedCourseCodes.length === 0 &&
-              maxPrice >= 200000 &&
-              contextClasses.length > itemsPerPage && (
-                <div className="flex justify-between mt-4">
-                  <Button
-                    disabled={currentPage === 1}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                  >
-                    Previous
-                  </Button>
-                  <span>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <Button
-                    disabled={currentPage === totalPages}
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
+            {contextClasses.length > itemsPerPage && (
+              <div className="flex justify-between mt-4">
+                <Button
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                >
+                  Previous
+                </Button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

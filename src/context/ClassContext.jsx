@@ -11,43 +11,52 @@ export const useClassContext = () => {
 
 // Create a provider component
 export const ClassProvider = ({ children }) => {
-  const [classes, setClasses] = useState([]);
+  // Initialize classes state with sessionStorage data if available
+  const [classes, setClasses] = useState(() => {
+    const storedClasses = sessionStorage.getItem("classes");
+    return storedClasses ? JSON.parse(storedClasses) : [];
+  });
   const [loading, setLoading] = useState(true);
 
   // Function to fetch classes
   const getClasses = async (token, role) => {
     if (role !== "STUDENT") return;
+    setLoading(true);
     try {
-      const localClasses = localStorage.getItem("classes");
-
-      // Load from localStorage if available
-      if (localClasses) {
-        setClasses(JSON.parse(localClasses));
-        setLoading(false);
-        return;
-      }
-
       const response = await fetchClasses(token);
+      console.log("Fetched classes:", response); // Log the response to verify it's correct
       if (response) {
-        setClasses(response);
-        localStorage.setItem("classes", JSON.stringify(response)); // Cache fresh data
+        const newClasses = response;
+        if (JSON.stringify(newClasses) !== JSON.stringify(classes)) {
+          setClasses(newClasses);
+          sessionStorage.setItem("classes", JSON.stringify(newClasses));
+        }
       }
     } catch (error) {
       console.error("Error fetching classes:", error);
+    } finally {
       setLoading(false);
     }
   };
+
   const clearClasses = () => {
     setClasses([]); // Clear classes
-    localStorage.removeItem("classes"); // Optionally clear from localStorage
+    sessionStorage.removeItem("classes"); // Remove from sessionStorage
   };
+
+  // Fetch classes on mount if user role is STUDENT
   useEffect(() => {
     const token = sessionStorage.getItem("token");
-    const result = JSON.parse(localStorage.getItem("result") || "{}");
+    const result = JSON.parse(sessionStorage.getItem("result") || "{}");
     const role = result.role;
-    console.log(role);
+
     if (token && role === "STUDENT") {
-      getClasses(token, role);
+      // Only fetch if classes are not in sessionStorage
+      if (classes.length === 0) {
+        getClasses(token, role);
+      } else {
+        setLoading(false); // Classes are already loaded from sessionStorage
+      }
     } else {
       setLoading(false);
     }

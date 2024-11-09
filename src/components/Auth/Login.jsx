@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import backgroundImage from "../../assets/background2.png";
 import { useNavigate } from "react-router-dom";
-import { fetchClasses, fetchLogin } from "@/data/api";
+import { fetchLogin } from "@/data/api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
@@ -25,28 +25,14 @@ export default function Login() {
       // Navigate based on user role
       if (response.data.role === "STAFF") {
         navigate("/dashboard");
-        // Optionally fetch classes for STAFF if needed
       } else if (response.data.role === "TEACHER") {
         navigate("/teacher");
-        // Optionally fetch classes for TEACHER if needed
       } else if (response.data.role === "STUDENT") {
-        try {
-          const classData = await fetchClasses(response.data.token);
-          localStorage.setItem("classes", JSON.stringify(classData));
-          navigate("/");
-        } catch (classFetchError) {
-          console.error(
-            "Failed to fetch classes for student:",
-            classFetchError
-          );
-          toast.error("Failed to fetch classes. Please try again.");
-          return;
-        }
+        navigate("/");
+        getClasses(response.data.token, "STUDENT");
       } else if (response.data.role === "ADMIN") {
         navigate("/admin-dashboard");
-      }
-
-      getClasses(response.data.token, response.data.role); // Optionally fetch classes based on the role
+      } // Optionally fetch classes based on the role
       toast.success("Login successful");
     } catch (error) {
       if (error.response) {
