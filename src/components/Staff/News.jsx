@@ -4,7 +4,6 @@ import { getNewsById, updateNews, createNews } from "@/data/api";
 import toast from "react-hot-toast";
 import ReactQuill from "react-quill"; // Import ReactQuill editor
 import "react-quill/dist/quill.snow.css"; // Import Quill's styles
-import "./News.css";
 const News = ({
   currentPage,
   itemsPerPage,
@@ -50,59 +49,20 @@ const News = ({
     return doc.body.textContent || "";
   }
 
-  const handleUpdateSubmit = async () => {
-    // Validate title and content
-    if (!updatedTitle.trim()) {
-      toast.error("Title cannot be empty");
-      return;
-    }
-
-    if (!updatedContent.trim()) {
-      toast.error("Content cannot be empty");
-      return;
-    }
-
-    try {
-      // Prepare the updated news data
-      const updatedNewsData = {
-        ...selectedNews,
-        title: updatedTitle, // Update title
-        content: updatedContent, // Update content
-      };
-
-      // Call the update API with the new title and content
-      await updateNews(selectedNews.id, updatedNewsData, token);
-
-      // Close the modal after successful update
-      setIsModalOpen(false);
-
-      // Manually update the news state with the updated title and content
-      setNews((prevNews) =>
-        prevNews.map((item) =>
-          item.id === selectedNews.id
-            ? { ...item, title: updatedTitle, content: updatedContent }
-            : item
-        )
-      );
-
-      toast.success("News updated successfully!");
-    } catch (error) {
-      console.error("Error updating news:", error);
-      toast.error("Failed to update news.");
-    }
-  };
-
   const handleModalClose = () => {
-    setIsModalOpen(false); // Close update modal without saving
+    setIsModalOpen(false);
   };
 
-  // Handle the modal for creating new news
   const handleCreateModalOpen = () => {
-    setIsCreateModalOpen(true); // Open create news modal
+    setNewTitle("");
+    setNewContent("");
+    setIsCreateModalOpen(true);
   };
 
   const handleCreateModalClose = () => {
-    setIsCreateModalOpen(false); // Close create news modal
+    setNewTitle("");
+    setNewContent("");
+    setIsCreateModalOpen(false);
   };
   const modules = {
     toolbar: [
@@ -127,7 +87,6 @@ const News = ({
     "align",
     "link",
   ];
-
   const handleCreateSubmit = async () => {
     // Validate title and content for creating news
     if (!newTitle.trim()) {
@@ -143,7 +102,7 @@ const News = ({
     try {
       const newNewsData = {
         title: newTitle,
-        content: newContent,
+        content: newContent, // Save formatted content directly
       };
       const data = await createNews(newNewsData, token);
       setNews((prevNews) => [...prevNews, { ...data }]);
@@ -152,6 +111,44 @@ const News = ({
     } catch (error) {
       console.error("Error creating news:", error);
       toast.error("Failed to create news.");
+    }
+  };
+
+  const handleUpdateSubmit = async () => {
+    // Validate title and content
+    if (!updatedTitle.trim()) {
+      toast.error("Title cannot be empty");
+      return;
+    }
+
+    if (!updatedContent.trim()) {
+      toast.error("Content cannot be empty");
+      return;
+    }
+
+    try {
+      const updatedNewsData = {
+        ...selectedNews,
+        title: updatedTitle,
+        content: updatedContent, // Save formatted content directly
+      };
+
+      await updateNews(selectedNews.id, updatedNewsData, token);
+
+      setIsModalOpen(false);
+
+      setNews((prevNews) =>
+        prevNews.map((item) =>
+          item.id === selectedNews.id
+            ? { ...item, title: updatedTitle, content: updatedContent }
+            : item
+        )
+      );
+
+      toast.success("News updated successfully!");
+    } catch (error) {
+      console.error("Error updating news:", error);
+      toast.error("Failed to update news.");
     }
   };
 

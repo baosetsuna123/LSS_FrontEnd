@@ -73,7 +73,10 @@ const NewsDetail = () => {
           <p className="text-sm text-gray-500 mb-6">
             Created on {formatDateTime(newsDetail.date, newsDetail.time)}
           </p>
-          <div className="text-gray-800 text-lg mb-8">{newsDetail.content}</div>
+          <div
+            dangerouslySetInnerHTML={{ __html: newsDetail.content }}
+            className="leading-7 text-gray-800"
+          />
 
           {/* Tin khác - Other News Section */}
           <section>
