@@ -411,7 +411,7 @@ export function Dashboard() {
           <div className="p-6 flex justify-between items-center">
             <h1 className="text-3xl font-bold mb-6">Staff Dashboard</h1>
             <div className="flex items-center">
-              <span className="mr-2">Xin chao, {user.username}</span>
+              <span className="mr-2">Hello, {user.username}</span>
               <div className="relative">
                 <ArrowDown
                   className="cursor-pointer"

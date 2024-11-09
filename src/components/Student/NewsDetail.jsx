@@ -81,7 +81,7 @@ const NewsDetail = () => {
           {/* Tin khác - Other News Section */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Tin khác
+              Other news
             </h2>
             <ul className="space-y-4">
               {otherNews.map((newsItem) => (

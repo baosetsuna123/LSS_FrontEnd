@@ -48,12 +48,12 @@ export function Application() {
     >
       <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
-          Đăng ký giảng dạy
+          Registration Form
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="title" className="block mb-2 text-gray-700">
-              Tiêu đề <span className="text-red-500">*</span>
+              Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -66,7 +66,7 @@ export function Application() {
           </div>
           <div>
             <label htmlFor="description" className="block mb-2 text-gray-700">
-              Mô tả <span className="text-red-500">*</span>
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               id="description"
@@ -78,24 +78,37 @@ export function Application() {
             ></textarea>
           </div>
           <div>
-            <label htmlFor="certificate" className="block mb-2 text-gray-700">
-              Chứng chỉ (nếu có)
+            <label htmlFor="certificate" className="block text-gray-700 mb-2">
+              Upload your certificate (PDF, JPG, or PNG)
             </label>
-            <input
-              type="file"
-              id="certificate"
-              onChange={(e) => setCertificate(e.target.files[0])}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex items-center space-x-4">
+              <input
+                type="file"
+                id="certificate"
+                accept=".pdf, .jpg, .png"
+                onChange={(e) => setCertificate(e.target.files[0])}
+                className="hidden"
+              />
+              <button
+                type="button" // Prevents form submission
+                onClick={() => document.getElementById("certificate").click()}
+                className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Choose File
+              </button>
+              <span className="text-gray-700">
+                {certificate ? certificate.name : "No file chosen"}
+              </span>
+            </div>
           </div>
           <button
             type="submit"
-            disabled={isLoading} // Disable button when loading
+            disabled={isLoading}
             className={`w-full text-white font-semibold px-4 py-2 rounded transition-colors ${
               isLoading ? "bg-gray-400" : "bg-gray-900 hover:bg-gray-600"
             }`}
           >
-            {isLoading ? "Submitting..." : "Gửi đơn"}
+            {isLoading ? "Submitting..." : "Submit"}
           </button>
         </form>
       </div>

@@ -8,13 +8,13 @@ const MyClass = () => {
   const [timetable, setTimetable] = useState({});
   const [datesInTheWeek, setDatesInTheWeek] = useState([]);
   const days = [
-    "Thứ 2",
-    "Thứ 3",
-    "Thứ 4",
-    "Thứ 5",
-    "Thứ 6",
-    "Thứ 7",
-    "Chủ nhật",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
   ];
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
@@ -50,13 +50,13 @@ const MyClass = () => {
 
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
-      2: "Thứ 2",
-      3: "Thứ 3",
-      4: "Thứ 4",
-      5: "Thứ 5",
-      6: "Thứ 6",
-      7: "Thứ 7",
-      8: "Chủ nhật",
+      2: "Monday",
+      3: "Tuesday",
+      4: "Wednesday",
+      5: "Thursday",
+      6: "Friday",
+      7: "Saturday",
+      8: "Sunday",
     };
 
     return classes.reduce((timetable, contentItem, index) => {

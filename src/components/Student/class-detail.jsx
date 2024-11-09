@@ -50,26 +50,46 @@ export function ClassDetail() {
         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
           <div className="flex items-center mb-4">
             <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
-            <h2 className="text-xl font-semibold">Xác nhận tham gia lớp học</h2>
+            <h2 className="text-xl font-semibold">
+              Confirm class participation
+            </h2>
           </div>
-          <p className="mb-6">
-            Bạn đồng ý tham gia vào lớp học này với giá{" "}
-            {formatCurrency(classDetail?.price)}?
-          </p>
-          <p className="mb-6">Số dư mới: {formatCurrency(newBalance)}</p>
+
+          {newBalance < 0 ? (
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-red-500">
+                Your current balance is not enough.
+              </p>
+              <button
+                onClick={() => navigate("/wallet")}
+                className="text-blue-500 hover:underline"
+              >
+                Deposit now
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="mb-6">
+                You agree to participate in this class with price{" "}
+                {formatCurrency(classDetail?.price)}?
+              </p>
+              <p className="mb-6">New balance: {formatCurrency(newBalance)}</p>
+            </>
+          )}
+
           <div className="flex justify-between space-x-4">
             <Button
               onClick={onConfirm}
               className="bg-green-500 hover:bg-green-600 px-10 py-3 text-lg"
             >
-              Có
+              Yes
             </Button>
             <Button
               variant="outline"
               onClick={onClose}
               className="border-red-500 text-red-500 hover:bg-red-100 px-6 py-3 text-lg"
             >
-              Không
+              No
             </Button>
           </div>
         </div>

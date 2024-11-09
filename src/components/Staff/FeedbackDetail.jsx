@@ -31,6 +31,55 @@ const FeedbackDetail = ({ classId }) => {
     { value: 5, label: "Satisfied" },
     { value: 6, label: "Extremely satisfied" },
   ];
+  const StarRating = ({ averageRating }) => {
+    const fullStars = Math.floor(averageRating);
+    const fractionalPart = averageRating % 1;
+    const emptyStars = 6 - fullStars - (fractionalPart > 0 ? 1 : 0);
+
+    return (
+      <div
+        className="inline-flex"
+        title={`Average: ${averageRating.toFixed(2)}`}
+      >
+        {Array.from({ length: fullStars }).map((_, index) => (
+          <span key={`full-${index}`} className="text-yellow-500">
+            ★
+          </span>
+        ))}
+
+        {fractionalPart > 0 && (
+          <span
+            className="relative text-yellow-500"
+            style={{
+              display: "inline-block",
+              width: "1em",
+              overflow: "hidden",
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                width: `${fractionalPart * 100}%`,
+                overflow: "hidden",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            >
+              ★
+            </span>
+            <span className="text-gray-300">☆</span>
+          </span>
+        )}
+
+        {Array.from({ length: emptyStars }).map((_, index) => (
+          <span key={`empty-${index}`} className="text-gray-300">
+            ☆
+          </span>
+        ))}
+      </div>
+    );
+  };
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -86,25 +135,30 @@ const FeedbackDetail = ({ classId }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {safeQuestions.map((question) => (
-            <TableRow key={question.id}>
-              <TableCell className="w-full max-w-3xl whitespace-normal break-words">
-                {question.questionText}
-              </TableCell>
-              {ratingOptions.map((option) => {
-                const ratingCount =
-                  feedbackLookup[question.id]?.ratingCount?.[option.value] || 0;
-                return (
-                  <TableCell key={option.value} className="text-center">
-                    {ratingCount}
-                  </TableCell>
-                );
-              })}
-              <TableCell className="text-center">
-                {feedbackLookup[question.id]?.averageRating || 0}
-              </TableCell>
-            </TableRow>
-          ))}
+          {safeQuestions.map((question) => {
+            const averageRating =
+              feedbackLookup[question.id]?.averageRating || 0;
+            return (
+              <TableRow key={question.id}>
+                <TableCell className="w-full max-w-3xl whitespace-normal break-words">
+                  {question.questionText}
+                </TableCell>
+                {ratingOptions.map((option) => {
+                  const ratingCount =
+                    feedbackLookup[question.id]?.ratingCount?.[option.value] ||
+                    0;
+                  return (
+                    <TableCell key={option.value} className="text-center">
+                      {ratingCount}
+                    </TableCell>
+                  );
+                })}
+                <TableCell className="text-center">
+                  <StarRating averageRating={averageRating} />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 

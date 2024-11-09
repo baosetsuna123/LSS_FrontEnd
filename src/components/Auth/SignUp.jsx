@@ -68,11 +68,13 @@ export default function SignUp() {
       toast.error("Confirm Password does not match Password.");
       return;
     }
+    if (phoneNumber.length < 10 || phoneNumber.length > 14) {
+      toast.error("Phone number must be between 10 and 14 characters.");
+      return;
+    }
     setIsLoading(true);
     try {
       if (userType === "student") {
-        toast.success("Please verify your email with OTP");
-        navigate("/verify-otp");
         await fetchSignUpStudent(
           username,
           password,
@@ -81,6 +83,8 @@ export default function SignUp() {
           phoneNumber,
           categoryIds
         );
+        toast.success("Please verify your email with OTP");
+        navigate("/verify-otp");
       } else if (userType === "teacher") {
         await fetchSignUpTeacher(
           username,
@@ -94,8 +98,18 @@ export default function SignUp() {
         navigate("/create-application");
       }
     } catch (error) {
-      console.error("Signup failed:", error);
-      toast.error(error.response?.data?.message || "Signup failed");
+      console.error("Signup failed:", error.response.data);
+      const errorMessage = error.response?.data;
+      if (
+        errorMessage ===
+        "Email hoặc số điện thoại đã tồn tại với trạng thái ACTIVE."
+      ) {
+        toast.error(
+          "This email or phone number is already in use with an active account."
+        );
+      } else {
+        toast.error(errorMessage || "Signup failed");
+      }
     } finally {
       setIsLoading(false);
     }
