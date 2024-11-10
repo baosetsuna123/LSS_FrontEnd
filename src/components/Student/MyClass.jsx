@@ -209,15 +209,13 @@ const MyClass = () => {
 
   return (
     <div className="my-6 px-4">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">
-        Thời khóa biểu của tôi
-      </h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">My TimeTable</h2>
       <YearWeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
           <thead>
             <tr className="bg-gray-200 *:text-center">
-              <th className="py-2 px-4 border-b border-r">Ca học</th>
+              <th className="py-2 px-4 border-b border-r">Slot</th>
               {datesInTheWeek.map((date, index) => {
                 const dayOfWeek = days[index % 7];
                 return (
@@ -236,7 +234,7 @@ const MyClass = () => {
                 className="hover:bg-gray-100 transition duration-150"
               >
                 <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
-                  Tiết {slot.period}
+                  Slot {slot.period}
                   <div className="text-xs text-gray-600">
                     {"(" + slot.start + " - " + slot.end + ")"}
                   </div>
