@@ -39,6 +39,7 @@ import { AboutMe } from "./components/Home/AboutMe";
 import { ApplicationManagement } from "./components/Student/ViewApplication";
 import News from "./components/Student/News";
 import NewsDetail from "./components/Student/NewsDetail";
+import TeacherProfile from "./components/Student/TeacherProfile";
 
 function App() {
   return (
@@ -126,6 +127,7 @@ function App() {
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/about-me" element={<AboutMe />} />
           <Route path="/class/:id" element={<ClassDetail />} />
+          <Route path="/profile/:teacherName" element={<TeacherProfile />} />
           <Route path="/class" element={<ViewAllClasses />} />
           <Route path="/feedback/:orderId" element={<FeedbackForm />} />
           <Route path="/my-class" element={<MyClass />} />

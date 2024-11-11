@@ -212,83 +212,104 @@ export function CourseLandingPage() {
             </div>
           </div>
         </section>
-        {isLoggedIn && majorClasses.length > 0 && (
-          <section className="w-full py-12 md:py-24 lg:py-32">
-            <div className="container px-4 mx-auto md:px-6">
-              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
-                Hot Topic
-              </h2>
-              {loading ? (
-                <div className="flex justify-center">
-                  <Loader className="w-10 h-10 animate-spin" />
-                </div>
-              ) : (
-                <Carousel
-                  ref={carouselRef}
-                  responsive={responsive}
-                  arrows={true}
-                  className={
-                    majorClasses.length <= 2 ? "flex justify-center" : ""
-                  }
-                >
-                  {majorClasses.map((course, index) => (
-                    <Card
-                      key={index}
-                      onClick={() => handleClassClick(course.classId)}
-                      className="transition-transform transform hover:scale-105 mx-2"
-                    >
-                      <img
-                        src={course.imageUrl}
-                        alt={course.name}
-                        className="w-full h-[200px] object-cover rounded-t-lg"
-                      />
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-xl font-semibold">
-                            {course.name}
-                          </CardTitle>
-                          <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                            {course.courseCode}
-                          </p>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex justify-between items-center">
-                          <p className="text-2xl font-bold">
-                            {formatCurrency(course.price)}
-                          </p>
-                          <p className="text-lg font-light text-gray-500">
-                            Created by {course.teacherName}
-                          </p>
-                        </div>
-                        <Button
-                          className="mt-4 w-full"
-                          disabled={enrollmentStatus[course.classId]}
+        {isLoggedIn &&
+          majorClasses.length > 0 &&
+          majorClasses.some(
+            (classItem) =>
+              classItem.status === "PENDING" || classItem.status === "ACTIVE"
+          ) && (
+            <section className="w-full py-12 md:py-24 lg:py-32">
+              <div className="container px-4 mx-auto md:px-6">
+                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
+                  Hot Topic
+                </h2>
+                {loading ? (
+                  <div className="flex justify-center">
+                    <Loader className="w-10 h-10 animate-spin" />
+                  </div>
+                ) : (
+                  <Carousel
+                    ref={carouselRef}
+                    responsive={responsive}
+                    arrows={true}
+                    className={
+                      majorClasses.filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      ).length <= 2
+                        ? "flex justify-center"
+                        : ""
+                    }
+                  >
+                    {majorClasses
+                      .filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      )
+                      .map((course, index) => (
+                        <Card
+                          key={index}
+                          onClick={() => handleClassClick(course.classId)}
+                          className="transition-transform transform hover:scale-105 mx-2"
                         >
-                          {enrollmentStatus[course.classId]
-                            ? "Enrolled"
-                            : "Enroll Now"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Carousel>
-              )}
-              <div className="flex justify-center mt-8">
-                <Button
-                  onClick={() => navigate("/class")}
-                  className={`${
-                    majorClasses.length <= 2
-                      ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-                      : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-                  }`}
-                >
-                  View All
-                </Button>
+                          <img
+                            src={course.imageUrl}
+                            alt={course.name}
+                            className="w-full h-[200px] object-cover rounded-t-lg"
+                          />
+                          <CardHeader>
+                            <div className="flex justify-between items-center">
+                              <CardTitle className="text-xl font-semibold">
+                                {course.name}
+                              </CardTitle>
+                              <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                                {course.courseCode}
+                              </p>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex justify-between items-center">
+                              <p className="text-2xl font-bold">
+                                {formatCurrency(course.price)}
+                              </p>
+                              <p className="text-lg font-light text-gray-500">
+                                Created by {course.teacherName}
+                              </p>
+                            </div>
+                            <Button
+                              className="mt-4 w-full"
+                              disabled={enrollmentStatus[course.classId]}
+                            >
+                              {enrollmentStatus[course.classId]
+                                ? "Enrolled"
+                                : "Enroll Now"}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </Carousel>
+                )}
+                <div className="flex justify-center mt-8">
+                  <Button
+                    onClick={() => navigate("/class")}
+                    className={`${
+                      majorClasses.filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      ).length <= 2
+                        ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                        : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                    }`}
+                  >
+                    View All
+                  </Button>
+                </div>
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
         {isLoggedIn && (
           <section className="w-full py-12 md:py-24 lg:py-32">
@@ -305,56 +326,74 @@ export function CourseLandingPage() {
                   ref={carouselRef}
                   responsive={responsive}
                   arrows={true}
-                  className={classes.length <= 2 ? "flex justify-center" : ""}
+                  className={
+                    classes.filter(
+                      (course) =>
+                        course.status === "PENDING" ||
+                        course.status === "ACTIVE"
+                    ).length <= 2
+                      ? "flex justify-center"
+                      : ""
+                  }
                 >
-                  {classes.map((course, index) => (
-                    <Card
-                      key={index}
-                      onClick={() => handleClassClick(course.classId)}
-                      className="transition-transform transform hover:scale-105 mx-2"
-                    >
-                      <img
-                        src={course.imageUrl}
-                        alt={course.name}
-                        className="w-full h-[200px] object-cover rounded-t-lg"
-                      />
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-xl font-semibold">
-                            {course.name}
-                          </CardTitle>
-                          <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                            {course.courseCode}
-                          </p>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex justify-between items-center">
-                          <p className="text-2xl font-bold">
-                            {formatCurrency(course.price)}
-                          </p>
-                          <p className="text-lg font-light text-gray-500">
-                            Created by {course.teacherName}
-                          </p>
-                        </div>
-                        <Button
-                          className="mt-4 w-full"
-                          disabled={enrollmentStatus[course.classId]}
-                        >
-                          {enrollmentStatus[course.classId]
-                            ? "Enrolled"
-                            : "Enroll Now"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {classes
+                    .filter(
+                      (course) =>
+                        course.status === "PENDING" ||
+                        course.status === "ACTIVE"
+                    )
+                    .map((course, index) => (
+                      <Card
+                        key={index}
+                        onClick={() => handleClassClick(course.classId)}
+                        className="transition-transform transform hover:scale-105 mx-2"
+                      >
+                        <img
+                          src={course.imageUrl}
+                          alt={course.name}
+                          className="w-full h-[200px] object-cover rounded-t-lg"
+                        />
+                        <CardHeader>
+                          <div className="flex justify-between items-center">
+                            <CardTitle className="text-xl font-semibold">
+                              {course.name}
+                            </CardTitle>
+                            <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                              {course.courseCode}
+                            </p>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex justify-between items-center">
+                            <p className="text-2xl font-bold">
+                              {formatCurrency(course.price)}
+                            </p>
+                            <p className="text-lg font-light text-gray-500">
+                              Created by {course.teacherName}
+                            </p>
+                          </div>
+                          <Button
+                            className="mt-4 w-full"
+                            disabled={enrollmentStatus[course.classId]}
+                          >
+                            {enrollmentStatus[course.classId]
+                              ? "Enrolled"
+                              : "Enroll Now"}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
                 </Carousel>
               )}
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => navigate("/class")}
                   className={`${
-                    classes.length <= 2
+                    classes.filter(
+                      (course) =>
+                        course.status === "PENDING" ||
+                        course.status === "ACTIVE"
+                    ).length <= 2
                       ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
                       : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
                   }`}

@@ -19,12 +19,12 @@ export function ViewAllClasses() {
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4; // Displaying 4 items per page (2x2)
+  const itemsPerPage = 4;
 
-  // Effect to update filtered classes when contextClasses or filters change
   useEffect(() => {
     const filtered = contextClasses.filter(
       (c) =>
+        (c.status === "PENDING" || c.status === "ACTIVE") &&
         (c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           c.teacherName.toLowerCase().includes(searchTerm.toLowerCase())) &&
         c.price <= maxPrice &&
@@ -32,10 +32,9 @@ export function ViewAllClasses() {
           selectedCourseCodes.includes(c.courseCode))
     );
     setFilteredClasses(filtered);
-    setCurrentPage(1); // Reset to first page whenever filters change
+    setCurrentPage(1);
   }, [searchTerm, maxPrice, selectedCourseCodes, contextClasses]);
 
-  // Effect to log contextClasses (for debugging)
   useEffect(() => {
     console.log(contextClasses);
   }, [contextClasses]);

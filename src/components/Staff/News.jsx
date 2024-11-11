@@ -237,7 +237,7 @@ const News = ({
                       title={item.content}
                     >
                       {item.content.length > 20
-                        ? `${stripHtml(item.content).slice(0, 20)}` // Strip HTML and then truncate
+                        ? `${stripHtml(item.content).slice(0, 20) + "..."}` // Strip HTML and then truncate
                         : stripHtml(item.content)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

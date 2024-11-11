@@ -41,6 +41,13 @@ export function ClassDetail() {
     }
   }, [token, loadBalance]);
   const newBalance = balance - classDetail?.price;
+  const handleTeacherClick = () => {
+    if (classDetail && classDetail.teacherName) {
+      navigate(`/profile/${encodeURIComponent(classDetail.teacherName)}`, {
+        state: { classId: classDetail.classId },
+      });
+    }
+  };
   // Confirmation Modal
   function ConfirmationModal({ isOpen, onClose, onConfirm }) {
     if (!isOpen) return null;
@@ -310,7 +317,10 @@ export function ClassDetail() {
                   </div>
                   <div className="flex items-center">
                     <GraduationCap className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span
+                      className="text-gray-700"
+                      onClick={handleTeacherClick}
+                    >
                       Teacher Username: {classDetail?.teacherName}
                     </span>
                   </div>
