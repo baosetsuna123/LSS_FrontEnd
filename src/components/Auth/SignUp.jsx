@@ -107,8 +107,12 @@ export default function SignUp() {
         toast.error(
           "This email or phone number is already in use with an active account."
         );
+      } else if (errorMessage === "Username đã tồn tại.") {
+        toast.error("This username is already in use.");
       } else {
-        toast.error(errorMessage || "Signup failed");
+        toast.error(
+          errorMessage || "Failed to create account. Please try again."
+        );
       }
     } finally {
       setIsLoading(false);

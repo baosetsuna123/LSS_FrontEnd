@@ -59,11 +59,9 @@ export function ViewAllClasses() {
     const role = result.role;
     setIsButtonDisabled(true);
     if (token && role === "STUDENT") {
-      sessionStorage.removeItem("classes");
-
       getClasses(token, role);
+      toast.success("Classes refreshed successfully!");
     }
-    toast.success("Classes refreshed successfully!");
     setTimeout(() => {
       setIsButtonDisabled(false);
     }, 10000);

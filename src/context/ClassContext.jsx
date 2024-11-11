@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { fetchClasses } from "../data/api"; // Import the fetchClasses function
+import { isEqual } from "lodash";
 
 // Create the ClassContext
 const ClassContext = createContext();
@@ -25,12 +26,10 @@ export const ClassProvider = ({ children }) => {
     try {
       const response = await fetchClasses(token);
       console.log("Fetched classes:", response); // Log the response to verify it's correct
-      if (response) {
-        const newClasses = response;
-        if (JSON.stringify(newClasses) !== JSON.stringify(classes)) {
-          setClasses(newClasses);
-          sessionStorage.setItem("classes", JSON.stringify(newClasses));
-        }
+
+      if (response && !isEqual(response, classes)) {
+        setClasses(response);
+        sessionStorage.setItem("classes", JSON.stringify(response));
       }
     } catch (error) {
       console.error("Error fetching classes:", error);

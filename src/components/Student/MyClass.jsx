@@ -115,6 +115,7 @@ const MyClass = () => {
   const fetchTimetable = async () => {
     try {
       const classes = await fetchOrderClasses(token);
+      console.log(classes);
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
@@ -159,6 +160,7 @@ const MyClass = () => {
 
     if (lesson) {
       const lessonStatus = lesson.orderStatus; // Use status from orderDTO
+      console.log(lessonStatus);
       return (
         <div className="p-4 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <p
