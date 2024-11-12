@@ -15,7 +15,7 @@ import profile from "../../assets/profilebg.jfif";
 
 export default function Profile() {
   const result = JSON.parse(localStorage.getItem("result") || "{}");
-  const token = sessionStorage.getItem("token"); // Assume token is stored in localStorage
+  const token = sessionStorage.getItem("token");
 
   const [profileData, setProfileData] = useState({
     username: result.username || "",
@@ -25,22 +25,9 @@ export default function Profile() {
     address: result.address || "",
   });
 
-  const [categoryIds, setCategoryIds] = useState([]); // Selected category IDs
-  const [allCategories, setAllCategories] = useState([]); // List of all categories
+  const [categoryIds, setCategoryIds] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
 
-  // Handle changes in profile input fields
-  const handleProfileChange = (event) => {
-    const { name, value } = event.target;
-    setProfileData({ ...profileData, [name]: value });
-  };
-
-  // Handle category selection
-  const handleCategoryChange = (event) => {
-    const { value } = event.target;
-    setCategoryIds(value);
-  };
-
-  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -52,7 +39,22 @@ export default function Profile() {
       }
     };
     fetchCategories();
+
+    if (result.major && result.major.length > 0) {
+      const savedCategoryIds = result.major.map((major) => major.categoryId);
+      setCategoryIds(savedCategoryIds);
+    }
   }, []);
+
+  const handleProfileChange = (event) => {
+    const { name, value } = event.target;
+    setProfileData({ ...profileData, [name]: value });
+  };
+
+  const handleCategoryChange = (event) => {
+    const { value } = event.target;
+    setCategoryIds(value);
+  };
 
   const handleUpdateProfile = async () => {
     if (
@@ -72,18 +74,17 @@ export default function Profile() {
       return;
     }
 
-    const userData = {
-      address: profileData.address,
-      fullName: profileData.fullName,
+    const updatedProfileData = {
+      ...profileData,
+      username: result.username,
+      email: result.email,
       categoryIds,
-      phoneNumber: profileData.phoneNumber,
     };
 
     try {
-      await updateCurrentUser(token, userData);
+      await updateCurrentUser(token, updatedProfileData);
       toast.success("Profile updated successfully!");
-
-      setProfileData(userData);
+      setProfileData(updatedProfileData);
     } catch (e) {
       console.log(e);
       toast.error("Failed to update profile.");
@@ -92,7 +93,7 @@ export default function Profile() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-6 lg:px-8"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-indigo-600 py-12 px-6 lg:px-8"
       style={{
         backgroundImage: `url(${profile})`,
         backgroundSize: "cover",
@@ -100,22 +101,22 @@ export default function Profile() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
-          Profile
+      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg transform transition-all duration-500 hover:scale-105">
+        <h1 className="text-4xl font-semibold text-gray-900 mb-8 text-center">
+          Update Profile
         </h1>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex items-center mb-4">
-            <label className="w-1/3 text-gray-700 text-xl font-semibold">
+            <label className="w-1/3 text-gray-700 text-lg font-semibold">
               Username:
             </label>
-            <p className="w-2/3 text-gray-900 mr-10 text-xl">
+            <p className="w-2/3 text-gray-900 text-lg">
               {profileData.username}
             </p>
           </div>
 
           <div className="flex items-center space-x-4">
-            <label className="w-1/3 text-xl font-semibold text-gray-800">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
               Full Name:
             </label>
             <TextField
@@ -124,20 +125,19 @@ export default function Profile() {
               onChange={handleProfileChange}
               fullWidth
               variant="outlined"
+              className="text-lg"
             />
           </div>
 
           <div className="flex items-center mb-4">
-            <label className="w-1/3 text-gray-700 text-xl font-semibold">
+            <label className="w-1/3 text-gray-700 text-lg font-semibold">
               Email:
             </label>
-            <p className="w-2/3 text-gray-900 mr-10 text-xl">
-              {profileData.email}
-            </p>
+            <p className="w-2/3 text-gray-900 text-lg">{profileData.email}</p>
           </div>
 
           <div className="flex items-center mb-4">
-            <label className="text-xl font-semibold text-gray-800 mr-4 whitespace-nowrap">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
               Phone Number:
             </label>
             <TextField
@@ -146,11 +146,12 @@ export default function Profile() {
               onChange={handleProfileChange}
               fullWidth
               variant="outlined"
+              className="text-lg"
             />
           </div>
 
           <div className="flex items-center space-x-4">
-            <label className="w-1/3 text-xl font-semibold text-gray-800">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
               Address:
             </label>
             <TextField
@@ -159,19 +160,18 @@ export default function Profile() {
               onChange={handleProfileChange}
               fullWidth
               variant="outlined"
+              className="text-lg"
             />
           </div>
 
           <div className="flex items-center space-x-4">
             <InputLabel
               id="category-label"
-              className="min-w-fit text-xl font-semibold text-gray-800" // min-w-fit prevents truncation
+              className="min-w-fit text-lg font-semibold text-gray-800"
             >
               Choose your Major:
             </InputLabel>
             <FormControl variant="outlined" className="flex-1">
-              {" "}
-              {/* flex-1 allows it to take up remaining space */}
               <Select
                 labelId="category-label"
                 multiple
@@ -185,7 +185,8 @@ export default function Profile() {
                     .map((category) => category.name);
                   return selectedNames.join(", ");
                 }}
-                displayEmpty // Ensures the label is visible until items are selected
+                displayEmpty
+                className="text-lg"
               >
                 {allCategories.map((category) => (
                   <MenuItem
@@ -207,7 +208,7 @@ export default function Profile() {
             variant="contained"
             color="primary"
             fullWidth
-            className="mt-4"
+            className="mt-6 py-3 text-lg font-semibold rounded-lg shadow-xl hover:bg-blue-700 transition duration-300"
           >
             Update Profile
           </Button>

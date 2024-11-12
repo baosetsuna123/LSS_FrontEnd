@@ -71,6 +71,7 @@ const TeacherProfile = () => {
 
     fetchAverage();
   }, [teacherName, token]);
+
   const [info, setInfo] = useState({});
   useEffect(() => {
     const fetchInfo = async () => {
@@ -78,7 +79,7 @@ const TeacherProfile = () => {
         const data = await fetchInfoTeacher(teacherName, token);
         setInfo(data);
       } catch (error) {
-        console.error("Error fetching average rating:", error);
+        console.error("Error fetching teacher info:", error);
       }
     };
 
@@ -157,74 +158,99 @@ const TeacherProfile = () => {
         </div>
       </section>
 
-      <div className="teacher-profile-container px-6 mt-6">
-        <h1 className="text-4xl font-semibold text-gray-800">{teacherName}</h1>
-        <div className="flex items-center gap-2 mt-2">
-          <StarRating averageRating={average} />
-          <span className="text-xl text-gray-600">({average.toFixed(2)})</span>
-        </div>
+      <div className="teacher-profile-container px-6 mt-6 flex justify-between items-center">
+        <div className="flex-1">
+          <Button className="mb-2 mr-4 text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 rounded-full px-4 py-1 text-sm">
+            Teacher
+          </Button>
 
-        {/* Display Total Students */}
-        <div className="mt-4 text-2xl text-gray-700">
-          Total Students: <span className="font-bold">{totalStudents}</span>
-        </div>
+          <h1 className="text-4xl font-semibold text-gray-800">
+            {teacherName}
+          </h1>
+          <div className="flex items-center gap-2 mt-2">
+            <StarRating averageRating={average} />
+            <span className="text-xl text-gray-600">
+              ({average.toFixed(2)})
+            </span>
+          </div>
 
-        {/* Display My Major */}
-        <div className="mt-4 text-2xl text-gray-700">
-          My Major:{" "}
-          <span className="font-bold">
-            {Array.isArray(info.major) && info.major.length > 0
-              ? info.major.join(" & ")
-              : "N/A"}
-          </span>
-        </div>
+          {/* Display Total Students */}
+          <div className="mt-4 text-2xl text-gray-700">
+            Total Students: <span className="font-bold">{totalStudents}</span>
+          </div>
 
-        <h2 className="text-3xl font-semibold text-gray-800 mt-6">
-          My Class ({classes.length})
-        </h2>
-        <div className="grid grid-cols-12 gap-6 mt-6">
-          {classes.length > 0 ? (
-            classes.map((classItem) => (
-              <div key={classItem.classId} className="col-span-6 md:col-span-3">
-                <Card
-                  onClick={() => handleClassClick(classItem.classId)}
-                  className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col gap-4">
-                      <img
-                        src={classItem.imageUrl}
-                        alt={classItem.name}
-                        className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
-                      />
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">
-                          {classItem.name}
-                        </h2>
-                        <p className="text-sm text-gray-600">
-                          Class Code: {classItem.code}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Course Code: {classItem.courseCode}
-                        </p>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <p className="text-lg font-bold flex items-center">
-                          {formatCurrency(classItem.price)}
-                        </p>
-                        <Button className="hover:bg-blue-500 hover:text-white transition-colors duration-300">
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ))
-          ) : (
-            <p>No classes found for this teacher.</p>
+          {/* Display My Major */}
+          <div className="mt-4 text-2xl text-gray-700">
+            My Major:{" "}
+            <span className="font-bold">
+              {Array.isArray(info.major) && info.major.length > 0
+                ? info.major.join(" & ")
+                : "N/A"}
+            </span>
+          </div>
+        </div>
+        <div className="ml-6">
+          {info.avatarImage && (
+            <img
+              src={info.avatarImage}
+              alt={`${teacherName}'s Avatar`}
+              className="w-50 h-50 mr-10 rounded-full object-cover border-2 border-blue-500"
+            />
           )}
         </div>
+      </div>
+      <div className="about-me-section px-6 mt-6">
+        <h3 className="text-3xl font-semibold text-gray-800">About Me</h3>
+        <p className="text-lg text-gray-700 mt-4">
+          {info.description ? info.description : "No description available."}
+        </p>
+      </div>
+
+      <h2 className="text-3xl font-semibold text-gray-800 mt-6 ml-5">
+        My Class ({classes.length})
+      </h2>
+      <div className="grid grid-cols-12 gap-6 mt-6">
+        {classes.length > 0 ? (
+          classes.map((classItem) => (
+            <div key={classItem.classId} className="col-span-6 md:col-span-3">
+              <Card
+                onClick={() => handleClassClick(classItem.classId)}
+                className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col gap-4">
+                    <img
+                      src={classItem.imageUrl}
+                      alt={classItem.name}
+                      className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
+                    />
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">
+                        {classItem.name}
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        Class Code: {classItem.code}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Course Code: {classItem.courseCode}
+                      </p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-lg font-bold flex items-center">
+                        {formatCurrency(classItem.price)}
+                      </p>
+                      <Button className="hover:bg-blue-500 hover:text-white transition-colors duration-300">
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))
+        ) : (
+          <p>No classes found for this teacher.</p>
+        )}
       </div>
     </>
   );

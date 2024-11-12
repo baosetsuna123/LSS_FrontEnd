@@ -192,20 +192,29 @@ const FeedbackDetail = ({ classId }) => {
                 <TableHead>Student Username</TableHead>
                 <TableHead>Question ID</TableHead>
                 <TableHead>Rating</TableHead>
-                <TableHead>Comment</TableHead>
+                <TableHead className="text-center">Comment</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {detailedFeedback
                 .slice(0, displayedCount)
-                .map((detail, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{detail.studentUsername}</TableCell>
-                    <TableCell>{detail.questionId}</TableCell>
-                    <TableCell>{detail.rating}</TableCell>
-                    <TableCell>{detail.comment || "N/A"}</TableCell>
-                  </TableRow>
-                ))}
+                .map((detail, index) => {
+                  // Check if it's the first item in the group of 6
+                  const showComment = index % 6 === 0;
+                  return (
+                    <TableRow key={index}>
+                      <TableCell>{detail.studentUsername}</TableCell>
+                      <TableCell>{detail.questionId}</TableCell>
+                      <TableCell>{detail.rating}</TableCell>
+                      <TableCell
+                        rowSpan={showComment ? 6 : 1} // Make the comment cell span 6 rows
+                        style={{ textAlign: "center" }}
+                      >
+                        {showComment ? detail.comment || "N/A" : ""}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </div>

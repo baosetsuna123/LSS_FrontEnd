@@ -47,7 +47,7 @@ const ApplicationLayout = ({
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
           app.applicationId === selectedApplication
-            ? { ...app, status: "REJECTED" }
+            ? { ...app, status: "REJECTED", rejectionReason }
             : app
         )
       );
@@ -153,8 +153,8 @@ const ApplicationLayout = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.description && typeof app.description === "string"
-                      ? app.description.length > 20
-                        ? `${app.description.slice(0, 20)}...`
+                      ? app.description.length > 12
+                        ? `${app.description.slice(0, 12)}...`
                         : app.description
                       : "N/A"}
                   </td>
@@ -186,8 +186,8 @@ const ApplicationLayout = ({
                     {app.status}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                    {app.teacherName.length > 20
-                      ? `${app.teacherName.slice(0, 20)}...`
+                    {app.teacherName.length > 12
+                      ? `${app.teacherName.slice(0, 12)}...`
                       : app.teacherName}
                   </td>
                   <td
@@ -195,9 +195,9 @@ const ApplicationLayout = ({
                     title={app.rejectionReason}
                   >
                     {app.status === "REJECTED"
-                      ? app.rejectionReason.length > 17
-                        ? `${app.rejectionReason.slice(0, 17)}...`
-                        : app.rejectionReason
+                      ? app.rejectionReason && app.rejectionReason.length > 12
+                        ? `${app.rejectionReason.slice(0, 12)}...`
+                        : app.rejectionReason || "-"
                       : "-"}
                   </td>
 

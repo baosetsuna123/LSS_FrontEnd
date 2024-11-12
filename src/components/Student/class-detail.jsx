@@ -17,6 +17,7 @@ import {
   Users,
   UserCheck,
   ChevronsLeftRightEllipsis,
+  MoveLeft,
 } from "lucide-react"; // Icon for the modal header
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -324,6 +325,28 @@ export function ClassDetail() {
                       Teacher Username: {classDetail?.teacherName}
                     </span>
                   </div>
+
+                  {/* Teacher Image with View Detail text and Left Arrow */}
+                  {classDetail?.imageTeacher && (
+                    <div className="mt-4 flex justify-center items-center relative">
+                      {/* Teacher Image */}
+                      <img
+                        src={classDetail?.imageTeacher}
+                        alt={`Instructor: ${classDetail?.fullName}`}
+                        className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 cursor-pointer"
+                        onClick={handleTeacherClick} // Make image clickable
+                      />
+
+                      {/* View Detail Text and Icon Below */}
+                      <div className="mt-2 ml-5 flex flex-col items-center justify-center cursor-pointer">
+                        <span className="text-sm text-blue-500">
+                          View Detail
+                        </span>
+                        <MoveLeft className="h-4 w-4 text-blue-500" />{" "}
+                        {/* Left Arrow Icon */}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
