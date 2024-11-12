@@ -40,6 +40,7 @@ import { ApplicationManagement } from "./components/Student/ViewApplication";
 import News from "./components/Student/News";
 import NewsDetail from "./components/Student/NewsDetail";
 import TeacherProfile from "./components/Student/TeacherProfile";
+import ProfileTeacher from "./components/Teacher/ProfileTeacher";
 
 function App() {
   return (
@@ -75,6 +76,7 @@ function App() {
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
             <Route path="send-applications" element={<SendApplication />} />
+            <Route path="profile" element={<ProfileTeacher />} />
             <Route path="assign-classes" element={<AssignClasses />} />
             <Route path="update-schedule" element={<UpdateSchedule />} />
             <Route path="cancel-request" element={<CancelClassRequest />} />

@@ -468,6 +468,65 @@ export const fetchClassbyID = async (id, token) => {
     throw error;
   }
 };
+//getinfoteacher
+export const fetchInfoTeacher = async (name, token) => {
+  try {
+    const response = await api.get(`/auth/GetTeacher/${name}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+//update-user
+export const updateCurrentUser = async (token, userData) => {
+  try {
+    const response = await api.put("/auth", userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data; // Return updated user data
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    throw error; // Rethrow error for handling in calling code
+  }
+};
+//update-teacher
+export const updateTeacherProfile = async (
+  teacherData,
+  avatarImage,
+  backgroundImage,
+  token
+) => {
+  const formData = new FormData();
+
+  formData.append("teacherDTO", JSON.stringify(teacherData));
+  if (avatarImage) {
+    formData.append("avatarImage", avatarImage);
+  }
+  if (backgroundImage) {
+    formData.append("backgroundImage", backgroundImage);
+  }
+  try {
+    const response = await api.put(`/auth/updateTeacher`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating teacher profile", error);
+    throw error;
+  }
+};
 //get by teacherName
 export const fetchClassbyteacherName = async (name, token) => {
   try {
@@ -476,6 +535,22 @@ export const fetchClassbyteacherName = async (name, token) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const fetchAverageTeacher = async (name, token) => {
+  try {
+    const response = await api.get(
+      `/feedback/average-feedback/teacher/${name}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetch balance:", error);
