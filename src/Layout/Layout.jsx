@@ -137,50 +137,51 @@ export function Layout({ children }) {
             <BookOpen className="h-6 w-6 mr-2" />
             <span className="font-bold">EduCourse</span>
           </Link>
-          <div className="flex items-center mx-auto relative">
-            <Search
-              className="h-6 w-6 mr-2 cursor-pointer"
-              onClick={() => searchInputRef.current.focus()}
-            />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search classes ..."
-              value={searchTerm}
-              onChange={handleSearchInputChange}
-              className="border rounded px-4 py-1 w-96"
-            />
+          {isLoggedIn && (
+            <div className="flex items-center mx-auto relative">
+              <Search
+                className="h-6 w-6 mr-2 cursor-pointer"
+                onClick={() => searchInputRef.current.focus()}
+              />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search classes ..."
+                value={searchTerm}
+                onChange={handleSearchInputChange}
+                className="border rounded px-4 py-1 w-96"
+              />
 
-            {/* Search Results Popup */}
-            {isSearchPopupVisible && filteredClasses.length > 0 && (
-              <div
-                ref={popupRef}
-                className="absolute top-full left-0 mt-2 ml-7 bg-white border border-gray-300 rounded-md shadow-lg z-50"
-                style={{
-                  width: "calc(93.5%)", // Adjust width to ensure it aligns with the input
-                }}
-              >
-                {filteredClasses.map((course) => (
-                  <div
-                    key={course.classId}
-                    onClick={() => handleClassClick(course.classId)}
-                    className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    <img
-                      src={course.imageUrl}
-                      alt={course.name}
-                      className="w-10 h-10 object-cover rounded mr-4"
-                    />
-                    <span className="font-semibold">{course.name}</span>
-                    <span className="ml-auto text-gray-500">
-                      {course.courseCode}
-                    </span>{" "}
-                    {/* Course code at the end */}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+              {/* Search Results Popup */}
+              {isSearchPopupVisible && filteredClasses.length > 0 && (
+                <div
+                  ref={popupRef}
+                  className="absolute top-full left-0 mt-2 ml-7 bg-white border border-gray-300 rounded-md shadow-lg z-50"
+                  style={{
+                    width: "calc(93.5%)", // Adjust width to ensure it aligns with the input
+                  }}
+                >
+                  {filteredClasses.slice(0, 5).map((course) => (
+                    <div
+                      key={course.classId}
+                      onClick={() => handleClassClick(course.classId)}
+                      className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      <img
+                        src={course.imageUrl}
+                        alt={course.name}
+                        className="w-10 h-10 object-cover rounded mr-4"
+                      />
+                      <span className="font-semibold">{course.name}</span>
+                      <span className="ml-auto text-gray-500">
+                        {course.courseCode}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <nav className="ml-auto flex gap-4 sm:gap-6">
             {isLoggedIn && (
