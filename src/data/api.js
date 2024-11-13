@@ -805,13 +805,9 @@ export const fetchOrderClasses = async (token) => {
   }
 };
 //-----------------Feedback-----------------
-export const fetchQuestionFeedback = async (token) => {
+export const fetchQuestionFeedback = async () => {
   try {
-    const response = await api.get("/api/feedback-question", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get("/api/feedback-question");
     return response.data;
   } catch (error) {
     console.error("Error fetch balance:", error);
