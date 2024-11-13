@@ -1,3 +1,4 @@
+import Deposit from "./components/Deposit";
 import SessionsChart from "./components/SessionsChart";
 import SystemWalletBalance from "./components/SystemWalletBalance";
 import TotalClasses from "./components/TotalClasses";
@@ -8,29 +9,20 @@ const AdminHome = () => {
 
   return (
     <div className="flex flex-col justify-center items-center w-full">
-      <div className="flex items-start gap-14 ">
-        <div className="">
-          <div className="py-6">
-            <TotalOrdersAmount />
-          </div>
-          <div className="py-6">
-            <TotalClasses />
-          </div>
-        </div>
-        <div className="min-w-[450px]">
-          <div className="py-6">
-            <UserCount />
-          </div>
-          <div className="py-6">
-            <SystemWalletBalance />
-          </div>
-        </div>
-      </div>
       <div>
-        <SessionsChart />
-      </div>
-      <div className="py-6">
-        <TransactionHistory />
+        <div className="grid grid-cols-4 gap-8 pb-8 min-h-[200px]">
+          <TotalOrdersAmount />
+          <TotalClasses />
+          <UserCount />
+          <SystemWalletBalance />
+        </div>
+        <div className="grid grid-cols-4 gap-8">
+          <SessionsChart />
+          <TransactionHistory />
+        </div>
+        <div className="max-w-[1000px] mx-auto py-8">
+          <Deposit />
+        </div>
       </div>
     </div>
   );

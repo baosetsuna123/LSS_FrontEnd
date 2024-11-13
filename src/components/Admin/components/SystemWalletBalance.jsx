@@ -29,9 +29,9 @@ export default function SystemWalletBalance() {
     }, [token]);
 
     return (
-        <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg pb-6 rounded-lg px-6">
-            <h1 className="font-semibold text-xl py-5 tracking-wider uppercase text-center">System Wallet Balance</h1>
-            <div className="*:text-blue-800 gap-6 text-2xl font-semibold" >
+        <div className=" h-full w-full bg-red-500 *:text-white shadow-lg py-2 rounded-lg px-4">
+            <h1 className="font-semibold text-xl pb-4 tracking-wider h-[75%]">System Wallet Balance</h1>
+            <div className="*:text-white text-xl font-semibold" >
                 <span>{wallet.toLocaleString()} VND</span>
             </div>
         </div>

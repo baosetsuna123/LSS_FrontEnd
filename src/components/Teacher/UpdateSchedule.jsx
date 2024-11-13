@@ -28,20 +28,6 @@ function UpdateSchedule() {
     }
   }
 
-  // const teachers = [
-  //   "Nguyễn Văn A",
-  //   "Trần Thị B",
-  //   "Lê Văn C",
-  //   "Phạm Thị D",
-  //   "Hoàng Văn E",
-  // ];
-  // const rooms = [
-  //   "Phòng Lab 101",
-  //   "Phòng Lab 202",
-  //   "Phòng Lab 303",
-  //   "Phòng Lab 404",
-  //   "Phòng Lab 505",
-  // ];
 
   const daysOfWeek = [
     { value: 2, name: "Monday" },
@@ -52,25 +38,6 @@ function UpdateSchedule() {
     { value: 7, name: "Saturday" },
     { value: 8, name: "Sunday" },
   ];
-  // const formatSchedule = (startDate, endDate) => {
-
-  //   const start = new Date(startDate);
-  //   const end = new Date(endDate);
-  //   const dayNames = [];
-
-  //   for (let m = new Date(start); m <= end; m.setDate(m.getDate() + 1)) {
-  //     const dayIndex = m.getDay();
-
-  //     if (!dayNames.includes(daysOfWeek[dayIndex])) {
-  //       dayNames.push(daysOfWeek[dayIndex]);
-  //     }
-  //   }
-
-  //   const startTime = start.toTimeString().slice(0, 5);
-  //   const endTime = end.toTimeString().slice(0, 5);
-
-  //   return `${dayNames.join(', ')} - ${startTime} - ${endTime}`;
-  // };
 
   const fetchClasses = async () => {
     try {
@@ -167,7 +134,7 @@ function UpdateSchedule() {
       return;
     }
     try {
-      if(updatedClass.maxStudents < classShow.maxStudents){
+      if (updatedClass.maxStudents < classShow.maxStudents) {
         toast.error(`Số học sinh đang chỉnh sửa không được nhỏ hơn số học sinh hiện tại`)
         return;
       }
@@ -197,12 +164,12 @@ function UpdateSchedule() {
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Cập nhật thông tin lớp học
+        Update Class Information
       </h2>
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Tìm kiếm lớp học..."
+          placeholder="Search for a class..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -216,16 +183,13 @@ function UpdateSchedule() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-lg">Lớp {cls.name}</h3>
-                <p className="text-gray-600">Môn học: {cls.courseName}</p>
-                <p className="text-gray-600">
-                  Số học sinh tối đa: {cls.maxStudents}
-                </p>
-                <p className="text-gray-600">Ngày học: {cls.startDate}</p>
+                <h3 className="font-bold text-lg">Class {cls.name}</h3>
+                <p className="text-gray-600">Subject: {cls.courseName}</p>
+                <p className="text-gray-600">Max students: {cls.maxStudents}</p>
+                <p className="text-gray-600">Start date: {cls.startDate}</p>
                 <p className="mt-2">
                   <span className="font-medium"></span>
-                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))
-                    ?.name || "Unknown"}
+                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))?.name || "Unknown"}
                   : {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
@@ -233,7 +197,7 @@ function UpdateSchedule() {
                 onClick={() => handleEdit(cls)}
                 className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-600 transition-colors"
               >
-                Chỉnh sửa
+                Edit
               </button>
             </div>
           </li>
@@ -243,16 +207,11 @@ function UpdateSchedule() {
       {isPopupOpen && editingClass && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
-            <h3 className="text-2xl font-bold mb-4">
-              Chỉnh sửa thông tin lớp học
-            </h3>
+            <h3 className="text-2xl font-bold mb-4">Edit Class Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Tên lớp:
+                <label htmlFor="name" className="block mb-2 font-medium text-gray-700">
+                  Class Name:
                 </label>
                 <input
                   type="text"
@@ -265,11 +224,8 @@ function UpdateSchedule() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="subject"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Môn học:
+                <label htmlFor="subject" className="block mb-2 font-medium text-gray-700">
+                  Subject:
                 </label>
                 <select
                   id="course"
@@ -279,9 +235,7 @@ function UpdateSchedule() {
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="" disabled>
-                    Chọn khóa học
-                  </option>
+                  <option value="" disabled>Select a course</option>
                   {courses.length > 0 ? (
                     courses.map((course) => (
                       <option key={course.courseCode} value={course.courseCode}>
@@ -289,40 +243,30 @@ function UpdateSchedule() {
                       </option>
                     ))
                   ) : (
-                    <option value="" disabled>
-                      Không có khóa học nào
-                    </option>
+                    <option value="" disabled>No available courses</option>
                   )}
                 </select>
               </div>
               <div>
-                <label
-                  htmlFor="students"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Số học sinh:
+                <label htmlFor="students" className="block mb-2 font-medium text-gray-700">
+                  Number of Students:
                 </label>
                 <input
                   type="number"
                   id="maxStudents"
                   name="maxStudents"
-                  placeholder={`Số học sinh hiện tại là ${classShow.maxStudents}`}
+                  placeholder={`Current number of students is ${classShow.maxStudents}`}
                   value={editingClass.maxStudents}
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {maxStudentsError && (
-                  <p className="text-red-500 mt-1 text-sm">
-                    {maxStudentsError}
-                  </p>
+                  <p className="text-red-500 mt-1 text-sm">{maxStudentsError}</p>
                 )}
               </div>
               <div>
-                <label
-                  htmlFor="teacher"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Giáo viên:
+                <label htmlFor="teacher" className="block mb-2 font-medium text-gray-700">
+                  Teacher:
                 </label>
                 <select
                   id="teacher"
@@ -332,48 +276,12 @@ function UpdateSchedule() {
                   disabled
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {/* {teachers.map((teacher) => (
-                    <option key={teacher} value={teacher}>
-                      {teacher}
-                    </option>
-                  ))} */}
                   <option>{editingClass.teacherName}</option>
                 </select>
               </div>
-              <div className="mb-4 col-span-2">
-                {/* <label className="block mb-2 font-medium text-gray-700">
-                  Thời gian học:
-                </label> */}
-                <div className="flex items-center space-x-4">
-                  {/* <div className="relative flex-1">
-                    <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="date"
-                      disabled
-                      value={startTime}
-                      onChange={(e) => handleTimeChange(e, "start")}
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div> */}
-                  {/* <span className="text-gray-500">đến</span>
-                  <div className="relative flex-1">
-                    <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="date"
-                      disabled
-                      value={endTime}
-                      onChange={(e) => handleTimeChange(e, 'end')}
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div> */}
-                </div>
-              </div>
               <div>
-                <label
-                  htmlFor="room"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Link phòng học:
+                <label htmlFor="room" className="block mb-2 font-medium text-gray-700">
+                  Classroom Link:
                 </label>
                 <input
                   type="text"
@@ -385,11 +293,8 @@ function UpdateSchedule() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="room"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Ngày học
+                <label htmlFor="room" className="block mb-2 font-medium text-gray-700">
+                  Day of the Week:
                 </label>
                 <select
                   id="dayofWeek"
@@ -406,9 +311,9 @@ function UpdateSchedule() {
                   ))}
                 </select>
               </div>
-              <div className="mb-4">
+              <div>
                 <label className="block mb-2 font-medium text-gray-700">
-                  Thời gian học:
+                  Class Time:
                 </label>
                 <div className="flex items-center space-x-4">
                   <div className="relative flex-1">
@@ -423,57 +328,33 @@ function UpdateSchedule() {
                     >
                       {slots.map((slot) => (
                         <option key={slot.slotId} value={slot.slotId}>
-                          Tiết {slot.slotId} ({slot.start} - {slot.end})
+                          Slot {slot.slotId} ({slot.start} - {slot.end})
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
               </div>
-              {/* <div>
-                <label
-                  htmlFor="image"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Hình ảnh:
-                </label>
-                <input
-                  type="file"
-                  id="image"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              {imagePreview && (
-                <div className="mb-4">
-                  <img
-                    src={imagePreview}
-                    alt="Selected Preview"
-                    className="w-full h-auto max-h-48 object-cover rounded-lg"
-                  />
-                </div>
-              )} */}
             </div>
             <div className="flex justify-end space-x-2 mt-4">
               <button
                 onClick={() => handleSave(editingClass)}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
               >
-                Lưu
+                Save
               </button>
               <button
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
               >
-                Hủy
+                Cancel
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
+
   );
 }
 

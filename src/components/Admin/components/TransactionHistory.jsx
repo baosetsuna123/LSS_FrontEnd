@@ -51,7 +51,7 @@ export default function TransactionHistory() {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-        setPage(0); 
+        setPage(0);
     };
 
     const filteredData = data.filter((row) =>
@@ -61,55 +61,57 @@ export default function TransactionHistory() {
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
-        <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg py-10 rounded-lg px-8">
-             <h1 className="font-semibold text-xl pb-4 tracking-wider uppercase text-center">Transaction History</h1>
-            <Input
-                label="Search by Username"
-                variant="outlined"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                placeholder='search by username'
-                className="my-4 w-full max-w-xs "
-            />
-            <div className="my-2">
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 800 }} aria-label="transaction history table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Transaction Amount</TableCell>
-                                <TableCell>Transaction Date</TableCell>
-                                <TableCell>Balance After Transaction</TableCell>
-                                <TableCell>Username</TableCell>
-                                <TableCell>Note</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {paginatedData.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell component="th" scope="row">
-                                        {row.transactionAmount.toLocaleString()} VND
-                                    </TableCell>
-                                    <TableCell>{new Date(row.transactionDate).toLocaleString()}</TableCell>
-                                    <TableCell>{row.balanceAfterTransaction.toLocaleString()} VND</TableCell>
-                                    <TableCell>{row.username}</TableCell>
-                                    <TableCell>{row.note}</TableCell>
+        <div className='col-span-2 min-h-[500px]'>
+            <div className="flex flex-col justify-center h-full items-center w-full bg-white shadow-lg py-2 rounded-lg px-8">
+                <h1 className="font-semibold text-xl pb-4 tracking-wider text-center">Transaction History</h1>
+                <Input
+                    label="Search by Username"
+                    variant="outlined"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    placeholder='search by username'
+                    className="my-4 w-full max-w-xs "
+                />
+                <div className="my-2">
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 750 }} aria-label="transaction history table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Transaction Amount</TableCell>
+                                    <TableCell>Transaction Date</TableCell>
+                                    <TableCell>Balance After Transaction</TableCell>
+                                    <TableCell>Username</TableCell>
+                                    <TableCell>Note</TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 15]}
-                        component="div"
-                        count={filteredData.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {paginatedData.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            {row.transactionAmount.toLocaleString()} VND
+                                        </TableCell>
+                                        <TableCell>{new Date(row.transactionDate).toLocaleString()}</TableCell>
+                                        <TableCell>{row.balanceAfterTransaction.toLocaleString()} VND</TableCell>
+                                        <TableCell>{row.username}</TableCell>
+                                        <TableCell>{row.note}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 15]}
+                            component="div"
+                            count={filteredData.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                    </TableContainer>
+                </div>
             </div>
         </div>
     );

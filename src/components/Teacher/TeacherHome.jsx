@@ -70,14 +70,15 @@ function TeacherHome() {
     dayOfWeek: "",
   });
   const days = [
-    "Thứ 2",
-    "Thứ 3",
-    "Thứ 4",
-    "Thứ 5",
-    "Thứ 6",
-    "Thứ 7",
-    "Chủ nhật",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
   ];
+  
 
   const result = localStorage.getItem("result");
   let token;
@@ -311,15 +312,10 @@ function TeacherHome() {
     return null;
   };
 
-  // const getPreviousDay = (dateString, daysBefore = 1) => {
-  //   const dateObj = new Date(dateString);
-  //   dateObj.setDate(dateObj.getDate() - daysBefore);
-  //   return dateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  // };
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Thời khóa biểu</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Timetable</h2>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
@@ -332,7 +328,7 @@ function TeacherHome() {
         <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
-              <th className="py-2 px-4 border-b border-r">Ca học</th>
+              <th className="py-2 px-4 border-b border-r">Slot</th>
               {datesInTheWeek.map((date, index) => {
                 const dayOfWeek = days[index % 7];
                 return (
@@ -351,7 +347,7 @@ function TeacherHome() {
                 className="hover:bg-gray-100 transition duration-150"
               >
                 <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
-                  Tiết {slot.period}
+                  Period {slot.period}
                   <div className="text-xs text-gray-600">
                     {"(" + slot.start + " - " + slot.end + ")"}
                   </div>
@@ -369,6 +365,7 @@ function TeacherHome() {
           </tbody>
         </table>
       </div>
+
 
       <Modal
         isOpen={isModalOpen}

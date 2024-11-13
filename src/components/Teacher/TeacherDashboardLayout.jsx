@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaChalkboardTeacher,
-  FaBookOpen,
   FaCalendarAlt,
   FaBan,
   // FaDoorOpen,
@@ -44,30 +43,25 @@ function TeacherDashboardLayout() {
     navigate("/login");
   };
   const navItems = [
-    { path: "/teacher", label: "Trang chủ", icon: FaChalkboardTeacher },
-    {
-      path: "/teacher/assign-classes",
-      label: "Phân công lớp học",
-      icon: FaBookOpen,
-    },
+    { path: "/teacher", label: "Home", icon: FaChalkboardTeacher },
     {
       path: "/teacher/update-schedule",
-      label: "Cập nhật lịch học",
+      label: "Update Schedule",
       icon: FaCalendarAlt,
     },
     {
       path: "/teacher/cancel-request",
-      label: "Gửi yêu cầu hủy lớp",
+      label: "Send Class Cancellation Request",
       icon: FaBan,
     },
     {
       path: "/teacher/class-list",
-      label: "Xem danh sách lớp học",
+      label: "View Class List",
       icon: FaList,
     },
     {
       path: "/teacher/send-applications",
-      label: "Gửi đơn rút tiền",
+      label: "Send Withdrawal Application",
       icon: FaDollarSign,
     },
   ];

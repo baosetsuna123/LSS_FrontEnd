@@ -64,7 +64,7 @@ export default function SessionsChart() {
         }
     }
 
-    
+
 
     useEffect(() => {
         getActiveClasses()
@@ -81,59 +81,61 @@ export default function SessionsChart() {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg py-6 rounded-lg px-4">
-            <h1 className="font-semibold text-2xl tracking-wider uppercase text-center">Review Sessions Chart</h1>
-            <div>
-                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="demo-select-small-label">Year</InputLabel>
-                    <Select
-                        labelId="demo-select-small-label"
-                        id="demo-select-small"
-                        label="Year"
-                        onChange={handleChangeYear}
-                        value={selectedYear}
-                        className='bg-white'
-                    >
-                        {Array.from({ length: 10 }, (_, i) => {
-                            const year = getCurrentYear() - 3 + i;
-                            return (
-                                <MenuItem key={year} value={year}>
-                                    {year}
-                                </MenuItem>
-                            );
-                        })}
-                    </Select>
-                </FormControl>
-                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="demo-select-small-label">Status</InputLabel>
-                    <Select
-                        labelId="demo-select-small-label"
-                        id="demo-select-small"
-                        label="Status"
-                        onChange={handleChange}
-                        value={selectedStatus}
-                        className='bg-white'
-                    >
+        <div className='col-span-2 min-h-[500px]'>
+            <div className="flex flex-col justify-center h-full items-center w-full bg-white shadow-lg py-2 rounded-lg px-4">
+                <h1 className="font-semibold text-xl pb-4 tracking-wider text-center">Review Sessions Chart</h1>
+                <div>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <InputLabel id="demo-select-small-label">Year</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            label="Year"
+                            onChange={handleChangeYear}
+                            value={selectedYear}
+                            className='bg-white'
+                        >
+                            {Array.from({ length: 10 }, (_, i) => {
+                                const year = getCurrentYear() - 3 + i;
+                                return (
+                                    <MenuItem key={year} value={year}>
+                                        {year}
+                                    </MenuItem>
+                                );
+                            })}
+                        </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <InputLabel id="demo-select-small-label">Status</InputLabel>
+                        <Select
+                            labelId="demo-select-small-label"
+                            id="demo-select-small"
+                            label="Status"
+                            onChange={handleChange}
+                            value={selectedStatus}
+                            className='bg-white'
+                        >
+                            {
+                                optionsStatus.map((item, index) =>
+                                    <MenuItem key={index} value={item}>{item}</MenuItem>
+                                )
+                            }
+                        </Select>
+                    </FormControl>
+                </div>
+                <LineChart
+                    xAxis={[{ scaleType: 'point', data: [...dataClasses.map(item => item.month)] }]}
+                    series={[
                         {
-                            optionsStatus.map((item, index) =>
-                                <MenuItem key={index} value={item}>{item}</MenuItem>
-                            )
-                        }
-                    </Select>
-                </FormControl>
+                            data: [...dataClasses.map(item => item.value)],
+                            label: 'Number of review sessions',
+                            area: true,
+                        },
+                    ]}
+                    width={750}
+                    height={320}
+                />
             </div>
-            <LineChart
-                xAxis={[{ scaleType: 'point', data: [...dataClasses.map(item => item.month)] }]}
-                series={[
-                    {
-                        data: [...dataClasses.map(item => item.value)],
-                        label: 'Number of review sessions',
-                        area: true,
-                    },
-                ]}
-                width={850}
-                height={320}
-            />
         </div>
 
     )

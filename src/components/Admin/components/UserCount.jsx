@@ -29,10 +29,10 @@ export default function UserCount() {
   }, [token])
 
   return (
-    <div className="flex flex-col justify-center items-center w-full bg-white shadow-lg py-10 rounded-lg px-8">
-      <h1 className="font-semibold text-xl pb-4 tracking-wider uppercase text-center">Total members</h1>
+    <div className=" h-full w-full bg-green-500 *:text-white shadow-lg py-2 rounded-lg px-4">
+       <h1 className="font-semibold text-xl pb-4 tracking-wider h-[40%]">Total members</h1>
       <div className="flex items-center gap-2 py-3">
-        <div className="grid grid-cols-2 items-center  *:text-blue-800 gap-6 text-2xl ">
+        <div className="grid grid-cols-2  *:text-white gap-2 text-xl ">
           <div >
             <span className="font-semibold">Admin:</span> <span>{members?.ADMIN | 0}</span>
           </div>

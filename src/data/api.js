@@ -1088,3 +1088,24 @@ export const getCompletedClassesByMonthDetailed = async (
     throw error;
   }
 };
+
+export const getDepositsByMonth = async (
+  year,
+  token
+) => {
+  try {
+    const response = await api.get(`/admin/statistics/deposit`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching completed classes by month (detailed):",
+      error
+    );
+    throw error;
+  }
+};

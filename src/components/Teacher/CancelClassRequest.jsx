@@ -34,27 +34,27 @@ function CancelClassRequest() {
   }, [token])
 
   useEffect(() => {
-    // Giả lập việc lấy dữ liệu từ API
+    // Mock fetching data from an API
     const fetchClasses = async () => {
-      // Thay thế bằng cuộc gọi API thực tế
+      // Replace with real API call
       const mockClasses = [
         {
           id: 1,
-          name: "Lớp A",
-          course: " thiết kế đồ họa",
-          schedule: "Thứ 2, 4, 6 - 18:00-20:00",
+          name: "Class A",
+          course: "Graphic Design",
+          schedule: "Mon, Wed, Fri - 18:00-20:00",
         },
         {
           id: 2,
-          name: "Lớp B",
-          course: "Kỹ thuật máy tính",
-          schedule: "Thứ 3, 5, 7 - 19:00-21:00",
+          name: "Class B",
+          course: "Computer Engineering",
+          schedule: "Tue, Thu, Sat - 19:00-21:00",
         },
         {
           id: 3,
-          name: "Lớp C",
-          course: "Kinh tế thị trường",
-          schedule: "Thứ 2, 4, 6 - 14:00-16:00",
+          name: "Class C",
+          course: "Market Economics",
+          schedule: "Mon, Wed, Fri - 14:00-16:00",
         },
       ];
       setClasses(mockClasses);
@@ -68,11 +68,11 @@ function CancelClassRequest() {
     setIsSubmitting(true);
     setSubmitMessage("");
 
-    // Giả lập gửi yêu cầu lên server
+    // Mock submitting the request to the server
     try {
-      // chỗ này thay thế bằng dữ liệu gọi api real nhé
+      // Replace with real API call data
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Yêu cầu hủy lớp:", {
+      console.log("Class cancellation request:", {
         class: selectedClass,
         reason,
         cancelDate,
@@ -80,7 +80,7 @@ function CancelClassRequest() {
         additionalInfo,
       });
       setSubmitMessage(
-        "Yêu cầu hủy lớp đã được gửi thành công. Chúng tôi sẽ xem xét và phản hồi sớm nhất có thể."
+        "Class cancellation request sent successfully. We will review and respond as soon as possible."
       );
       // Reset form
       setSelectedClass("");
@@ -89,8 +89,8 @@ function CancelClassRequest() {
       setUrgency("normal");
       setAdditionalInfo("");
     } catch (error) {
-      console.error("Có lỗi xảy ra khi gửi yêu cầu:", error);
-      setSubmitMessage("Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.");
+      console.error("An error occurred while submitting the request:", error);
+      setSubmitMessage("An error occurred while submitting the request. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -99,7 +99,7 @@ function CancelClassRequest() {
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Gửi yêu cầu hủy lớp
+        Submit Class Cancellation Request
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -107,7 +107,7 @@ function CancelClassRequest() {
             htmlFor="class"
             className="block mb-2 font-medium text-gray-700"
           >
-            Chọn lớp
+            Select Class
           </label>
           <select
             id="class"
@@ -116,7 +116,7 @@ function CancelClassRequest() {
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
           >
-            <option value="">-- Chọn lớp --</option>
+            <option value="">-- Select Class --</option>
             {classes.map((cls) => (
               <option key={cls.id} value={cls.id}>
                 {cls.name}
@@ -129,7 +129,7 @@ function CancelClassRequest() {
             htmlFor="reason"
             className="block mb-2 font-medium text-gray-700"
           >
-            Lý do hủy
+            Reason for Cancellation
           </label>
           <textarea
             id="reason"
@@ -145,7 +145,7 @@ function CancelClassRequest() {
             htmlFor="cancelDate"
             className="block mb-2 font-medium text-gray-700"
           >
-            Ngày muốn hủy
+            Cancellation Date
           </label>
           <input
             type="date"
@@ -161,7 +161,7 @@ function CancelClassRequest() {
             htmlFor="urgency"
             className="block mb-2 font-medium text-gray-700"
           >
-            Mức độ khẩn cấp
+            Urgency Level
           </label>
           <select
             id="urgency"
@@ -169,8 +169,8 @@ function CancelClassRequest() {
             onChange={(e) => setUrgency(e.target.value)}
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="normal">Bình thường</option>
-            <option value="urgent">Khẩn cấp</option>
+            <option value="normal">Normal</option>
+            <option value="urgent">Urgent</option>
           </select>
         </div>
         <div>
@@ -178,7 +178,7 @@ function CancelClassRequest() {
             htmlFor="additionalInfo"
             className="block mb-2 font-medium text-gray-700"
           >
-            Thông tin bổ sung (nếu có)
+            Additional Information (if any)
           </label>
           <textarea
             id="additionalInfo"
@@ -193,13 +193,13 @@ function CancelClassRequest() {
           className="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu hủy"}
+          {isSubmitting ? "Submitting..." : "Submit Cancellation Request"}
         </button>
       </form>
       {submitMessage && (
         <div
           className={`mt-4 p-4 rounded-lg ${
-            submitMessage.includes("thành công")
+            submitMessage.includes("successfully")
               ? "bg-green-100 text-green-700"
               : "bg-red-100 text-red-700"
           }`}
