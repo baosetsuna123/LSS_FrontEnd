@@ -13,6 +13,7 @@ import { toast } from "react-hot-toast";
 
 const FeedbackDetail = ({ classId }) => {
   const { questions } = useQuestionContext();
+  console.log(questions);
   const safeQuestions = Array.isArray(questions) ? questions : [];
   const [feedback, setFeedback] = useState([]);
   const [detailedFeedback, setDetailedFeedback] = useState([]);

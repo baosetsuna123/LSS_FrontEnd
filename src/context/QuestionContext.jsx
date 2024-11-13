@@ -18,7 +18,8 @@ export const QuestionProvider = ({ children }) => {
     // Fetch questions when the provider mounts
     const getQuestions = async () => {
       try {
-        const data = await fetchQuestionFeedback();
+        const token = sessionStorage.getItem("token");
+        const data = await fetchQuestionFeedback(token);
         setQuestions(data);
       } catch (err) {
         console.error("Error fetching feedback questions:", err);

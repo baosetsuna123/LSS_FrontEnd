@@ -7,15 +7,13 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+import profile from "../../assets/profilebg.jfif";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { updateTeacherProfile } from "@/data/api"; // Make sure to import the updateTeacherProfile function
+import { updateTeacherProfile } from "@/data/api";
 
 const ProfileTeacher = () => {
-  // Retrieve result from localStorage
   const result = JSON.parse(localStorage.getItem("result"));
-
-  // Initialize state for the avatar, background images, description, and form data
   const [profileData, setProfileData] = useState({
     username: result?.username || "",
     fullName: result?.fullName || "",
@@ -122,7 +120,15 @@ const ProfileTeacher = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-6 lg:px-8">
+    <div
+      className="min-h-screen bg-gray-100 py-12 px-6 lg:px-8"
+      style={{
+        backgroundImage: `url(${profile})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
         <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
           Teacher Profile
