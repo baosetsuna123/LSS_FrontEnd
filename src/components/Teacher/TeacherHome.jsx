@@ -78,7 +78,6 @@ function TeacherHome() {
     "Saturday",
     "Sunday",
   ];
-  
 
   const result = localStorage.getItem("result");
   let token;
@@ -105,13 +104,13 @@ function TeacherHome() {
   };
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
-      2: "Thứ 2",
-      3: "Thứ 3",
-      4: "Thứ 4",
-      5: "Thứ 5",
-      6: "Thứ 6",
-      7: "Thứ 7",
-      8: "Chủ nhật",
+      2: "Monday",
+      3: "Tuesday",
+      4: "Wednesday",
+      5: "Thursday",
+      6: "Friday",
+      7: "Saturday",
+      8: "Sunday",
     };
     return classes.reduce((timetable, classItem) => {
       const day = daysOfWeekMap[classItem.dayOfWeek];
@@ -296,8 +295,8 @@ function TeacherHome() {
           onClick={() => handleShowDetail(lesson)}
         >
           <p className="font-bold text-base text-blue-800">{lesson.subject}</p>
-          <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
-          <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
+          <p className="text-sm text-gray-600">Code: {lesson.code}</p>
+          <p className="text-sm text-gray-600">Name: {lesson.class}</p>
           {lesson.room && (
             <button
               onClick={() => window.open(lesson.room, "_blank")}
@@ -365,7 +364,6 @@ function TeacherHome() {
           </tbody>
         </table>
       </div>
-
 
       <Modal
         isOpen={isModalOpen}

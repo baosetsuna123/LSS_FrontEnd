@@ -171,8 +171,8 @@ const MyClass = () => {
           >
             {lesson.subject}
           </p>
-          <p className="text-sm text-gray-600">Mã: {lesson.code}</p>
-          <p className="text-sm text-gray-600">Lớp: {lesson.class}</p>
+          <p className="text-sm text-gray-600">Code: {lesson.code}</p>
+          <p className="text-sm text-gray-600">Name: {lesson.class}</p>
 
           {lessonStatus === "COMPLETED" &&
           !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (

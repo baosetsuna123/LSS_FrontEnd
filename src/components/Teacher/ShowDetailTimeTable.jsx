@@ -37,10 +37,28 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
         </div>
         <div className="col-span-4">
           <strong>Day of Week: </strong>
-          {Number(data?.dayOfWeek) === 8
-            ? "Chủ Nhật"
-            : `Thứ ${Number(data?.dayOfWeek)}`}
+          {(() => {
+            switch (Number(data?.dayOfWeek)) {
+              case 2:
+                return "Monday";
+              case 3:
+                return "Tuesday";
+              case 4:
+                return "Wednesday";
+              case 5:
+                return "Thursday";
+              case 6:
+                return "Friday";
+              case 7:
+                return "Saturday";
+              case 8:
+                return "Sunday";
+              default:
+                return "Invalid day";
+            }
+          })()}
         </div>
+
         <div className="col-span-4 flex items-center gap-5">
           <strong>Classroom:</strong>
           {data?.location ? (
