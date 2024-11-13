@@ -1,269 +1,219 @@
-/* eslint-disable react/no-unescaped-entities */
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Progress } from "../ui/progress";
-import misasa from "../../assets/misasa.jfif";
+import { useState, useEffect } from "react";
 import {
-  Book,
-  GraduationCap,
-  Award,
-  Briefcase,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Button,
+  Checkbox,
+  ListItemText,
+} from "@mui/material";
+import { fetchAllCategories, updateCurrentUser } from "@/data/api";
+import { toast } from "react-hot-toast";
 import profile from "../../assets/profilebg.jfif";
-export default function Profile() {
-  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-  const result = localStorage.getItem("result");
-  const projects = [
-    {
-      title: "Machine Learning Image Classifier",
-      description:
-        "Developed a CNN-based image classifier using TensorFlow and Keras.",
-      technologies: ["Python", "TensorFlow", "Keras"],
-      link: "#",
-    },
-    {
-      title: "E-commerce Web Application",
-      description:
-        "Built a full-stack e-commerce platform with React and Node.js.",
-      technologies: ["React", "Node.js", "MongoDB"],
-      link: "#",
-    },
-    {
-      title: "Mobile Fitness Tracker",
-      description:
-        "Created a React Native app for tracking workouts and nutrition.",
-      technologies: ["React Native", "Firebase", "Redux"],
-      link: "#",
-    },
-  ];
 
-  const nextProject = () => {
-    setCurrentProjectIndex((prevIndex) => (prevIndex + 1) % projects.length);
+export default function Profile() {
+  const result = JSON.parse(localStorage.getItem("result") || "{}");
+  const token = sessionStorage.getItem("token");
+
+  const [profileData, setProfileData] = useState({
+    username: result.username || "",
+    fullName: result.fullName || "",
+    email: result.email || "",
+    phoneNumber: result.phoneNumber || "",
+    address: result.address || "",
+  });
+
+  const [categoryIds, setCategoryIds] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await fetchAllCategories();
+        setAllCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
+
+    if (result.major && result.major.length > 0) {
+      const savedCategoryIds = result.major.map((major) => major.categoryId);
+      setCategoryIds(savedCategoryIds);
+    }
+  }, []);
+
+  const handleProfileChange = (event) => {
+    const { name, value } = event.target;
+    setProfileData({ ...profileData, [name]: value });
   };
 
-  const prevProject = () => {
-    setCurrentProjectIndex(
-      (prevIndex) => (prevIndex - 1 + projects.length) % projects.length
-    );
+  const handleCategoryChange = (event) => {
+    const { value } = event.target;
+    setCategoryIds(value);
+  };
+
+  const handleUpdateProfile = async () => {
+    if (
+      !profileData.fullName ||
+      !profileData.address ||
+      !profileData.phoneNumber ||
+      categoryIds.length === 0
+    ) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    if (
+      profileData.phoneNumber.length < 10 ||
+      profileData.phoneNumber.length > 14
+    ) {
+      toast.error("Phone number must be between 10 and 14 digits.");
+      return;
+    }
+
+    const updatedProfileData = {
+      ...profileData,
+      username: result.username,
+      email: result.email,
+      categoryIds,
+    };
+
+    try {
+      await updateCurrentUser(token, updatedProfileData);
+      toast.success("Profile updated successfully!");
+      setProfileData(updatedProfileData);
+    } catch (e) {
+      console.log(e);
+      toast.error("Failed to update profile.");
+    }
   };
 
   return (
     <div
-      className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 to-indigo-600 py-12 px-6 lg:px-8"
       style={{
         backgroundImage: `url(${profile})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
-      <Card className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-32 sm:h-48"></div>
-        <CardContent className="relative px-4 sm:px-6 lg:px-8 py-8">
-          <div className="sm:flex sm:items-end sm:space-x-5">
-            <div className="flex -mt-16 sm:-mt-24">
-              <img
-                className="h-24 w-24 sm:h-32 sm:w-32 rounded-full ring-4 ring-white object-cover"
-                src={misasa}
-                alt="Student Profile"
-              />
-            </div>
-            <div className="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
-              <div className="sm:hidden md:block mt-6 min-w-0 flex-1">
-                <h1 className="text-2xl font-bold text-gray-900 truncate">
-                  {result ? JSON.parse(result).username : "Misasa"}
-                </h1>
-                <p className="text-sm text-gray-500">
-                  Software Engineer | Class of 2024
-                </p>
-                <p className="text-sm text-gray-500">
-                  Email: {result ? JSON.parse(result).email : null}
-                </p>
-                <p className="text-sm text-gray-500">
-                  FullName: {result ? JSON.parse(result).fullName : "Misasa"}
-                </p>
-              </div>
-              <div className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
-                <Button>
-                  <Book className="mr-2 h-4 w-4" />
-                  View Portfolio
-                </Button>
-                <Button variant="outline">Contact</Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-        <CardContent className="px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              About Me
-            </h2>
-            <p className="text-gray-700 mb-4">
-              I'm a passionate Computer Science student with a focus on machine
-              learning and web development. I love tackling complex problems and
-              building innovative solutions. Currently seeking internship
-              opportunities to apply my skills in a real-world setting.
+      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg transform transition-all duration-500 hover:scale-105">
+        <h1 className="text-4xl font-semibold text-gray-900 mb-8 text-center">
+          Update Profile
+        </h1>
+        <div className="space-y-6">
+          <div className="flex items-center mb-4">
+            <label className="w-1/3 text-gray-700 text-lg font-semibold">
+              Username:
+            </label>
+            <p className="w-2/3 text-gray-900 text-lg">
+              {profileData.username}
             </p>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Skills</h2>
-            <div className="flex flex-wrap gap-2">
-              <Badge>Python</Badge>
-              <Badge>JavaScript</Badge>
-              <Badge>React</Badge>
-              <Badge>Node.js</Badge>
-              <Badge>TensorFlow</Badge>
-              <Badge>SQL</Badge>
-              <Badge>Git</Badge>
-              <Badge>Agile Methodologies</Badge>
-              <Badge>Data Structures</Badge>
-              <Badge>Algorithms</Badge>
-            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Education
-            </h2>
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3">
-                <GraduationCap className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="font-medium">BSc in Computer Science</p>
-                  <p className="text-sm text-gray-500">
-                    Tech University, 2020 - 2024
-                  </p>
-                </div>
-              </li>
-            </ul>
-            <h2 className="text-xl font-semibold text-gray-900 mt-6 mb-4">
-              Achievements
-            </h2>
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3">
-                <Award className="h-5 w-5 text-yellow-400" />
-                <span className="text-gray-700">Dean's List (2021, 2022)</span>
-              </li>
-              <li className="flex items-center space-x-3">
-                <Award className="h-5 w-5 text-yellow-400" />
-                <span className="text-gray-700">Hackathon Winner (2023)</span>
-              </li>
-            </ul>
+
+          <div className="flex items-center space-x-4">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
+              Full Name:
+            </label>
+            <TextField
+              name="fullName"
+              value={profileData.fullName}
+              onChange={handleProfileChange}
+              fullWidth
+              variant="outlined"
+              className="text-lg"
+            />
           </div>
-        </CardContent>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Current Courses</CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-base font-medium text-blue-700">
-                  Advanced Algorithms
-                </span>
-                <span className="text-sm font-medium text-blue-700">70%</span>
-              </div>
-              <Progress value={70} className="w-full" />
-            </div>
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-base font-medium text-blue-700">
-                  Machine Learning
-                </span>
-                <span className="text-sm font-medium text-blue-700">85%</span>
-              </div>
-              <Progress value={85} className="w-full" />
-            </div>
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-base font-medium text-blue-700">
-                  Web Development
-                </span>
-                <span className="text-sm font-medium text-blue-700">90%</span>
-              </div>
-              <Progress value={90} className="w-full" />
-            </div>
+
+          <div className="flex items-center mb-4">
+            <label className="w-1/3 text-gray-700 text-lg font-semibold">
+              Email:
+            </label>
+            <p className="w-2/3 text-gray-900 text-lg">{profileData.email}</p>
           </div>
-        </CardContent>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Featured Projects
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="relative">
-            <Card className="bg-gray-50">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  {projects[currentProjectIndex].title}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {projects[currentProjectIndex].description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <div className="flex flex-wrap gap-2">
-                    {projects[currentProjectIndex].technologies.map(
-                      (tech, index) => (
-                        <Badge key={index} variant="secondary">
-                          {tech}
-                        </Badge>
-                      )
-                    )}
-                  </div>
-                  <Button asChild>
-                    <a href={projects[currentProjectIndex].link}>
-                      View Project
-                    </a>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            <div className="absolute top-1/2 -left-4 -translate-y-1/2">
-              <Button size="icon" variant="ghost" onClick={prevProject}>
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-            </div>
-            <div className="absolute top-1/2 -right-4 -translate-y-1/2">
-              <Button size="icon" variant="ghost" onClick={nextProject}>
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            </div>
+
+          <div className="flex items-center mb-4">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
+              Phone Number:
+            </label>
+            <TextField
+              name="phoneNumber"
+              value={profileData.phoneNumber}
+              onChange={handleProfileChange}
+              fullWidth
+              variant="outlined"
+              className="text-lg"
+            />
           </div>
-        </CardContent>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Work Experience</CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Briefcase className="h-5 w-5 text-blue-500 mt-1" />
-              <div>
-                <p className="font-medium">Software Development Intern</p>
-                <p className="text-sm text-gray-500">
-                  TechCorp Inc., Summer 2023
-                </p>
-                <p className="text-sm text-gray-700 mt-1">
-                  Worked on developing new features for the company's main web
-                  application using React and Node.js.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <Briefcase className="h-5 w-5 text-blue-500 mt-1" />
-              <div>
-                <p className="font-medium">Research Assistant</p>
-                <p className="text-sm text-gray-500">
-                  AI Lab, Tech University, Fall 2022 - Present
-                </p>
-                <p className="text-sm text-gray-700 mt-1">
-                  Assisting in research on natural language processing and
-                  contributing to open-source machine learning projects.
-                </p>
-              </div>
-            </div>
+
+          <div className="flex items-center space-x-4">
+            <label className="w-1/3 text-lg font-semibold text-gray-800">
+              Address:
+            </label>
+            <TextField
+              name="address"
+              value={profileData.address}
+              onChange={handleProfileChange}
+              fullWidth
+              variant="outlined"
+              className="text-lg"
+            />
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="flex items-center space-x-4">
+            <InputLabel
+              id="category-label"
+              className="min-w-fit text-lg font-semibold text-gray-800"
+            >
+              Choose your Major:
+            </InputLabel>
+            <FormControl variant="outlined" className="flex-1">
+              <Select
+                labelId="category-label"
+                multiple
+                value={categoryIds}
+                onChange={handleCategoryChange}
+                renderValue={(selected) => {
+                  const selectedNames = allCategories
+                    .filter((category) =>
+                      selected.includes(category.categoryId)
+                    )
+                    .map((category) => category.name);
+                  return selectedNames.join(", ");
+                }}
+                displayEmpty
+                className="text-lg"
+              >
+                {allCategories.map((category) => (
+                  <MenuItem
+                    key={category.categoryId}
+                    value={category.categoryId}
+                  >
+                    <Checkbox
+                      checked={categoryIds.includes(category.categoryId)}
+                    />
+                    <ListItemText primary={category.name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+
+          <Button
+            onClick={handleUpdateProfile}
+            variant="contained"
+            color="primary"
+            fullWidth
+            className="mt-6 py-3 text-lg font-semibold rounded-lg shadow-xl hover:bg-blue-700 transition duration-300"
+          >
+            Update Profile
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

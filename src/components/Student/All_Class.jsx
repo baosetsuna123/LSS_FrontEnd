@@ -183,52 +183,58 @@ export function ViewAllClasses() {
           </div>
 
           <div className="md:col-span-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {currentClasses.length > 0 ? (
-                currentClasses.map((classItem) => (
-                  <Card
-                    key={classItem.classId}
-                    onClick={() => handleClassClick(classItem.classId)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex flex-col gap-4">
-                        <img
-                          src={classItem.imageUrl}
-                          alt={classItem.name}
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                        <div>
-                          <h2 className="text-2xl font-bold">
-                            {classItem.name}
-                          </h2>
-                          <p className="text-sm text-gray-600">
-                            Class Code: {classItem.code}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Course Code: {classItem.courseCode}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Instructor: {classItem.teacherName}
-                          </p>
+            <div className="md:col-span-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {currentClasses.length > 0 ? (
+                  currentClasses.map((classItem) => (
+                    <Card
+                      key={classItem.classId}
+                      onClick={() => handleClassClick(classItem.classId)}
+                      className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex flex-col gap-4">
+                          <img
+                            src={classItem.imageUrl}
+                            alt={classItem.name}
+                            className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
+                          />
+                          <div>
+                            <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">
+                              {classItem.name}
+                            </h2>
+                            <p className="text-sm text-gray-600">
+                              Class Code: {classItem.code}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Course Code: {classItem.courseCode}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Instructor: {classItem.teacherName}
+                            </p>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <p className="text-lg font-bold text-gray-900 flex items-center">
+                              {formatCurrency(classItem.price)}
+                            </p>
+                            <Button className="transition-colors duration-300 hover:bg-blue-500 hover:text-white">
+                              View Details
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <p className="text-lg font-bold flex items-center">
-                            {formatCurrency(classItem.price)}
-                          </p>
-                          <Button>View Details</Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="col-span-2 flex justify-center">
-                  <p className="text-lg font-bold text-red-500">
-                    No class matches with your search
-                  </p>
-                </div>
-              )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-2 flex justify-center">
+                    <p className="text-lg font-bold text-red-500">
+                      No class matches with your search
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
+
             {/* Pagination Controls only when there is no search term */}
             {contextClasses.length > itemsPerPage && (
               <div className="flex justify-between mt-4">

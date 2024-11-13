@@ -9,6 +9,7 @@ import {
   FaBars,
   FaTimes,
   FaDollarSign,
+  FaUser,
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
@@ -63,6 +64,11 @@ function TeacherDashboardLayout() {
       path: "/teacher/send-applications",
       label: "Send Withdrawal Application",
       icon: FaDollarSign,
+    },
+    {
+      path: "/teacher/profile",
+      label: "My Profile",
+      icon: FaUser,
     },
   ];
 

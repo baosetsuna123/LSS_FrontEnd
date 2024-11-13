@@ -50,7 +50,7 @@ export default function FeedbackForm() {
   useEffect(() => {
     const fetchCate = async () => {
       try {
-        const data = await fetchQuestionFeedback(token);
+        const data = await fetchQuestionFeedback();
         if (Array.isArray(data)) {
           setQuestions(data);
           setFeedbackData((prevData) => ({
