@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -124,6 +124,14 @@ export function SendApplication() {
     const { name, value } = e.target;
     setOtherRequestData((prev) => ({ ...prev, [name]: value }));
   };
+  const [role, setRole] = useState(null);
+  useEffect(() => {
+    const storedData = localStorage.getItem("result");
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      setRole(parsedData.role);
+    }
+  }, []);
   const numberToWords = (num, includeZero = false, isThousandPart = false) => {
     const units = [
       "",
@@ -402,7 +410,7 @@ export function SendApplication() {
                 <div className="space-y-2">
                   <Label htmlFor="studentName">
                     <User className="w-4 h-4 inline-block mr-2" />
-                    Student Name
+                    Name
                   </Label>
                   <Input
                     id="studentName"
@@ -412,19 +420,21 @@ export function SendApplication() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="studentRollNo">
-                    <FileText className="w-4 h-4 inline-block mr-2" />
-                    Student Roll Number
-                  </Label>
-                  <Input
-                    id="studentRollNo"
-                    name="studentRollNo"
-                    value={otherRequestData.studentRollNo}
-                    onChange={handleOtherRequestChange}
-                    required
-                  />
-                </div>
+                {role != "TEACHER" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="studentRollNo">
+                      <FileText className="w-4 h-4 inline-block mr-2" />
+                      Student Roll Number
+                    </Label>
+                    <Input
+                      id="studentRollNo"
+                      name="studentRollNo"
+                      value={otherRequestData.studentRollNo}
+                      onChange={handleOtherRequestChange}
+                      required
+                    />
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="reason">Reason for Application</Label>
                   <Textarea

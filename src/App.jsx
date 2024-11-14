@@ -41,6 +41,7 @@ import News from "./components/Student/News";
 import NewsDetail from "./components/Student/NewsDetail";
 import TeacherProfile from "./components/Student/TeacherProfile";
 import ProfileTeacher from "./components/Teacher/ProfileTeacher";
+import { WalletTeacher } from "./components/Teacher/WalletTeacher";
 
 function App() {
   return (
@@ -76,7 +77,12 @@ function App() {
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
             <Route path="send-applications" element={<SendApplication />} />
+            <Route
+              path="view-applications"
+              element={<ApplicationManagement />}
+            />
             <Route path="profile" element={<ProfileTeacher />} />
+            <Route path="wallet" element={<WalletTeacher />} />
             <Route path="assign-classes" element={<AssignClasses />} />
             <Route path="update-schedule" element={<UpdateSchedule />} />
             <Route path="cancel-request" element={<CancelClassRequest />} />

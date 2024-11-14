@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
-import { ArrowDown, LogOut } from "lucide-react";
+import { ArrowDown, Dock, LogOut, Wallet } from "lucide-react";
 
 function TeacherDashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -64,6 +64,16 @@ function TeacherDashboardLayout() {
       path: "/teacher/send-applications",
       label: "Send Withdrawal Application",
       icon: FaDollarSign,
+    },
+    {
+      path: "/teacher/view-applications",
+      label: "View Applications",
+      icon: Dock,
+    },
+    {
+      path: "/teacher/wallet",
+      label: "My Wallet",
+      icon: Wallet,
     },
     {
       path: "/teacher/profile",

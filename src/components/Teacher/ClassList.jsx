@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 function ClassList() {
   const [classes, setClasses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("ALL");
   const [selectedClass, setSelectedClass] = useState(null);
-  const result = localStorage.getItem("result")
+  const result = localStorage.getItem("result");
   const [classesUpdated, setClassesUpdated] = useState([]);
-  const [courses, setCourses] = useState([])
+  const [courses, setCourses] = useState([]);
   let token;
   if (result) {
     try {
@@ -24,7 +24,7 @@ function ClassList() {
       const res = await fetchClassbyteacher(token);
       setClasses(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -35,22 +35,24 @@ function ClassList() {
   useEffect(() => {
     if (classes.length > 0 && courses.length > 0) {
       const newClasses = classes.map((classItem) => {
-        const course = courses.find(course => course.courseCode === classItem.courseCode);
+        const course = courses.find(
+          (course) => course.courseCode === classItem.courseCode
+        );
         return {
           ...classItem,
-          courseName: course ? course.name : "Undefined course"
+          courseName: course ? course.name : "Undefined course",
         };
       });
       setClassesUpdated(newClasses);
     }
-  }, [classes, courses])
+  }, [classes, courses]);
 
   const fetchCourses = async () => {
     try {
       const res = await fetchCoursesService(token);
       setCourses(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -59,20 +61,43 @@ function ClassList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  const filteredClasses = classesUpdated.filter(
-    (cls) =>
-      (cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cls.subject.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterStatus === "all" || cls.status === filterStatus)
-  );
-
   const handleShowDetails = (cls) => {
     setSelectedClass(cls);
+    console.log("Selected class details:", cls);
   };
 
   const handleClosePopup = () => {
     setSelectedClass(null);
   };
+  const dayOfWeekMap = {
+    2: "Monday",
+    3: "Tuesday",
+    4: "Wednesday",
+    5: "Thursday",
+    6: "Friday",
+    7: "Saturday",
+    8: "Sunday",
+  };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  const slotTimeMap = {
+    1: "7h00 - 9h15",
+    2: "9h30 - 11h45",
+    3: "12h30 - 14h45",
+    4: "15h00 - 17h15",
+    5: "17h45 - 20h00",
+  };
+  const filteredClasses = classesUpdated.filter(
+    (cls) =>
+      (cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cls.code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (filterStatus === "ALL" || cls.status === filterStatus)
+  );
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
@@ -92,114 +117,152 @@ function ClassList() {
           onChange={(e) => setFilterStatus(e.target.value)}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">All Statuses</option>
+          <option value="ALL">All Statuses</option>
+          <option value="PENDING">Pending</option>
           <option value="ACTIVE">Ongoing</option>
-          <option value="INACTIVE">Upcoming</option>
+          <option value="ONGOING">Active</option>
+          <option value="CANCELED">Canceled</option>
           <option value="COMPLETED">Completed</option>
         </select>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Class Name</th>
-              <th className="py-3 px-6 text-left">Subject</th>
-              <th className="py-3 px-6 text-center">Students</th>
-              <th className="py-3 px-6 text-center">Schedule</th>
-              <th className="py-3 px-6 text-center">Status</th>
-              <th className="py-3 px-6 text-center">Time</th>
-              <th className="py-3 px-6 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {filteredClasses.map((cls) => (
-              <tr
-                key={cls.id}
-                className="border-b border-gray-200 hover:bg-gray-100"
-              >
-                <td className="py-3 px-6 text-left whitespace-nowrap">
-                  <span className="font-medium">{cls.name}</span>
-                </td>
-                <td className="py-3 px-6 text-left">{cls.courseName}</td>
-                <td className="py-3 px-6 text-center">{cls.maxStudents}</td>
-                <td className="py-3 px-6 text-center">{cls.schedule}</td>
-                <td className="py-3 px-6 text-center">
-                  <span
-                    className={` bg-${cls.status === "ACTIVE"
-                      ? "green"
-                      : cls.status === "INACTIVE"
-                        ? "yellow"
-                        : "red"
-                      }-200 text-${cls.status === "ACTIVE"
-                        ? "green"
-                        : cls.status === "INACTIVE"
-                          ? "yellow"
-                          : "red"
-                      }-600 py-1 px-3 rounded-full text-xs`}
-                  >
-                    {cls.status === "ACTIVE"
-                      ? "Ongoing"
-                      : cls.status === "INACTIVE"
-                        ? "Upcoming"
-                        : "Completed"}
-                  </span>
-                </td>
-                <td className="py-3 px-6 text-center">
-                  {cls.startDate.split('T')[0]} {'->'} {" "}
-                  {cls.endDate.split('T')[0]}
-                </td>
-                <td className="py-3 px-6 text-center">
-                  <button
-                    onClick={() => handleShowDetails(cls)}
-                    className="bg-gray-900 text-white active:bg-gray-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    Details
-                  </button>
-                </td>
+      {filteredClasses.length === 0 ? (
+        <div className="text-red-600 text-center font-semibold text-lg">
+          No Class matches with your filter.
+        </div>
+      ) : (
+        <div>
+          <table className="min-w-full bg-white w-full">
+            <thead>
+              <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th className="py-3 px-6 text-left w-1/6">Class Name</th>
+                <th className="py-3 px-6 text-left w-1/6">Subject</th>
+                <th className="py-3 px-6 text-center w-1/6">Students</th>
+                <th className="py-3 px-6 text-center w-1/6">Schedule</th>
+                <th className="py-3 px-6 text-center w-1/6">Status</th>
+                <th className="py-3 px-6 text-center w-1/6">Time</th>
+                <th className="py-3 px-6 text-center w-1/6">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="text-gray-600 text-sm font-light">
+              {filteredClasses.map((cls) => (
+                <tr
+                  key={cls.id}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
+                  <td className="py-3 px-6 text-left whitespace-nowrap">
+                    <span className="font-medium">{cls.name}</span>
+                  </td>
+                  <td className="py-3 px-6 text-left">{cls.courseName}</td>
+                  <td className="py-3 px-6 text-center">{cls.maxStudents}</td>
+                  <td className="py-3 px-6 text-center whitespace-nowrap">
+                    {`${formatDate(cls.startDate)} (${
+                      dayOfWeekMap[cls.dayOfWeek] || "Unknown"
+                    })`}
+                  </td>
+                  <td className="py-3 px-6 text-center">
+                    <span
+                      className={`py-1 px-3 rounded-full text-xs font-bold ${
+                        cls.status === "PENDING"
+                          ? "bg-yellow-200 text-yellow-600"
+                          : cls.status === "ACTIVE"
+                          ? "bg-purple-200 text-purple-600"
+                          : cls.status === "ONGOING"
+                          ? "bg-blue-200 text-blue-600"
+                          : cls.status === "CANCELED"
+                          ? "bg-red-200 text-red-600"
+                          : cls.status === "COMPLETED"
+                          ? "bg-green-200 text-green-600"
+                          : ""
+                      }`}
+                    >
+                      {cls.status === "PENDING"
+                        ? "Pending"
+                        : cls.status === "ACTIVE"
+                        ? "Active"
+                        : cls.status === "ONGOING"
+                        ? "Ongoing"
+                        : cls.status === "CANCELED"
+                        ? "Canceled"
+                        : cls.status === "COMPLETED"
+                        ? "Completed"
+                        : ""}
+                    </span>
+                  </td>
+
+                  <td className="py-3 px-6 text-center whitespace-nowrap">
+                    <span
+                      className={`bg-blue-200 text-blue-800 rounded-full py-1 px-4 text-xs font-semibold`}
+                    >
+                      {slotTimeMap[cls.slotId] || "Unknown"}
+                    </span>
+                  </td>
+                  <td className="py-3 px-6 text-center">
+                    <button
+                      onClick={() => handleShowDetails(cls)}
+                      className="bg-gray-900 text-white active:bg-gray-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                      type="button"
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {selectedClass && (
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+          className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50"
           id="my-modal"
         >
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+            <div className="text-center">
+              <h3 className="text-2xl font-semibold text-gray-900">
                 {selectedClass.name}
               </h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500">
+              <div className="mt-4 text-left">
+                <p className="text-sm text-gray-700 mb-2">
                   <strong>Subject:</strong> {selectedClass.courseName}
-                  <br />
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
                   <strong>Students:</strong> {selectedClass.maxStudents}
-                  <br />
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
                   <strong>Schedule:</strong> {selectedClass.schedule}
-                  <br />
-                  <strong>Status:</strong> {selectedClass.status === "ACTIVE"
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Status:</strong>{" "}
+                  {selectedClass.status === "ACTIVE"
                     ? "Ongoing"
                     : selectedClass.status === "INACTIVE"
-                      ? "Upcoming"
-                      : "Completed"}
-                  <br />
-                  <strong>Time:</strong> {selectedClass.startDate.split('T')[0]} {'->'} {" "}
-                  {selectedClass.endDate.split('T')[0]}
-                  <br />
+                    ? "Upcoming"
+                    : "Completed"}
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Time:</strong> {selectedClass.startDate.split("T")[0]}{" "}
+                  {/* {"->"} {selectedClass.endDate.split("T")[0]}{" "} */}
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
                   <strong>Teacher:</strong> {selectedClass.teacherName}
-                  <br />
-                  <strong>Location:</strong> {selectedClass.location}
+                </p>
+                <p className="text-sm text-gray-700 mb-4">
+                  <strong>Location:</strong>
+                  <button
+                    onClick={() =>
+                      window.open(selectedClass.location, "_blank")
+                    }
+                    className="ml-2 text-gray-700 bg-gray-200 py-1 px-3 rounded-md text-xs font-medium hover:bg-gray-300 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  >
+                    Meet URL
+                  </button>
                 </p>
               </div>
-              <div className="items-center px-4 py-3">
+              <div className="mt-6">
                 <button
-                  id="ok-btn"
-                  className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   onClick={handleClosePopup}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full font-medium shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
                 >
                   Close
                 </button>

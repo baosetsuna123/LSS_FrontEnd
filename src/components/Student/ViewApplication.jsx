@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchCancelApplication, viewAllApplications } from "@/data/api";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Importing pagination icons
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const parseDescription = (description) => {
   const accountMatch = description.match(/Account number: (\d+)/);
@@ -98,10 +98,18 @@ export function ApplicationManagement() {
 
   const paginateWithdraw = (pageNumber) => setWithdrawPage(pageNumber);
   const paginateOther = (pageNumber) => setOtherPage(pageNumber);
+  const [role, setRole] = useState("");
+  useEffect(() => {
+    const storedData = localStorage.getItem("result");
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      setRole(parsedData.role);
+    }
+  }, []);
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Application Management</h1>
+      <h1 className="text-2xl font-bold mb-4">View Your Applications</h1>
 
       {/* Search Input */}
       <div className="mb-4">
@@ -257,7 +265,10 @@ export function ApplicationManagement() {
                   <TableHead>ID</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Roll Number</TableHead>
+                  {role !== "TEACHER" && (
+                    <TableHead>Roll Number</TableHead>
+                  )}{" "}
+                  {/* Conditionally render the Roll Number column */}
                   <TableHead>Reason</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -274,7 +285,10 @@ export function ApplicationManagement() {
                       </TableCell>
                       <TableCell>{app.applicationType.name}</TableCell>
                       <TableCell>{app.name}</TableCell>
-                      <TableCell>{studentRollNo}</TableCell>
+                      {role !== "TEACHER" && (
+                        <TableCell>{studentRollNo}</TableCell>
+                      )}{" "}
+                      {/* Conditionally render Roll Number data */}
                       <TableCell>{reason}</TableCell>
                       <TableCell>
                         <Badge
