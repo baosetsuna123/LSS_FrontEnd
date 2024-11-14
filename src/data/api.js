@@ -804,6 +804,20 @@ export const fetchOrderClasses = async (token) => {
     throw error;
   }
 };
+//get wallet teacher
+export const fetchWalletTeacher = async (token) => {
+  try {
+    const response = await api.get("/wallet/Teacher/wallet", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //-----------------Feedback-----------------
 export const fetchQuestionFeedback = async () => {
   try {
@@ -1164,10 +1178,7 @@ export const getCompletedClassesByMonthDetailed = async (
   }
 };
 
-export const getDepositsByMonth = async (
-  year,
-  token
-) => {
+export const getDepositsByMonth = async (year, token) => {
   try {
     const response = await api.get(`/admin/statistics/deposit`, {
       headers: {

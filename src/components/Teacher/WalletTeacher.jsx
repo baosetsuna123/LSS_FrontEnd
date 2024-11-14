@@ -12,8 +12,8 @@ import wallet from "../../assets/wallet.jpg"; // Ensure the path is correct
 import { useEffect, useState } from "react";
 import {
   fetchVNPayReturn,
-  fetchBalance,
   fetchWalletHistory,
+  fetchWalletTeacher,
 } from "../../data/api"; // Import the functions
 import { toast } from "react-hot-toast"; // Import toast
 import { useLocation, useNavigate } from "react-router-dom";
@@ -50,7 +50,7 @@ export function WalletTeacher() {
     // Hàm để lấy số dư
     const getBalance = async () => {
       try {
-        const data = await fetchBalance(token); // Gọi hàm fetchBalance
+        const data = await fetchWalletTeacher(token); // Gọi hàm fetchBalance
         setBalance(data.balance); // Cập nhật số dư từ dữ liệu trả về
       } catch (error) {
         console.error("Failed to fetch balance:", error);
@@ -130,68 +130,74 @@ export function WalletTeacher() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>Your latest wallet activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              {transactions.slice(0, 3).map((transaction, index) => {
-                const isCredit = transaction.amount >= 0; // If amount is positive or zero, it's credit
-                const formattedAmount = Math.abs(transaction.amount); // Use absolute value for display
-
-                return (
-                  <li
-                    key={transaction.id}
-                    className="flex items-center justify-between border-b pb-2"
-                  >
-                    <div className="flex items-center">
-                      {isCredit ? (
-                        <ArrowUpRight className="mr-2 h-4 w-4 text-green-500" />
-                      ) : (
-                        <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
-                      )}
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          {formatTransactionDate(transaction.transactionDate)}{" "}
-                          {/* Display formatted date */}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          Transaction ID: {index + 1}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          Type: {transaction.note} {/* Display the note */}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <p
-                        className={`font-medium ${
-                          isCredit ? "text-green-500" : "text-red-500"
-                        }`}
-                      >
-                        {isCredit ? "+ " : "- "}
-                        {formatCurrency(formattedAmount)}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        New Balance:{" "}
-                        {formatCurrency(transaction.transactionBalance)}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </CardContent>
           {transactions.length > 0 && (
-            <CardFooter>
-              <Button
-                className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
-                onClick={() => navigate("/all-transactions")} // Navigate to all transactions
-              >
-                Show All Transactions
-              </Button>
-            </CardFooter>
+            <>
+              <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>Your latest wallet activity</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-4">
+                  {transactions.slice(0, 3).map((transaction, index) => {
+                    const isCredit = transaction.amount >= 0;
+                    const formattedAmount = Math.abs(transaction.amount);
+
+                    return (
+                      <li
+                        key={transaction.id}
+                        className="flex items-center justify-between border-b pb-2"
+                      >
+                        <div className="flex items-center">
+                          {isCredit ? (
+                            <ArrowUpRight className="mr-2 h-4 w-4 text-green-500" />
+                          ) : (
+                            <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
+                          )}
+                          <div>
+                            <p className="text-sm text-gray-500">
+                              {formatTransactionDate(
+                                transaction.transactionDate
+                              )}{" "}
+                              {/* Display formatted date */}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              Transaction ID: {index + 1}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              Type: {transaction.note} {/* Display the note */}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <p
+                            className={`font-medium ${
+                              isCredit ? "text-green-500" : "text-red-500"
+                            }`}
+                          >
+                            {isCredit ? "+ " : "- "}
+                            {formatCurrency(formattedAmount)}
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            New Balance:{" "}
+                            {formatCurrency(transaction.transactionBalance)}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </CardContent>
+              {transactions.length > 3 && (
+                <CardFooter>
+                  <Button
+                    className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                    onClick={() => navigate("/all-transactions")}
+                  >
+                    Show All Transactions
+                  </Button>
+                </CardFooter>
+              )}
+            </>
           )}
         </Card>
       </div>

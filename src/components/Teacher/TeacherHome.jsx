@@ -162,8 +162,13 @@ function TeacherHome() {
       setDatesInTheWeek(getDatesInRange(startRange, endRange));
       const filteredClasses = classes.filter((item) => {
         const classStartDate = formatDateToYMD(new Date(item.startDate));
-        return classStartDate >= startRange && classStartDate <= endRange;
+        return (
+          classStartDate >= startRange &&
+          classStartDate <= endRange &&
+          ["ACTIVE", "ONGOING", "PENDING"].includes(item.status)
+        );
       });
+
       setClasses(filteredClasses);
       const courses = await fetchCoursesService(token);
       const updatedClasses = filteredClasses.map((classItem) => {
@@ -300,7 +305,7 @@ function TeacherHome() {
           {lesson.room && (
             <button
               onClick={() => window.open(lesson.room, "_blank")}
-              className="mt-3 inline-flex items-center text-xs font-semibold text-white bg-gray-600 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 py-1 px-3"
+              className="mt-3 whitespace-nowrap inline-flex items-center text-xs font-semibold text-white bg-gray-600 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 py-1 px-3"
             >
               Meet URL
             </button>
