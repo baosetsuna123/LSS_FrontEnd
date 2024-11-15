@@ -37,7 +37,6 @@ export function WalletTeacher() {
 
     fetchTransactions();
   }, [token, location.state]);
-  // Hàm định dạng số tiền sang tiền Việt Nam
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -45,13 +44,11 @@ export function WalletTeacher() {
     }).format(amount);
   };
 
-  // Hàm để lấy số dư
   useEffect(() => {
-    // Hàm để lấy số dư
     const getBalance = async () => {
       try {
-        const data = await fetchWalletTeacher(token); // Gọi hàm fetchBalance
-        setBalance(data.balance); // Cập nhật số dư từ dữ liệu trả về
+        const data = await fetchWalletTeacher(token);
+        setBalance(data.balance);
       } catch (error) {
         console.error("Failed to fetch balance:", error);
       }
@@ -124,7 +121,7 @@ export function WalletTeacher() {
           </CardHeader>
           <CardContent className="flex flex-col items-center">
             <p className="text-4xl font-bold text-gray-900">
-              {formatCurrency(balance)} {/* Hiển thị số dư đã định dạng */}
+              {formatCurrency(balance)}
             </p>
           </CardContent>
         </Card>

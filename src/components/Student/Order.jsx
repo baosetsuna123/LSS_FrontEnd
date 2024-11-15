@@ -10,7 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { fetchOrderClasses, CancelOrder } from "@/data/api";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import { useWallet } from "@/context/WalletContext";
 
 const statusColors = {
   COMPLETED: "bg-green-100 text-green-800 hover:bg-green-200",
@@ -31,15 +36,25 @@ export function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const [selectedOrder, setSelectedOrder] = useState(null); // Order to cancel
+  const [newBalance, setNewBalance] = useState(null); // New balance after cancellation
   const itemsPerPage = 5;
   const token = sessionStorage.getItem("token");
+  const { balance, loadBalance } = useWallet();
+
+  useEffect(() => {
+    if (token) {
+      loadBalance(token);
+    }
+  }, [token, loadBalance]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await fetchOrderClasses(token);
         setOrders(response.data.content);
-        console.log("Orders:", response);
+        console.log(response.data.content);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -47,19 +62,32 @@ export function MyOrders() {
     fetchOrders();
   }, [token]);
 
-  const handleCancelOrder = async (orderId) => {
+  const handleCancelOrder = async () => {
+    if (!selectedOrder) return;
+
     try {
-      await CancelOrder(orderId, token);
+      // Cancel the order
+      await CancelOrder(selectedOrder.orderDTO.orderId, token);
+
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order.orderDTO.orderId === orderId
+          order.orderDTO.orderId === selectedOrder.orderDTO.orderId
             ? { ...order, orderDTO: { ...order.orderDTO, status: "CANCELLED" } }
             : order
         )
       );
+      loadBalance(token);
+
+      const updatedBalance = balance + selectedOrder.classDTO.price;
+      console.log(selectedOrder.classDTO.price, balance, updatedBalance);
+      setNewBalance(updatedBalance);
+
       toast.success("Order canceled successfully!");
+      setShowModal(false);
     } catch (error) {
       console.error("Error canceling order:", error);
+      toast.error("Error canceling order.");
+      setShowModal(false);
     }
   };
 
@@ -81,6 +109,12 @@ export function MyOrders() {
       setCurrentPage(page);
     }
   };
+  useEffect(() => {
+    if (selectedOrder && balance !== null) {
+      const updatedBalance = balance + selectedOrder.classDTO.price;
+      setNewBalance(updatedBalance);
+    }
+  }, [balance, selectedOrder]);
 
   return (
     <>
@@ -105,6 +139,7 @@ export function MyOrders() {
             No Data
           </div>
         )}
+
         {filteredOrders.length > 0 && (
           <Table>
             <TableHeader>
@@ -121,7 +156,6 @@ export function MyOrders() {
               {currentData.map((order, index) => (
                 <TableRow key={order.orderDetailId}>
                   <TableCell className="font-medium pl-7">
-                    {/* Adjust the index here to account for pagination */}
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </TableCell>
                   <TableCell className="pl-10">
@@ -146,9 +180,10 @@ export function MyOrders() {
                   <TableCell className="text-center">
                     {order.orderDTO.status === "PENDING" && (
                       <button
-                        onClick={() =>
-                          handleCancelOrder(order.orderDTO.orderId)
-                        }
+                        onClick={() => {
+                          setSelectedOrder(order); // Set the selected order
+                          setShowModal(true); // Show the modal
+                        }}
                         className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 w-24"
                       >
                         Cancel
@@ -161,7 +196,7 @@ export function MyOrders() {
           </Table>
         )}
 
-        {filteredOrders.length > 0 && !searchQuery && (
+        {orders.length > itemsPerPage && !searchQuery && (
           <div className="flex justify-end mt-6">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -181,6 +216,45 @@ export function MyOrders() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <div className="flex items-center justify-center mb-4">
+              <FaExclamationTriangle className="text-red-500 text-4xl" />
+            </div>
+            <h2 className="text-xl font-semibold text-center text-gray-800">
+              Are you sure you want to cancel this order?
+            </h2>
+            <div className="mt-4 text-center">
+              <p className="mb-4 text-lg font-medium text-green-600">
+                Current Balance: {formatCurrency(balance)}
+              </p>
+              <p className="mb-6 text-lg font-medium text-green-600">
+                New Balance:{" "}
+                {newBalance !== null
+                  ? formatCurrency(newBalance)
+                  : "Calculating..."}
+              </p>
+              <div className="flex justify-between">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-24"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -13,7 +13,9 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
-import { ArrowDown, Dock, LogOut, Wallet } from "lucide-react";
+import { Dock, LogOut, Wallet } from "lucide-react";
+import misasa from "../../assets/misasa.jfif";
+import { useAvatar } from "@/context/AvatarContext";
 
 function TeacherDashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -35,8 +37,11 @@ function TeacherDashboardLayout() {
       console.error("Error parsing result from localStorage:", error);
     }
   }
+
+  const avatarImage = JSON.parse(localStorage.getItem("result")).avatarImage;
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { userProfile } = useAvatar();
   const handleLogout = (e) => {
     e.stopPropagation();
     logout();
@@ -62,7 +67,7 @@ function TeacherDashboardLayout() {
     },
     {
       path: "/teacher/send-applications",
-      label: "Send Withdrawal Application",
+      label: "Send Application",
       icon: FaDollarSign,
     },
     {
@@ -171,13 +176,24 @@ function TeacherDashboardLayout() {
             <h1 className="text-2xl font-semibold text-gray-800">
               Welcome, {teacherName}
             </h1>
-            <div className="relative">
-              <ArrowDown
-                className="cursor-pointer"
-                onClick={() => setShowLogoutText(!showLogoutText)}
-              />
+            <div className="relative flex items-center gap-4">
+              {avatarImage ? (
+                <img
+                  src={userProfile.avatarImage}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
+                  onClick={() => setShowLogoutText(!showLogoutText)}
+                />
+              ) : (
+                <img
+                  src={misasa}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
+                  onClick={() => setShowLogoutText(!showLogoutText)}
+                />
+              )}
               {showLogoutText && (
-                <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md p-2">
+                <div className="absolute top-0 right-0 transform translate-y-full translate-x-2 bg-white shadow-lg rounded-md p-2 flex flex-col items-center">
                   <span
                     className="flex items-center cursor-pointer text-red-600"
                     onClick={() => setShowLogoutPopup(true)}

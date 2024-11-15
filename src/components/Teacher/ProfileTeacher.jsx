@@ -11,7 +11,8 @@ import profile from "../../assets/profilebg.jfif";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { updateTeacherProfile } from "@/data/api";
-
+import misasa from "../../assets/misasa.jfif";
+import { useAvatar } from "@/context/AvatarContext";
 const ProfileTeacher = () => {
   const result = JSON.parse(localStorage.getItem("result"));
   const [profileData, setProfileData] = useState({
@@ -20,7 +21,8 @@ const ProfileTeacher = () => {
     phoneNumber: result?.phoneNumber || "",
     email: result?.email || "",
     address: result?.address || "", // Add address field
-    description: result?.description || "", // Add description field
+    description: result?.description || "",
+    avatarImage: result?.avatarImage || "",
   });
   const [categoryIds, setCategoryIds] = useState([]); // Selected category IDs
   const [allCategories, setAllCategories] = useState([]); // List of all categories
@@ -55,14 +57,27 @@ const ProfileTeacher = () => {
       [name]: value,
     }));
   };
+  const [avatarName, setAvatarName] = useState("");
+  const [avatarImage, setAvatarImage] = useState("");
+  useEffect(() => {
+    const storedAvatar = JSON.parse(
+      localStorage.getItem("result")
+    )?.avatarImage;
+    if (storedAvatar) {
+      const imageName = storedAvatar.split("/").pop(); // Extract image name from URL
+      setAvatarImage(imageName); // Set the image name for display
+    }
+  }, []);
 
-  // Handle avatar file selection
+  // Handle file selection
   const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; // Get the file selected by the user
     if (file) {
-      setAvatar(file);
+      setAvatar(file); // Update avatar file state
+      setAvatarName(file.name); // Update avatar name with the file's name (not the URL)
     }
   };
+  // Handle avatar file selection
 
   // Handle category selection
   const handleCategoryChange = (event) => {
@@ -71,7 +86,7 @@ const ProfileTeacher = () => {
   };
 
   const [loading, setLoading] = useState(false); // State to track loading
-
+  const { updateUserProfile } = useAvatar();
   // Function to handle form submission
   const handleSubmit = async () => {
     try {
@@ -99,25 +114,39 @@ const ProfileTeacher = () => {
       );
 
       if (response) {
-        // If response is successful, update the profileData
-        setProfileData((prev) => ({
-          ...prev,
+        // Prepare the updated user profile object
+        const updatedResult = {
+          ...result,
+          avatarImage: response.avatarImage,
           fullName: profileData.fullName,
           phoneNumber: profileData.phoneNumber,
           address: profileData.address,
-          avatar: null,
-          description: profileData.description, // Ensure description is saved
-        }));
-        setAvatar(null);
+          description: profileData.description,
+        };
+
+        localStorage.setItem("result", JSON.stringify(updatedResult));
+
+        setProfileData(updatedResult);
+
+        updateUserProfile(updatedResult);
+
         toast.success("Profile updated successfully");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Failed to update profile");
+      if (
+        error.response &&
+        error.response.data === "Maximum upload size exceeded" // 413 indicates payload too large
+      ) {
+        toast.error("Upload failed: Maximum file size exceeded.");
+      } else {
+        toast.error("Failed to update profile");
+      }
     } finally {
       setLoading(false); // Stop loading when API call finishes
     }
   };
+
+  const avatarImages = JSON.parse(localStorage.getItem("result")).avatarImage;
 
   return (
     <div
@@ -130,9 +159,22 @@ const ProfileTeacher = () => {
       }}
     >
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
-          Teacher Profile
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold text-gray-900">Teacher Profile</h1>
+          {avatarImage ? (
+            <img
+              src={avatarImages}
+              alt="Avatar"
+              className="w-16 h-16 rounded-full border-2 border-gray-300"
+            />
+          ) : (
+            <img
+              src={misasa}
+              alt="Avatar"
+              className="w-16 h-16 rounded-full border-2 border-gray-300"
+            />
+          )}
+        </div>
 
         <div className="space-y-4">
           {/* Username */}
@@ -201,20 +243,30 @@ const ProfileTeacher = () => {
               className="w-3/4 p-2 border border-gray-300 rounded-lg"
             />
           </div>
-
-          {/* Avatar File Input */}
           <div className="mb-4 flex items-center">
-            <label className="text-gray-700 font-semibold w-1/4">Avatar</label>
-            <input
-              type="file"
-              onChange={handleAvatarChange}
-              className="w-3/4 p-2 border border-gray-300 rounded-lg"
-            />
-            {avatar && (
-              <div className="mt-2">
-                <p className="text-gray-900">Selected File: {avatar.name}</p>
-              </div>
-            )}
+            <label className="text-gray-700 font-semibold w-1/4">
+              Upload Avatar
+            </label>
+            <div className="w-3/4 flex items-center">
+              <button
+                type="button"
+                onClick={() => document.getElementById("avatarInput").click()}
+                className="p-2 border border-gray-300 rounded-lg bg-gray-200 hover:bg-gray-300"
+              >
+                Choose File
+              </button>
+              <input
+                id="avatarInput"
+                type="file"
+                onChange={handleAvatarChange}
+                className="hidden"
+              />
+              <span className="ml-2 text-gray-900">
+                {avatarName
+                  ? `Selected Avatar: ${avatarName}`
+                  : "No file selected"}
+              </span>
+            </div>
           </div>
 
           {/* Major Select */}

@@ -9,6 +9,7 @@ import { useClassContext } from "@/context/ClassContext";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../Home/Breadcrumb";
 import toast from "react-hot-toast";
+import defaults from "../../assets/default.jfif";
 
 export function ViewAllClasses() {
   const { classes: contextClasses, getClasses } = useClassContext();
@@ -195,7 +196,7 @@ export function ViewAllClasses() {
                       <CardContent className="p-6">
                         <div className="flex flex-col gap-4">
                           <img
-                            src={classItem.imageUrl}
+                            src={classItem.imageUrl || defaults}
                             alt={classItem.name}
                             className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
                           />

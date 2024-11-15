@@ -12,6 +12,7 @@ import "react-multi-carousel/lib/styles.css";
 import home1 from "../../assets/home-carousel-1.png";
 import home2 from "../../assets/home-2.png";
 import home3 from "../../assets/home-3.jpg";
+import defaults from "../../assets/default.jfif";
 
 export function CourseLandingPage() {
   const [majorClasses, setMajorClasses] = useState([]);
@@ -255,7 +256,7 @@ export function CourseLandingPage() {
                           className="transition-transform transform hover:scale-105 mx-2"
                         >
                           <img
-                            src={course.imageUrl}
+                            src={course.imageUrl || defaults}
                             alt={course.name}
                             className="w-full h-[200px] object-cover rounded-t-lg"
                           />
@@ -349,7 +350,7 @@ export function CourseLandingPage() {
                         className="transition-transform transform hover:scale-105 mx-2"
                       >
                         <img
-                          src={course.imageUrl}
+                          src={course.imageUrl || defaults}
                           alt={course.name}
                           className="w-full h-[200px] object-cover rounded-t-lg"
                         />

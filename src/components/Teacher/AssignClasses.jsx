@@ -1,5 +1,6 @@
 import { fetchClassbyteacherName } from "@/data/api";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 function AssignClasses() {
   const [availableClasses, setAvailableClasses] = useState([]);
@@ -8,7 +9,7 @@ function AssignClasses() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCourse, setFilterCourse] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const result = localStorage.getItem("result")
+  const result = localStorage.getItem("result");
   let token;
   let nameTeacher;
   if (result) {
@@ -22,26 +23,23 @@ function AssignClasses() {
   }
 
   useEffect(() => {
-    // Giả lập việc lấy dữ liệu từ API
     const fetchClasses = async () => {
-      // Thay thế bằng cuộc gọi API thực tế
       try {
-        const res = await fetchClassbyteacherName(nameTeacher,token);
+        const res = await fetchClassbyteacherName(nameTeacher, token);
         setAvailableClasses(res);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     };
 
     fetchClasses();
-    // Giả lập lấy chuyên môn của giáo viên
-    setTeacherSpecialization("Thiết kế đồ họa cơ bản");
-  }, [nameTeacher,token]);
+    setTeacherSpecialization("Basic graphic design");
+  }, [nameTeacher, token]);
 
   const handleClassSelect = (classId) => {
     const classToSelect = availableClasses.find((cls) => cls.id === classId);
-    if (classToSelect.status === "Đã phân công") {
-      alert("Lớp học này đã được phân công. Không thể chọn.");
+    if (classToSelect.status === "Assigned") {
+      toast.success("This class has been assigned. Cannot select.");
       return;
     }
     setSelectedClasses((prev) =>
@@ -52,9 +50,7 @@ function AssignClasses() {
   };
 
   const handleSubmit = () => {
-    console.log("Các lớp đã chọn:", selectedClasses);
-    // Xử lý gửi thông tin lên server
-    alert("Đã gửi yêu cầu phân công lớp học thành công!");
+    toast.success("Send request successfully!");
   };
 
   const filteredClasses = availableClasses.filter(
@@ -70,17 +66,17 @@ function AssignClasses() {
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Phân công lớp học
+        Assign Classes
       </h2>
       <div className="mb-6 p-4 bg-blue-50 rounded-lg">
         <p className="text-gray-700">
-          Chuyên môn của bạn: <strong>{teacherSpecialization}</strong>
+          Your major: <strong>{teacherSpecialization}</strong>
         </p>
       </div>
       <div className="mb-6 flex space-x-4">
         <input
           type="text"
-          placeholder="Tìm kiếm lớp học..."
+          placeholder="Search Classes..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -90,7 +86,7 @@ function AssignClasses() {
           onChange={(e) => setFilterCourse(e.target.value)}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Tất cả khóa học</option>
+          <option value="">All Course</option>
           {courses.map((course) => (
             <option key={course} value={course}>
               {course}
@@ -102,17 +98,18 @@ function AssignClasses() {
           onChange={(e) => setFilterStatus(e.target.value)}
           className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Tất cả trạng thái</option>
-          <option value="Chưa phân công">Chưa phân công</option>
-          <option value="Đã phân công">Đã phân công</option>
+          <option value="">All Status</option>
+          <option value="Not Assign">Not Assign</option>
+          <option value="Assigned">Assigned</option>
         </select>
       </div>
       <ul className="space-y-4">
         {filteredClasses.map((cls) => (
           <li
             key={cls.id}
-            className={`flex items-center justify-between p-4 border rounded-lg ${cls.status === "Đã phân công" ? "bg-gray-100" : "hover:bg-gray-50"
-              }`}
+            className={`flex items-center justify-between p-4 border rounded-lg ${
+              cls.status === "Assigned" ? "bg-gray-100" : "hover:bg-gray-50"
+            }`}
           >
             <div className="flex items-center">
               <input
@@ -120,11 +117,10 @@ function AssignClasses() {
                 id={`class-${cls.id}`}
                 checked={selectedClasses.includes(cls.id)}
                 onChange={() => handleClassSelect(cls.id)}
-                disabled={cls.status === "Đã phân công"}
-                className={`mr-4 h-5 w-5 ${cls.status === "Đã phân công"
-                    ? "text-gray-400"
-                    : "text-blue-600"
-                  }`}
+                disabled={cls.status === "Assigned"}
+                className={`mr-4 h-5 w-5 ${
+                  cls.status === "Assigned" ? "text-gray-400" : "text-blue-600"
+                }`}
               />
               <label htmlFor={`class-${cls.id}`} className="flex flex-col">
                 <span className="font-semibold">
@@ -132,26 +128,28 @@ function AssignClasses() {
                 </span>
                 <span className="text-sm text-gray-600">{cls.schedule}</span>
                 <span className="text-sm text-gray-600">
-                  Sĩ số: {cls.enrolled}/{cls.capacity}
+                  Number: {cls.enrolled}/{cls.capacity}
                 </span>
               </label>
             </div>
             <div className="flex flex-col items-end">
               <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${cls.course === teacherSpecialization
+                className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                  cls.course === teacherSpecialization
                     ? "bg-green-100 text-green-800"
                     : "bg-gray-100 text-gray-800"
-                  }`}
+                }`}
               >
                 {cls.course === teacherSpecialization
-                  ? "Phù hợp chuyên môn"
-                  : "Khác chuyên môn"}
+                  ? "Professionally suitable"
+                  : "Different expertise"}
               </span>
               <span
-                className={`mt-2 px-2 py-1 rounded-full text-xs font-semibold ${cls.status === "Chưa phân công"
+                className={`mt-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                  cls.status === "Not Assign"
                     ? "bg-yellow-100 text-yellow-800"
                     : "bg-red-100 text-red-800"
-                  }`}
+                }`}
               >
                 {cls.status}
               </span>
@@ -164,7 +162,7 @@ function AssignClasses() {
         className="mt-6 w-full bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
         disabled={selectedClasses.length === 0}
       >
-        Xác nhận phân công
+        Submit
       </button>
     </div>
   );

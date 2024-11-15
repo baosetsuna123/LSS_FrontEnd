@@ -8,7 +8,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Breadcrumb from "../Home/Breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import defaults from "@/assets/default.jfif";
 const TeacherProfile = () => {
   const { teacherName } = useParams();
   const [classes, setClasses] = useState([]);
@@ -220,7 +220,7 @@ const TeacherProfile = () => {
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-4">
                     <img
-                      src={classItem.imageUrl}
+                      src={classItem.imageUrl || defaults}
                       alt={classItem.name}
                       className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
                     />

@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchCancelApplication, viewAllApplications } from "@/data/api";
 import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaInfoCircle } from "react-icons/fa";
+import { useWallet } from "@/context/WalletContext";
 
 const parseDescription = (description) => {
   const accountMatch = description.match(/Account number: (\d+)/);
@@ -29,6 +30,20 @@ const parseDescription = (description) => {
 
 export function ApplicationManagement() {
   const [applications, setApplications] = useState([]);
+  const { balance, loadBalance } = useWallet();
+  const token = sessionStorage.getItem("token");
+  const [showModal, setShowModal] = useState(false);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+  useEffect(() => {
+    if (token) {
+      loadBalance(token);
+    }
+  }, [token, loadBalance]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedTab, setSelectedTab] = useState("Withdraw Applications");
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,20 +51,23 @@ export function ApplicationManagement() {
   const [otherPage, setOtherPage] = useState(1); // Separate page for Other Applications
   const [applicationsPerPage] = useState(5);
 
-  const token = sessionStorage.getItem("token");
-
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         const data = await viewAllApplications(token);
         setApplications(data);
+        console.log(data);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
       }
     };
     fetchApplications();
   }, [token]);
-
+  const [selectedApp, setSelectedApp] = useState(null);
+  const handleShowModal = (app) => {
+    setSelectedApp(app);
+    setShowModal(true);
+  };
   // Filter applications based on search query
   useEffect(() => {
     const filtered = applications.filter((app) =>
@@ -57,18 +75,33 @@ export function ApplicationManagement() {
     );
     setFilteredApplications(filtered);
   }, [searchQuery, applications]);
+  const handleCloseModal = () => setShowModal(false);
 
-  const handleAction = async (id) => {
+  const handleCancelApplication = async () => {
+    if (!selectedApp) return;
+
+    const amountToRefund = selectedApp.amountFromDescription;
+    const newBalance = balance + amountToRefund;
+
     try {
-      await fetchCancelApplication(id, token);
+      await fetchCancelApplication(selectedApp.applicationUserId, token);
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
-          app.applicationUserId === id ? { ...app, status: "Canceled" } : app
+          app.applicationUserId === selectedApp.applicationUserId
+            ? { ...app, status: "Canceled" }
+            : app
         )
       );
-      toast.success("Application canceled successfully!");
+      loadBalance(token); // Update balance after cancel
+      toast.success(
+        `Application canceled successfully!\nNew balance: ${formatCurrency(
+          newBalance
+        )}`
+      );
+      handleCloseModal();
     } catch (error) {
       console.error("Error canceling application:", error);
+      toast.error("Failed to cancel the application.");
     }
   };
 
@@ -209,7 +242,7 @@ export function ApplicationManagement() {
                         {app.status === "pending" && (
                           <Button
                             className="px-4 py-2 text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-400"
-                            onClick={() => handleAction(app.applicationUserId)}
+                            onClick={() => handleShowModal(app)}
                           >
                             Cancel
                           </Button>
@@ -218,37 +251,87 @@ export function ApplicationManagement() {
                     </TableRow>
                   );
                 })}
+                {showModal && selectedApp && (
+                  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-lg w-full sm:w-96 p-6 shadow-xl transform transition-all scale-95 hover:scale-100">
+                      <div className="flex items-center mb-4 border-b border-gray-200 pb-3">
+                        <FaInfoCircle className="text-blue-500 mr-3 text-2xl" />
+                        <h3 className="text-2xl font-semibold text-gray-800">
+                          Cancel Application
+                        </h3>
+                      </div>
+
+                      <div className="text-gray-700 mb-4">
+                        <p className="text-lg">
+                          Are you sure you want to cancel the application for{" "}
+                          <strong className="font-semibold">
+                            {selectedApp.name}
+                          </strong>
+                          ?
+                        </p>
+                      </div>
+
+                      <div className="mt-4">
+                        <p className="text-xl font-semibold text-green-600">
+                          New Balance:{" "}
+                          {formatCurrency(
+                            balance + selectedApp.amountFromDescription
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between mt-6">
+                        <button
+                          className="w-full sm:w-auto mt-3 sm:mt-0 text-lg px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors duration-200"
+                          onClick={handleCancelApplication}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          className="w-full sm:w-auto px-6 py-2 text-lg bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200"
+                          onClick={handleCloseModal}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </TableBody>
             </Table>
           )}
 
           {/* Pagination Controls */}
-          {withdrawApplications.length > 0 && searchQuery === "" && (
-            <div className="flex justify-end items-center mt-4">
-              <div className="flex items-center">
-                <Button
-                  onClick={() => paginateWithdraw(withdrawPage - 1)}
-                  disabled={withdrawPage === 1}
-                  className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                >
-                  <FaChevronLeft />
-                </Button>
+          {applications.length > applicationsPerPage &&
+            withdrawApplications.length > 0 &&
+            searchQuery === "" && (
+              <div className="flex justify-end items-center mt-4">
+                <div className="flex items-center">
+                  <Button
+                    onClick={() => paginateWithdraw(withdrawPage - 1)}
+                    disabled={withdrawPage === 1}
+                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+                  >
+                    <FaChevronLeft />
+                  </Button>
 
-                <span className="px-4 text-lg">{withdrawPage}</span>
+                  <span className="px-4 text-lg">{withdrawPage}</span>
 
-                <Button
-                  onClick={() => paginateWithdraw(withdrawPage + 1)}
-                  disabled={
-                    withdrawPage ===
-                    Math.ceil(withdrawApplications.length / applicationsPerPage)
-                  }
-                  className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                >
-                  <FaChevronRight />
-                </Button>
+                  <Button
+                    onClick={() => paginateWithdraw(withdrawPage + 1)}
+                    disabled={
+                      withdrawPage ===
+                      Math.ceil(
+                        withdrawApplications.length / applicationsPerPage
+                      )
+                    }
+                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+                  >
+                    <FaChevronRight />
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </>
       )}
 
@@ -314,32 +397,34 @@ export function ApplicationManagement() {
           )}
 
           {/* Pagination Controls */}
-          {otherApplications.length > 0 && searchQuery === "" && (
-            <div className="flex justify-end items-center mt-4">
-              <div className="flex items-center">
-                <Button
-                  onClick={() => paginateOther(otherPage - 1)}
-                  disabled={otherPage === 1}
-                  className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                >
-                  <FaChevronLeft />
-                </Button>
+          {otherApplications.length > applicationsPerPage &&
+            otherApplications.length > 0 &&
+            searchQuery === "" && (
+              <div className="flex justify-end items-center mt-4">
+                <div className="flex items-center">
+                  <Button
+                    onClick={() => paginateOther(otherPage - 1)}
+                    disabled={otherPage === 1}
+                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+                  >
+                    <FaChevronLeft />
+                  </Button>
 
-                <span className="px-4 text-lg">{otherPage}</span>
+                  <span className="px-4 text-lg">{otherPage}</span>
 
-                <Button
-                  onClick={() => paginateOther(otherPage + 1)}
-                  disabled={
-                    otherPage ===
-                    Math.ceil(otherApplications.length / applicationsPerPage)
-                  }
-                  className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                >
-                  <FaChevronRight />
-                </Button>
+                  <Button
+                    onClick={() => paginateOther(otherPage + 1)}
+                    disabled={
+                      otherPage ===
+                      Math.ceil(otherApplications.length / applicationsPerPage)
+                    }
+                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+                  >
+                    <FaChevronRight />
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </>
       )}
     </div>

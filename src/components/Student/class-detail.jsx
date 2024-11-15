@@ -17,7 +17,6 @@ import {
   Users,
   UserCheck,
   ChevronsLeftRightEllipsis,
-  MoveLeft,
 } from "lucide-react"; // Icon for the modal header
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -25,6 +24,8 @@ import { fetchClassbyID, fetchCreateOrder } from "@/data/api"; // Assume createO
 import Breadcrumb from "../Home/Breadcrumb";
 import toast from "react-hot-toast";
 import { useWallet } from "@/context/WalletContext";
+import defaults from "../../assets/default.jfif";
+import misasa from "../../assets/misasa.jfif";
 
 // Modal Component for Confirmation
 
@@ -162,14 +163,15 @@ export function ClassDetail() {
     try {
       setIsProcessing(true);
       await fetchCreateOrder(id, token);
-      toast.success("Đăng ký lớp học thành công!");
+      toast.success("Order Class Successfully!");
       setIsEnrolled(true);
     } catch (error) {
       if (error.response) {
         const errorMessage =
           error.response.data?.message || "Failed to create order";
+        console.log(errorMessage);
 
-        if (errorMessage === "User has already registered for this class.") {
+        if (errorMessage === "User has already registered for this schedule.") {
           toast.error(errorMessage);
         } else {
           toast.error(errorMessage);
@@ -213,7 +215,7 @@ export function ClassDetail() {
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <img
-                  src={classDetail?.imageUrl}
+                  src={classDetail?.imageUrl || defaults}
                   alt={classDetail?.name}
                   className="w-full h-64 object-cover rounded-lg border border-gray-200 shadow-md"
                 />
@@ -325,26 +327,25 @@ export function ClassDetail() {
                       Teacher Username: {classDetail?.teacherName}
                     </span>
                   </div>
-
-                  {/* Teacher Image with View Detail text and Left Arrow */}
-                  {classDetail?.imageTeacher && (
+                  {classDetail?.imageTeacher ? (
                     <div className="mt-4 flex justify-center items-center relative">
                       {/* Teacher Image */}
                       <img
                         src={classDetail?.imageTeacher}
                         alt={`Instructor: ${classDetail?.fullName}`}
                         className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 cursor-pointer"
-                        onClick={handleTeacherClick} // Make image clickable
+                        onClick={handleTeacherClick}
                       />
-
-                      {/* View Detail Text and Icon Below */}
-                      <div className="mt-2 ml-5 flex flex-col items-center justify-center cursor-pointer">
-                        <span className="text-sm text-blue-500">
-                          View Detail
-                        </span>
-                        <MoveLeft className="h-4 w-4 text-blue-500" />{" "}
-                        {/* Left Arrow Icon */}
-                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex justify-center items-center relative">
+                      {/* Default Image */}
+                      <img
+                        src={misasa}
+                        alt={`Instructor: ${classDetail?.fullName}`}
+                        className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 cursor-pointer"
+                        onClick={handleTeacherClick}
+                      />
                     </div>
                   )}
                 </CardContent>

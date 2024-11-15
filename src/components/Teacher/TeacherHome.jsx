@@ -207,7 +207,13 @@ function TeacherHome() {
   };
 
   const handleFileChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    console.log(file); // Log the file object to ensure it's correctly selected
+    if (file) {
+      setImage(file); // Store the file object instead of just the name
+    } else {
+      setImage(null); // Reset when no file is selected
+    }
   };
 
   const handleCreateClass = async () => {
@@ -248,7 +254,12 @@ function TeacherHome() {
       setImage(null);
       fetchTimetable();
     } catch (error) {
-      toast.error(error.message || "Failed to create class");
+      if (error.message && error.message.includes("duplicate")) {
+        toast.error("Code is already in use");
+      } else {
+        toast.error(error.message || "Failed to create class");
+      }
+      console.log(error.message);
     } finally {
       setIsLoading(false); // Reset loading state
     }
@@ -476,7 +487,7 @@ function TeacherHome() {
           <input
             type="text"
             name="location"
-            placeholder="meeting url..."
+            placeholder="Meeting Url"
             onChange={handleInputChange}
             required
             className="border col-span-2 p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -487,19 +498,34 @@ function TeacherHome() {
             onChange={handleInputChange}
             className="border p-2 rounded-lg col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
-          <input
-            onChange={handleFileChange}
-            accept="image/*"
-            type="file"
-            className="block w-full text-sm text-slate-500
-          file:mr-4 file:py-1 file:px-2
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-violet-50 file:text-violet-700
-          hover:file:bg-violet-100
-          transition duration-200
-        "
-          />
+          <div className="mb-4 flex items-center">
+            <label className="text-gray-700 font-semibold w-1/4 whitespace-nowrap">
+              Upload File
+            </label>
+            <div className="w-3/4 flex items-center">
+              {/* Custom button to trigger file input */}
+              <button
+                type="button"
+                onClick={() => document.getElementById("fileInput").click()}
+                className="p-2 border ml-4 border-gray-300 rounded-lg whitespace-nowrap bg-gray-200 hover:bg-gray-300"
+              >
+                Choose File
+              </button>
+
+              <input
+                id="fileInput"
+                onChange={handleFileChange}
+                accept="image/*"
+                type="file"
+                className="hidden whitespace-nowrap"
+              />
+
+              {/* Display selected file name or default message */}
+              <span className="ml-2 text-gray-900 whitespace-nowrap">
+                {image ? `Selected File: ${image.name}` : "No file selected"}
+              </span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-6 justify-center">
           <button
@@ -508,10 +534,10 @@ function TeacherHome() {
             className="mt-4 bg-blue-600 text-white px-5 py-1 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
           >
             {isLoading ? (
-              <>
+              <div className="flex items-center">
                 <FaSpinner className="animate-spin mr-2" />
-                Creating...
-              </>
+                <span>Creating...</span>
+              </div>
             ) : (
               "Create Class"
             )}

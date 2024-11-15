@@ -1,6 +1,7 @@
 import { completeWithdrawalRequest } from "@/data/api"; // Import the API function
 import { toast } from "react-hot-toast";
 import { Search } from "lucide-react";
+import { useState } from "react"; // Import useState for modal visibility
 
 const AppWithDraw = ({
   currentPage,
@@ -11,22 +12,40 @@ const AppWithDraw = ({
   setSearchQuery,
 }) => {
   const token = sessionStorage.getItem("token"); // Get the token from session storage
-  console.log(appwithdraw);
+  const [showModal, setShowModal] = useState(false); // State for modal visibility
+  const [selectedApp, setSelectedApp] = useState(null); // Store selected application
 
-  const handleClick = async (id) => {
+  // Function to handle click on Approve button, which will trigger the modal
+  const handleClick = (app) => {
+    setSelectedApp(app); // Store the selected application
+    setShowModal(true); // Show the confirmation modal
+  };
+
+  const handleApprove = async () => {
     try {
-      const response = await completeWithdrawalRequest(id, token);
+      const response = await completeWithdrawalRequest(
+        selectedApp.applicationUserId,
+        token
+      );
       console.log("Withdraw", response);
+
       setAppWithdraw((prevApplications) =>
         prevApplications.map((app) =>
-          app.applicationUserId === id ? { ...app, status: "completed" } : app
+          app.applicationUserId === selectedApp.applicationUserId
+            ? { ...app, status: "completed" }
+            : app
         )
       );
       toast.success("Application approved successfully");
+      setShowModal(false); // Close the modal after approval
     } catch (error) {
       console.error("Failed to approve application:", error);
       toast.error("Failed to approve application.");
     }
+  };
+
+  const handleCancel = () => {
+    setShowModal(false); // Close the modal if Cancel is clicked
   };
 
   const formatCurrency = (amount) => {
@@ -36,17 +55,6 @@ const AppWithDraw = ({
     }).format(amount);
   };
 
-  // Function to extract account number and bank from description
-  const extractAccountInfo = (description) => {
-    const accountMatch = description.match(/Account number: (\d+)/);
-    const bankMatch = description.match(/Bank: ([^,]+)/);
-    return {
-      accountNumber: accountMatch ? accountMatch[1] : "N/A",
-      bank: bankMatch ? bankMatch[1] : "N/A",
-    };
-  };
-
-  // Calculate the current data to display based on pagination and search query
   const filteredApplications = appwithdraw.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -58,8 +66,8 @@ const AppWithDraw = ({
 
   return (
     <div>
+      {/* Search Box */}
       <div className="flex justify-between items-center mb-4">
-        {/* Search Box */}
         <div
           className="flex items-center border rounded p-2"
           style={{ width: "330px" }}
@@ -105,9 +113,6 @@ const AppWithDraw = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.length > 0 ? (
               currentData.map((app, index) => {
-                const { accountNumber, bank } = extractAccountInfo(
-                  app.description
-                );
                 return (
                   <tr
                     key={app.applicationUserId}
@@ -120,9 +125,11 @@ const AppWithDraw = ({
                       {app.name || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {accountNumber}
+                      {app.accountNumber || "N/A"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">{bank}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {app.bank || "N/A"}
+                    </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
                         app.status === "completed"
@@ -140,17 +147,16 @@ const AppWithDraw = ({
                       {formatCurrency(app.amountFromDescription) || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {/* Approve Button */}
                       <button
-                        onClick={() => handleClick(app.applicationUserId)}
+                        onClick={() => handleClick(app)}
                         disabled={
                           app.status === "completed" ||
                           app.status === "Canceled"
-                        } // Disable if completed or canceled
+                        }
                         className={`px-4 py-2 text-white rounded-md transition duration-200 ${
                           app.status === "completed" ||
                           app.status === "Canceled"
-                            ? "bg-gray-400 cursor-not-allowed" // Disabled style
+                            ? "bg-gray-400 cursor-not-allowed"
                             : "bg-blue-500 hover:bg-blue-600"
                         }`}
                       >
@@ -177,6 +183,41 @@ const AppWithDraw = ({
           </tbody>
         </table>
       </div>
+
+      {/* Modal for Confirmation */}
+      {showModal && selectedApp && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <div className="flex items-center justify-center mb-4">
+              <span className="text-green-500 text-4xl">✔️</span>{" "}
+              {/* Icon for confirmation */}
+            </div>
+            <h2 className="text-xl font-semibold text-center text-gray-800 mb-4">
+              Are you sure you want to approve this withdrawal?
+            </h2>
+            <p className="text-center text-lg">
+              <strong>{selectedApp.name}</strong>
+            </p>
+            <p className="text-center text-lg text-green-600">
+              {formatCurrency(selectedApp.amountFromDescription)}
+            </p>
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApprove}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-24"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

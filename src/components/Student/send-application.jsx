@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, DollarSign, User, FileText, Send } from "lucide-react";
 import { submitOther, submitWithdrawal } from "@/data/api";
 import toast from "react-hot-toast";
+import { useWallet } from "@/context/WalletContext";
+import { useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 export function SendApplication() {
   const banks = [
@@ -67,7 +70,22 @@ export function SendApplication() {
     "VRB",
     "Woori",
   ];
-
+  const { balance, loadBalance } = useWallet();
+  const token = sessionStorage.getItem("token");
+  const navigate = useNavigate(); // For navigation to "/wallet"
+  const [showModal, setShowModal] = useState(false);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+  useEffect(() => {
+    if (token) {
+      loadBalance(token);
+    }
+  }, [token, loadBalance]);
+  const [updatedBalance, setUpdatedBalance] = useState(balance);
   const [withdrawalData, setWithdrawalData] = useState({
     accountHolderName: "",
     accountNumber: "",
@@ -75,6 +93,15 @@ export function SendApplication() {
     amount: null,
     applicationTypeId: 1,
   });
+  const handleWithdrawalSubmit = (e) => {
+    e.preventDefault();
+
+    const calculatedNewBalance = balance - withdrawalData.amount;
+    setUpdatedBalance(calculatedNewBalance);
+
+    // Open the confirmation modal
+    setShowModal(true);
+  };
   const formatWithCommas = (num) => {
     if (!num) return "";
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas to the number string
@@ -95,7 +122,6 @@ export function SendApplication() {
     }
   };
 
-  const token = sessionStorage.getItem("token");
   const [otherRequestData, setOtherRequestData] = useState({
     studentName: "",
     studentRollNo: "",
@@ -246,8 +272,8 @@ export function SendApplication() {
 
     return result.trim();
   };
-  const handleWithdrawalSubmit = async (e) => {
-    e.preventDefault();
+  const handleConfirmWithdrawal = async () => {
+    setShowModal(false); // Close the modal
 
     if (
       withdrawalData.accountNumber.length < 8 ||
@@ -256,20 +282,29 @@ export function SendApplication() {
       toast.error("Account number must be between 8 and 15 digits.");
       return;
     }
+
     if (withdrawalData.amount < 50000) {
-      toast.error("Amount must be higher or equal than 50,000d");
+      toast.error("Amount must be higher or equal than 50,000đ");
       return;
     }
+
     try {
-      await submitWithdrawal(withdrawalData, token);
-      toast.success("Withdrawal application submitted successfully!");
-      setWithdrawalData({
-        accountHolderName: "",
-        accountNumber: "",
-        bank: "",
-        amount: null,
-        applicationTypeId: 1,
-      });
+      const response = await submitWithdrawal(withdrawalData, token);
+      console.log(response);
+      if (response) {
+        loadBalance(token);
+        toast.success(
+          "Withdrawal application submitted successfully!\nNew balance: " +
+            formatCurrency(updatedBalance)
+        );
+        setWithdrawalData({
+          accountHolderName: "",
+          accountNumber: "",
+          bank: "",
+          amount: null,
+          applicationTypeId: 1,
+        });
+      }
     } catch (error) {
       if (error.response && typeof error.response.data === "string") {
         const errorMessage = error.response.data;
@@ -283,6 +318,9 @@ export function SendApplication() {
         toast.error("An unexpected error occurred.");
       }
     }
+  };
+  const handleCancel = () => {
+    setShowModal(false); // Close the modal if No is clicked
   };
 
   const handleOtherRequestSubmit = async (e) => {
@@ -384,7 +422,6 @@ export function SendApplication() {
                 {withdrawalData.amount && (
                   <p className="text-gray-600 text-sm">
                     {formatAmount(withdrawalData.amount)}{" "}
-                    {/* Hiển thị định dạng tiền */}
                   </p>
                 )}
               </CardContent>
@@ -396,7 +433,68 @@ export function SendApplication() {
               </CardFooter>
             </form>
           </Card>
+
+          {/* Modal for confirming withdrawal */}
+          {showModal && (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-96">
+                {updatedBalance < 0 ? (
+                  // When balance is negative, show the "X" icon and "Deposit now" button
+                  <div className="text-center text-red-500">
+                    <FaTimesCircle className="text-red-500 w-12 h-12 mb-4 mx-auto" />{" "}
+                    {/* Center the X icon */}
+                    <p>
+                      Your current balance is not enough to withdraw this
+                      amount.
+                    </p>
+                    <div className="flex justify-between mt-4">
+                      <button
+                        onClick={() => navigate("/wallet")}
+                        className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                      >
+                        Deposit now
+                      </button>
+                      <button
+                        onClick={handleCancel} // Close modal action
+                        className="py-2 px-4 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400"
+                      >
+                        No
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // When balance is sufficient, show the confirmation message with "Yes" and "No" buttons
+                  <>
+                    <div className="flex justify-center mb-4">
+                      <FaCheckCircle className="text-green-500 w-12 h-12" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-center mb-4">
+                      Are you sure you want to submit the withdrawal request?
+                    </h2>
+                    <div className="text-center text-green-600">
+                      <p>New Balance: {formatCurrency(updatedBalance)}</p>
+                    </div>
+                    <div className="flex justify-between mt-4">
+                      <button
+                        onClick={handleConfirmWithdrawal}
+                        className="py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-transform duration-200 transform hover:scale-105 px-6"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="py-2 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400 transition-transform duration-200 transform hover:scale-105 px-6"
+                      >
+                        No
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </TabsContent>
+
         <TabsContent value="other">
           <Card>
             <CardHeader>

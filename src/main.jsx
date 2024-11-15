@@ -7,6 +7,7 @@ import { ClassProvider } from "./context/ClassContext.jsx";
 import { WalletProvider } from "./context/WalletContext.jsx";
 import { FeedbackProvider } from "./context/FeedbackContext.jsx";
 import { QuestionProvider } from "./context/QuestionContext.jsx";
+import { AvatarProvider } from "./context/AvatarContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
@@ -14,8 +15,10 @@ createRoot(document.getElementById("root")).render(
       <WalletProvider>
         <FeedbackProvider>
           <QuestionProvider>
-            <Toaster />
-            <App />
+            <AvatarProvider>
+              <Toaster />
+              <App />
+            </AvatarProvider>
           </QuestionProvider>
         </FeedbackProvider>
       </WalletProvider>

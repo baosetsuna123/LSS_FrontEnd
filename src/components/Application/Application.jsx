@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { createApplication } from "@/data/api";
 import backgroundImage from "../../assets/background2.png";
+import { FaInfoCircle, FaSpinner } from "react-icons/fa";
 export function Application() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -50,35 +51,53 @@ export function Application() {
         <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
           Registration Form
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="title" className="block mb-2 text-gray-700">
-              Title <span className="text-red-500">*</span>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Title Section */}
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="title"
+              className="text-gray-700 flex items-center font-semibold"
+            >
+              Title
+              <FaInfoCircle className="ml-2 text-gray-500" />
             </label>
             <input
               type="text"
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+              placeholder="Enter the title"
               required
             />
           </div>
-          <div>
-            <label htmlFor="description" className="block mb-2 text-gray-700">
-              Description <span className="text-red-500">*</span>
+
+          {/* Description Section */}
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="description"
+              className="text-gray-700 flex items-center font-semibold"
+            >
+              Description
+              <FaInfoCircle className="ml-2 text-gray-500" />
             </label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="3"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+              rows="4"
+              placeholder="Enter a detailed description"
               required
-            ></textarea>
+            />
           </div>
-          <div>
-            <label htmlFor="certificate" className="block text-gray-700 mb-2">
+
+          {/* Certificate Upload Section */}
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="certificate"
+              className="text-gray-700 font-semibold"
+            >
               Upload your certificate (PDF, JPG, or PNG)
             </label>
             <div className="flex items-center space-x-4">
@@ -92,7 +111,7 @@ export function Application() {
               <button
                 type="button" // Prevents form submission
                 onClick={() => document.getElementById("certificate").click()}
-                className="bg-blue-500 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600 transition duration-300"
               >
                 Choose File
               </button>
@@ -101,15 +120,26 @@ export function Application() {
               </span>
             </div>
           </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full text-white font-semibold px-4 py-2 rounded transition-colors ${
-              isLoading ? "bg-gray-400" : "bg-gray-900 hover:bg-gray-600"
-            }`}
-          >
-            {isLoading ? "Submitting..." : "Submit"}
-          </button>
+
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-300 ${
+                isLoading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2 inline-block" />
+                  Submitting...
+                </>
+              ) : (
+                "Submit"
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>

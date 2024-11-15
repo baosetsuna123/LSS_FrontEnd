@@ -24,9 +24,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export function MyWallet() {
   const [balance, setBalance] = useState(0); // Initial balance
-  const [amount, setAmount] = useState(""); // Khởi tạo amount là chuỗi rỗng
+  const [amount, setAmount] = useState("");
   const [transactions, setTransactions] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(""); // Thêm state để lưu thông báo lỗi
+  const [errorMessage, setErrorMessage] = useState("");
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,7 +43,6 @@ export function MyWallet() {
 
     fetchTransactions();
   }, [token, location.state]);
-  // Hàm định dạng số tiền sang tiền Việt Nam
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -64,7 +63,6 @@ export function MyWallet() {
     if (!num) return "";
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas to the number string
   };
-  // Hàm chuyển đổi số thành định dạng "triệu", "nghìn", "đồng"
   const numberToWords = (num, includeZero = false, isThousandPart = false) => {
     const units = [
       "",
@@ -240,10 +238,10 @@ export function MyWallet() {
   };
   const handleRecharge = async () => {
     if (amount <= 0) {
-      setErrorMessage("Số tiền phải lớn hơn 0."); // Hiển thị thông báo lỗi
+      setErrorMessage("Amount must be larger than 0.");
       return;
     }
-    setErrorMessage(""); // Xóa thông báo lỗi nếu hợp lệ
+    setErrorMessage("");
     try {
       const data = await fetchRecharge(amount, token);
       console.log("Recharge data:", data);
@@ -256,7 +254,7 @@ export function MyWallet() {
 
       // Update transactions state
       setTransactions((prev) => [...prev, newTransaction]);
-      window.open(data.paymentUrl, "_self"); // Mở trang thanh toán VNPay
+      window.open(data.paymentUrl, "_self");
     } catch (error) {
       console.error("Recharge failed:", error);
     }
@@ -315,11 +313,11 @@ export function MyWallet() {
                   />
                   {amount && (
                     <p className="text-gray-600 text-sm">
-                      {formatAmount(amount)} {/* Hiển thị định dạng tiền */}
+                      {formatAmount(amount)}
                     </p>
                   )}
                   {errorMessage && (
-                    <p className="text-red-500 text-sm">{errorMessage}</p> // Hiển thị thông báo lỗi
+                    <p className="text-red-500 text-sm">{errorMessage}</p>
                   )}
                 </div>
               </CardContent>

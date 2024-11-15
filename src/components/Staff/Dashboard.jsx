@@ -331,18 +331,14 @@ export function Dashboard() {
               onClick={() => {
                 setIsWithdrawMenuOpen(!isWithdrawMenuOpen); // Toggle Withdraw menu
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "withdraw" ? "bg-gray-200" : ""
-              }`}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200`}
             >
               <AppWindowMac size={20} className="mr-2" />
               Application (Withdraw)
             </button>
 
-            {isWithdrawMenuOpen && ( // Show child buttons if menu is open
+            {isWithdrawMenuOpen && (
               <div className="pl-4">
-                {" "}
-                {/* Indent child buttons */}
                 <button
                   onClick={() => {
                     setActiveCategory("withdraw");

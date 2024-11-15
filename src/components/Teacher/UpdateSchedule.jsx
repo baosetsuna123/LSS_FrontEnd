@@ -28,7 +28,6 @@ function UpdateSchedule() {
     }
   }
 
-
   const daysOfWeek = [
     { value: 2, name: "Monday" },
     { value: 3, name: "Tuesday" },
@@ -72,7 +71,7 @@ function UpdateSchedule() {
       const res = await fetchSlots(token);
       setSlots(res);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu:", error);
+      console.error("Error when fetching data:", error);
     }
   };
 
@@ -90,9 +89,9 @@ function UpdateSchedule() {
         const slot = slots.find((slot) => slot.slotId === classItem.slotId);
         return {
           ...classItem,
-          courseName: course ? course.name : "Khóa học không xác định",
-          slotStart: slot ? slot.start : "Thời gian không xác định",
-          slotEnd: slot ? slot.end : "Thời gian không xác định",
+          courseName: course ? course.name : "Course not specified",
+          slotStart: slot ? slot.start : "Time not specified",
+          slotEnd: slot ? slot.end : "Time not specified",
         };
       });
 
@@ -101,9 +100,8 @@ function UpdateSchedule() {
   }, [classes, courses, slots]);
   const [initialMaxStudents, setInitialMaxStudents] = useState(null);
 
-
   const handleEdit = (classInfo) => {
-    setClassShow(classInfo)
+    setClassShow(classInfo);
     setEditingClass({ ...classInfo });
     setInitialMaxStudents(classInfo.maxStudents);
     setMaxStudentsError("");
@@ -120,7 +118,7 @@ function UpdateSchedule() {
       if (value && newMaxStudents < initialMaxStudents) {
         console.log(newMaxStudents, initialMaxStudents);
         setMaxStudentsError(
-          "Số học sinh không được nhỏ hơn số học sinh hiện tại"
+          "Max Students cannot be less than the current number of students"
         );
       } else {
         setMaxStudentsError("");
@@ -135,7 +133,9 @@ function UpdateSchedule() {
     }
     try {
       if (updatedClass.maxStudents < classShow.maxStudents) {
-        toast.error(`Số học sinh đang chỉnh sửa không được nhỏ hơn số học sinh hiện tại`)
+        toast.error(
+          `Max students cannot be less than the current number of students (${classShow.maxStudents})`
+        );
         return;
       }
 
@@ -145,7 +145,7 @@ function UpdateSchedule() {
       fetchClasses();
       setIsPopupOpen(false);
       setEditingClass(null);
-      toast.success("Lớp học đã được cập nhật thành công!");
+      toast.success("Update Class Successfully!");
     } catch (error) {
       console.error(error);
     }
@@ -189,7 +189,8 @@ function UpdateSchedule() {
                 <p className="text-gray-600">Start date: {cls.startDate}</p>
                 <p className="mt-2">
                   <span className="font-medium"></span>
-                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))?.name || "Unknown"}
+                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))
+                    ?.name || "Unknown"}
                   : {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
@@ -210,7 +211,10 @@ function UpdateSchedule() {
             <h3 className="text-2xl font-bold mb-4">Edit Class Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="name" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="name"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Class Name:
                 </label>
                 <input
@@ -224,7 +228,10 @@ function UpdateSchedule() {
                 />
               </div>
               <div>
-                <label htmlFor="subject" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="subject"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Subject:
                 </label>
                 <select
@@ -235,7 +242,9 @@ function UpdateSchedule() {
                   onChange={handleInputChange}
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="" disabled>Select a course</option>
+                  <option value="" disabled>
+                    Select a course
+                  </option>
                   {courses.length > 0 ? (
                     courses.map((course) => (
                       <option key={course.courseCode} value={course.courseCode}>
@@ -243,12 +252,17 @@ function UpdateSchedule() {
                       </option>
                     ))
                   ) : (
-                    <option value="" disabled>No available courses</option>
+                    <option value="" disabled>
+                      No available courses
+                    </option>
                   )}
                 </select>
               </div>
               <div>
-                <label htmlFor="students" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="students"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Number of Students:
                 </label>
                 <input
@@ -261,11 +275,16 @@ function UpdateSchedule() {
                   className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {maxStudentsError && (
-                  <p className="text-red-500 mt-1 text-sm">{maxStudentsError}</p>
+                  <p className="text-red-500 mt-1 text-sm">
+                    {maxStudentsError}
+                  </p>
                 )}
               </div>
               <div>
-                <label htmlFor="teacher" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="teacher"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Teacher:
                 </label>
                 <select
@@ -280,7 +299,10 @@ function UpdateSchedule() {
                 </select>
               </div>
               <div>
-                <label htmlFor="room" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="room"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Classroom Link:
                 </label>
                 <input
@@ -293,7 +315,10 @@ function UpdateSchedule() {
                 />
               </div>
               <div>
-                <label htmlFor="room" className="block mb-2 font-medium text-gray-700">
+                <label
+                  htmlFor="room"
+                  className="block mb-2 font-medium text-gray-700"
+                >
                   Day of the Week:
                 </label>
                 <select
@@ -354,7 +379,6 @@ function UpdateSchedule() {
         </div>
       )}
     </div>
-
   );
 }
 

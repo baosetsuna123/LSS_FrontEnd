@@ -19,10 +19,8 @@ import { Dashboard } from "./components/Staff/Dashboard";
 
 // Import các component Teacher Dashboard
 import TeacherDashboardLayout from "./components/Teacher/TeacherDashboardLayout";
-import AssignClasses from "./components/Teacher/AssignClasses";
 import UpdateSchedule from "./components/Teacher/UpdateSchedule";
 import CancelClassRequest from "./components/Teacher/CancelClassRequest";
-import CreateClassroom from "./components/Teacher/CreateClassroom";
 import ClassList from "./components/Teacher/ClassList";
 import TeacherHome from "./components/Teacher/TeacherHome";
 import { MyWallet } from "./components/Student/Wallet";
@@ -83,10 +81,8 @@ function App() {
             />
             <Route path="profile" element={<ProfileTeacher />} />
             <Route path="wallet" element={<WalletTeacher />} />
-            <Route path="assign-classes" element={<AssignClasses />} />
             <Route path="update-schedule" element={<UpdateSchedule />} />
             <Route path="cancel-request" element={<CancelClassRequest />} />
-            <Route path="create-classroom" element={<CreateClassroom />} />
             <Route path="class-list" element={<ClassList />} />
           </Route>
         </Route>
