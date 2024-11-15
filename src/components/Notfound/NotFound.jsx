@@ -15,7 +15,7 @@ const NotFound = () => {
     if (role === "STAFF") {
       navigate("/dashboard");
     } else if (role === "ADMIN") {
-      navigate("/admin-dashboard");
+      navigate("/admin");
     } else if (role === "TEACHER") {
       navigate("/teacher");
     } else {

@@ -31,7 +31,7 @@ export default function Login() {
         navigate("/");
         getClasses(response.data.token, "STUDENT");
       } else if (response.data.role === "ADMIN") {
-        navigate("/admin-dashboard");
+        navigate("/admin");
       } // Optionally fetch classes based on the role
       toast.success("Login successful");
     } catch (error) {

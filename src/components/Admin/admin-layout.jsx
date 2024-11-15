@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Modal from "@/components/Helper/Modal"; // Adjust the import path
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AssignApplication } from "@/data/api";
 
@@ -50,10 +50,10 @@ export function AdminLayout({ children }) {
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "#" },
-    { icon: Users, label: "Users", href: "#" },
-    { icon: FileText, label: "Applications", href: "#" },
-    { icon: Settings, label: "Settings", href: "#" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+    { icon: Users, label: "Users", path: "/admin/User" },
+    { icon: FileText, label: "Applications", path: "#" },
+    { icon: Settings, label: "Settings", path: "#" },
   ];
 
   return (
@@ -79,16 +79,16 @@ export function AdminLayout({ children }) {
         <ScrollArea className="flex-grow h-[calc(100vh-8rem)]">
           <nav className="p-2">
             {menuItems.map((item, index) => (
-              <a
+              <Link
                 key={index}
-                href={item.href}
+                to={item.path}
                 className={`flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors ${
                   isExpanded ? "justify-start" : "justify-center"
                 }`}
               >
                 <item.icon className="h-6 w-6" />
                 {isExpanded && <span className="ml-3">{item.label}</span>}
-              </a>
+              </Link>
             ))}
           </nav>
         </ScrollArea>
