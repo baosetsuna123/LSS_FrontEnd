@@ -6,7 +6,6 @@ import TotalOrdersAmount from "./components/TotalOrdersAmount";
 import TransactionHistory from "./components/TransactionHistory";
 import UserCount from "./components/UserCount";
 const AdminHome = () => {
-
   return (
     <div className="flex flex-col justify-center items-center w-full">
       <div>
@@ -16,7 +15,7 @@ const AdminHome = () => {
           <UserCount />
           <SystemWalletBalance />
         </div>
-        <div className="grid grid-cols-4 gap-8">
+        <div className="flex flex-col gap-2">
           <SessionsChart />
           <TransactionHistory />
         </div>

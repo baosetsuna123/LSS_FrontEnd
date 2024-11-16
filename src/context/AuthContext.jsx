@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useTheme } from "./Theme-Provider";
 
 export const AuthContext = createContext();
 
@@ -16,22 +17,29 @@ export const AuthProvider = ({ children }) => {
   const login = () => {
     setIsLoggedIn(true);
   };
-
+  const { setTheme } = useTheme();
   const logout = () => {
     setIsLoggedIn(false);
     sessionStorage.clear();
 
+    // Preserve "submittedFeedbackOrderIds" before clearing localStorage
     const submittedFeedbackOrderIds = localStorage.getItem(
       "submittedFeedbackOrderIds"
     );
-    localStorage.clear(); // Clear everything first
 
+    // Clear all localStorage
+    localStorage.clear();
+
+    // Restore the preserved data
     if (submittedFeedbackOrderIds) {
       localStorage.setItem(
         "submittedFeedbackOrderIds",
         submittedFeedbackOrderIds
       );
     }
+
+    // Change theme to light explicitly
+    setTheme("light");
   };
 
   useEffect(() => {}, [isLoggedIn]);

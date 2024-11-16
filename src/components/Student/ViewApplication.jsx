@@ -241,7 +241,7 @@ export function ApplicationManagement() {
                       <TableCell>
                         {app.status === "pending" && (
                           <Button
-                            className="px-4 py-2 text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+                            className="px-4 py-2 text-white dark:bg-red-400 dark:hover:bg-red-500 bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-400"
                             onClick={() => handleShowModal(app)}
                           >
                             Cancel

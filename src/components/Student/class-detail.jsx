@@ -56,47 +56,49 @@ export function ClassDetail() {
 
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
           <div className="flex items-center mb-4">
-            <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
-            <h2 className="text-xl font-semibold">
+            <AlertCircle className="h-6 w-6 text-red-500 dark:text-red-400 mr-2" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               Confirm class participation
             </h2>
           </div>
 
           {newBalance < 0 ? (
             <div className="flex justify-between items-center mb-6">
-              <p className="text-red-500">
+              <p className="text-red-500 dark:text-red-400">
                 Your current balance is not enough.
               </p>
               <button
                 onClick={() => navigate("/wallet")}
-                className="text-blue-500 hover:underline"
+                className="text-blue-500 dark:text-blue-400 hover:underline"
               >
                 Deposit now
               </button>
             </div>
           ) : (
             <>
-              <p className="mb-6">
+              <p className="mb-6 text-gray-700 dark:text-gray-300">
                 You agree to participate in this class with price{" "}
                 {formatCurrency(classDetail?.price)}?
               </p>
-              <p className="mb-6">New balance: {formatCurrency(newBalance)}</p>
+              <p className="mb-6 text-gray-700 dark:text-gray-300">
+                New balance: {formatCurrency(newBalance)}
+              </p>
             </>
           )}
 
           <div className="flex justify-between space-x-4">
             <Button
               onClick={onConfirm}
-              className="bg-green-500 hover:bg-green-600 px-10 py-3 text-lg"
+              className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500 px-10 py-3 text-lg"
             >
               Yes
             </Button>
             <Button
               variant="outline"
               onClick={onClose}
-              className="border-red-500 text-red-500 hover:bg-red-100 px-6 py-3 text-lg"
+              className="border-red-500 text-red-500 hover:bg-red-100 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900 px-6 py-3 text-lg"
             >
               No
             </Button>

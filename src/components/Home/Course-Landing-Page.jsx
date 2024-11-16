@@ -1,7 +1,6 @@
 import { CheckCircle, Loader, Star, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Input } from "../ui/input";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
@@ -459,29 +458,14 @@ export function CourseLandingPage() {
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
-                <form className="flex space-x-2">
-                  <Input
-                    className="flex-1 bg-zinc-900 text-white placeholder-gray-500 rounded-lg shadow-md"
-                    placeholder="Enter your email"
-                    type="email"
-                  />
-                  <Button
-                    type="submit"
-                    variant="secondary"
-                    className="rounded-lg shadow-md bg-indigo-600 text-white hover:bg-indigo-500"
-                  >
-                    Get Started
-                  </Button>
-                </form>
-                <p className="text-xs text-white">
-                  By signing up, you agree to our{" "}
-                  <a
-                    className="underline underline-offset-2 text-white hover:text-gray-300"
-                    href="#"
-                  >
-                    Terms & Conditions
-                  </a>
-                </p>
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  onClick={() => navigate("/login")}
+                  className="rounded-lg text-center dark:bg-orange-500 dark:hover:bg-orange-700 shadow-md bg-indigo-600 text-white hover:bg-indigo-500"
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
           </div>

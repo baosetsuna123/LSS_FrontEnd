@@ -11,20 +11,20 @@ import { AvatarProvider } from "./context/AvatarContext.jsx";
 import { ThemeProvider } from "./context/Theme-Provider.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
-    <ClassProvider>
-      <WalletProvider>
-        <FeedbackProvider>
-          <QuestionProvider>
-            <AvatarProvider>
-              <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+  <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <AuthProvider>
+      <ClassProvider>
+        <WalletProvider>
+          <FeedbackProvider>
+            <QuestionProvider>
+              <AvatarProvider>
                 <Toaster />
                 <App />
-              </ThemeProvider>
-            </AvatarProvider>
-          </QuestionProvider>
-        </FeedbackProvider>
-      </WalletProvider>
-    </ClassProvider>
-  </AuthProvider>
+              </AvatarProvider>
+            </QuestionProvider>
+          </FeedbackProvider>
+        </WalletProvider>
+      </ClassProvider>
+    </AuthProvider>
+  </ThemeProvider>
 );
