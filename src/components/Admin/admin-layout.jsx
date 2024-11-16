@@ -20,6 +20,7 @@ import { AssignApplication } from "@/data/api";
 export function AdminLayout({ children }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUsersMenuExpanded, setIsUsersMenuExpanded] = useState(false); // State to toggle the users submenu
   const result = localStorage.getItem("result");
   const [isLogoutHovered, setIsLogoutHovered] = useState(false); // State to track hover
   const { logout } = useAuth(); // Import the useAuth hook
@@ -31,6 +32,7 @@ export function AdminLayout({ children }) {
     console.log("Logout button clicked"); // Debugging line
     setIsModalOpen(true);
   };
+
   const handleClick = async () => {
     try {
       await AssignApplication();
@@ -40,9 +42,9 @@ export function AdminLayout({ children }) {
       toast.error("Already assigned for Staff!");
     }
   };
+
   const navigate = useNavigate();
   const handleLogoutConfirm = () => {
-    // Implement your logout logic here
     setIsModalOpen(false);
     logout();
     navigate("/login");
@@ -51,9 +53,19 @@ export function AdminLayout({ children }) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
-    { icon: Users, label: "Users", path: "/admin/User" },
+    {
+      icon: Users,
+      label: "Users",
+      path: "#",
+      onClick: () => setIsUsersMenuExpanded(!isUsersMenuExpanded), // Toggle child menu
+    },
     { icon: FileText, label: "Applications", path: "#" },
     { icon: Settings, label: "Settings", path: "#" },
+  ];
+
+  const usersSubMenuItems = [
+    { label: "List User", path: "/admin/User" },
+    { label: "Create Staff", path: "/admin/User/create-staff" }, // Example path for creating staff
   ];
 
   return (
@@ -79,23 +91,43 @@ export function AdminLayout({ children }) {
         <ScrollArea className="flex-grow h-[calc(100vh-8rem)]">
           <nav className="p-2">
             {menuItems.map((item, index) => (
-              <Link
-                key={index}
-                to={item.path}
-                className={`flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                  isExpanded ? "justify-start" : "justify-center"
-                }`}
-              >
-                <item.icon className="h-6 w-6" />
-                {isExpanded && <span className="ml-3">{item.label}</span>}
-              </Link>
+              <div key={index}>
+                {/* If the menu item is "Users", handle submenu rendering */}
+                <Link
+                  to={item.path}
+                  className={`flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors ${
+                    isExpanded ? "justify-start" : "justify-center"
+                  }`}
+                  onClick={item.onClick} // If it's the "Users" item, toggle the submenu
+                >
+                  <item.icon className="h-6 w-6" />
+                  {isExpanded && <span className="ml-3">{item.label}</span>}
+                </Link>
+
+                {/* Render sub-menu items if the "Users" menu is expanded */}
+                {isUsersMenuExpanded &&
+                  item.label === "Users" &&
+                  usersSubMenuItems.map((subItem, subIndex) => (
+                    <Link
+                      key={subIndex}
+                      to={subItem.path}
+                      className={`flex items-center pl-6 p-2 rounded-lg hover:bg-gray-700 transition-colors ${
+                        isExpanded ? "justify-start" : "justify-center"
+                      }`}
+                    >
+                      {isExpanded && (
+                        <span className="ml-3">{subItem.label}</span>
+                      )}
+                    </Link>
+                  ))}
+              </div>
             ))}
           </nav>
         </ScrollArea>
       </div>
+
       {/* Main content area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <span className="text-gray-800 font-semibold">
             Hello,{" "}

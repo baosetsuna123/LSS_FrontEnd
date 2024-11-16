@@ -197,7 +197,7 @@ export function ClassDetail() {
         onConfirm={handleConfirmEnroll}
       />
 
-      <section className="w-full py-4 bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900">
+      <section className="w-full py-4 dark:bg-gray-800 bg-gray-100">
         <div className="container px-4 md:px-6">
           <Breadcrumb
             items={[
@@ -210,32 +210,32 @@ export function ClassDetail() {
       </section>
 
       <div className="container mx-auto p-6 max-w-4xl">
-        <Card className="shadow-lg border rounded-lg overflow-hidden">
-          <CardContent className="p-8 bg-white rounded-t-lg">
+        <Card className="shadow-lg border rounded-lg overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+          <CardContent className="p-8 bg-white dark:bg-gray-900 rounded-t-lg">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <img
                   src={classDetail?.imageUrl || defaults}
                   alt={classDetail?.name}
-                  className="w-full h-64 object-cover rounded-lg border border-gray-200 shadow-md"
+                  className="w-full h-64 object-cover rounded-lg border border-gray-200 shadow-md dark:border-gray-600"
                 />
               </div>
               <div className="md:w-1/2 space-y-4">
-                <h1 className="text-3xl font-bold text-gray-800">
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                   {classDetail?.name}
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-gray-600 dark:text-gray-300">
                   Class Code:{" "}
                   <span className="font-semibold">{classDetail?.code}</span>
                 </p>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-gray-600 dark:text-gray-300">
                   Course Code:{" "}
                   <span className="font-semibold">
                     {classDetail?.courseCode}
                   </span>
                 </p>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                     {formatCurrency(classDetail?.price)}
                   </p>
                   <Button
@@ -254,74 +254,74 @@ export function ClassDetail() {
             </div>
 
             <div className="mt-10">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700">
+              <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
                 Description
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed dark:text-gray-300">
                 {classDetail?.description}
               </p>
             </div>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="bg-gray-50 border border-gray-200 shadow-md">
+              <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
                   <CardTitle className="text-lg">Class Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
                     <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Start Date: {classDetail?.startDate}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Clock className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Day of Week: {getDayOfWeek(classDetail?.dayOfWeek)}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Code className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Course Code: {classDetail?.courseCode}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Users className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Max Students: {classDetail?.maxStudents}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <ChevronsLeftRightEllipsis className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Slot: {getSlotTime(classDetail?.slotId)}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <UserCheck className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Students Joined: {classDetail?.students?.length || 0}
                     </span>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-50 border border-gray-200 shadow-md">
+              <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
                   <CardTitle className="text-lg">Instructor</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
                     <User className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700">
+                    <span className="text-gray-700 dark:text-gray-300">
                       Instructor Name: {classDetail?.fullName}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <GraduationCap className="mr-2 h-5 w-5 text-blue-600" />
                     <span
-                      className="text-gray-700"
+                      className="text-gray-700 dark:text-gray-300"
                       onClick={handleTeacherClick}
                     >
                       Teacher Username: {classDetail?.teacherName}
@@ -329,7 +329,6 @@ export function ClassDetail() {
                   </div>
                   {classDetail?.imageTeacher ? (
                     <div className="mt-4 flex justify-center items-center relative">
-                      {/* Teacher Image */}
                       <img
                         src={classDetail?.imageTeacher}
                         alt={`Instructor: ${classDetail?.fullName}`}
@@ -339,7 +338,6 @@ export function ClassDetail() {
                     </div>
                   ) : (
                     <div className="mt-4 flex justify-center items-center relative">
-                      {/* Default Image */}
                       <img
                         src={misasa}
                         alt={`Instructor: ${classDetail?.fullName}`}
@@ -353,12 +351,12 @@ export function ClassDetail() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex items-center text-gray-700">
+          <CardFooter className="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
               <Clock className="mr-2 h-5 w-5 text-blue-600" />
               <span>Duration: 2 hours 15 minutes</span>
             </div>
-            <div className="flex items-center text-gray-700">
+            <div className="flex items-center text-gray-700 dark:text-gray-300">
               <Coins className="mr-2 h-5 w-5 text-blue-600" />
               <span>Price: {formatCurrency(classDetail?.price)}</span>
             </div>

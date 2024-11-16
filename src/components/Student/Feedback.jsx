@@ -141,7 +141,7 @@ export default function FeedbackForm() {
   };
   return (
     <>
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-gray-100 dark:bg-gray-800">
         <div className="container px-4 md:px-6">
           <Breadcrumb
             items={[
@@ -152,17 +152,25 @@ export default function FeedbackForm() {
           />
         </div>
       </section>
+
       <div className="container mx-auto p-4 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-6">Course Feedback</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+          Course Feedback
+        </h1>
         <form onSubmit={handleSubmit}>
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-gray-700">
             <CardContent>
-              <Table>
+              <Table className="min-w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-1/3">Question</TableHead>
+                    <TableHead className="w-1/3 text-gray-800 dark:text-gray-100">
+                      Question
+                    </TableHead>
                     {ratingOptions.map((option) => (
-                      <TableHead key={option.value} className="text-center">
+                      <TableHead
+                        key={option.value}
+                        className="text-center text-gray-800 dark:text-gray-100"
+                      >
                         {option.label} {/* Show label only in header */}
                       </TableHead>
                     ))}
@@ -170,11 +178,11 @@ export default function FeedbackForm() {
                 </TableHeader>
                 <TableBody>
                   {questions.map((question) => (
-                    <TableRow key={question.id}>
-                      <TableCell>{question.questionText}</TableCell>
+                    <TableRow key={question.id} className="dark:bg-gray-700">
+                      <TableCell className="text-gray-800 dark:text-gray-100">
+                        {question.questionText}
+                      </TableCell>
                       {ratingOptions.map((option) => (
-                        // ... (previous imports and code remain the same)
-
                         <TableCell key={option.value} className="text-center">
                           <RadioGroup
                             value={
@@ -203,8 +211,8 @@ export default function FeedbackForm() {
                                     feedbackData.feedbackAnswers.find(
                                       (a) => a.questionId === question.id
                                     )?.rating === option.value
-                                      ? "border-blue-500 bg-blue-500" // Selected state
-                                      : "border-gray-300 bg-white hover:border-gray-400" // Unselected state
+                                      ? "border-blue-500 bg-blue-500"
+                                      : "border-gray-300 bg-white hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500"
                                   }`}
                                 />
 
@@ -225,37 +233,46 @@ export default function FeedbackForm() {
               </Table>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card className="dark:bg-gray-700">
             <CardHeader>
-              <CardTitle>Additional Comments</CardTitle>
+              <CardTitle className="text-gray-800 dark:text-gray-100">
+                Additional Comments
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea
                 placeholder="Please provide any additional feedback here..."
                 value={feedbackData.comment}
                 onChange={handleCommentChange}
-                className="min-h-[100px]"
+                className="min-h-[100px] dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+              >
                 Submit Feedback
               </Button>
             </CardFooter>
           </Card>
         </form>
+
         {showSuccessModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
               <div className="flex flex-col items-center text-center">
                 <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-                <h2 className="text-2xl font-semibold mb-2">Thank You!</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+                  Thank You!
+                </h2>
+                <p className="text-gray-600 mb-6 dark:text-gray-300">
                   Your feedback has been submitted successfully.
                 </p>
                 <Button
                   onClick={handleModalClose}
-                  className="w-full bg-green-500 hover:bg-green-600"
+                  className="w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
                 >
                   OK
                 </Button>

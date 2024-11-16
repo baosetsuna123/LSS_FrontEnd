@@ -105,7 +105,9 @@ export function WalletHistory() {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Wallet History</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Wallet History
+        </h1>
         <Button
           onClick={() => navigate("/wallet")}
           className="bg-blue-600 text-white hover:bg-blue-700 transition duration-200 flex items-center"
@@ -114,10 +116,10 @@ export function WalletHistory() {
           Back to Wallet
         </Button>
       </div>
-      <Card className="mb-6">
+      <Card className="mb-6 bg-white dark:bg-gray-800">
         <CardHeader className="flex justify-between items-center w-full">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Filter Transactions
             </CardTitle>
           </div>
@@ -134,7 +136,7 @@ export function WalletHistory() {
           <div className="flex-1 min-w-[200px]">
             <label
               htmlFor="start-date"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Start Date
             </label>
@@ -148,7 +150,7 @@ export function WalletHistory() {
           <div className="flex-1 min-w-[200px]">
             <label
               htmlFor="end-date"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               End Date
             </label>
@@ -162,7 +164,7 @@ export function WalletHistory() {
           <div className="flex-1 min-w-[200px]">
             <label
               htmlFor="transaction-type"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Transaction Type
             </label>
@@ -187,9 +189,11 @@ export function WalletHistory() {
           </div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-white dark:bg-gray-800">
         <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-gray-100">
+            Transaction History
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {filteredTransactions.length === 0 ? (
@@ -217,13 +221,13 @@ export function WalletHistory() {
                         <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
                       )}
                       <div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-300">
                           {transactionDate}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
                           Transaction ID: {index + 1}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
                           Type: {transaction.note} {/* Display the note */}
                         </p>
                       </div>
@@ -237,7 +241,7 @@ export function WalletHistory() {
                         {isCredit ? "+" : "-"}
                         {formatCurrency(formattedAmount)}
                       </p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-400 dark:text-gray-500">
                         New Balance:{" "}
                         {formatCurrency(transaction.transactionBalance)}
                       </p>

@@ -53,7 +53,7 @@ const NewsDetail = () => {
 
   return (
     <>
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-gray-100 dark:bg-gray-800">
         <div className="container px-4 md:px-6">
           <Breadcrumb
             items={[
@@ -67,34 +67,36 @@ const NewsDetail = () => {
 
       {newsDetail && (
         <div className="container px-4 md:px-6 py-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             {newsDetail.title}
           </h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Created on {formatDateTime(newsDetail.date, newsDetail.time)}
           </p>
           <div
             dangerouslySetInnerHTML={{ __html: newsDetail.content }}
-            className="leading-7 text-gray-800"
+            className="leading-7 text-gray-800 dark:text-gray-300"
           />
 
           {/* Tin khác - Other News Section */}
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
               Other news
             </h2>
             <ul className="space-y-4">
               {otherNews.map((newsItem) => (
                 <li
                   key={newsItem.id}
-                  className="border-b pb-4 cursor-pointer hover:bg-gray-100"
+                  className="border-b pb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                   onClick={() => navigate(`/news/${newsItem.id}`)} // Navigate to another news detail
                 >
-                  <span className="mr-2 text-gray-500">•</span>
-                  <span className="text-blue-500 pl-2">
+                  <span className="mr-2 text-gray-500 dark:text-gray-400">
+                    •
+                  </span>
+                  <span className="text-blue-500 pl-2 dark:text-blue-400">
                     {formatDateTime(newsItem.date, newsItem.time)} :
                   </span>
-                  <span className="font-medium text-gray-800 pl-2 hover:text-blue-400">
+                  <span className="font-medium text-gray-800 pl-2 hover:text-blue-400 dark:text-gray-100 dark:hover:text-blue-400">
                     {newsItem.title}
                   </span>
                 </li>

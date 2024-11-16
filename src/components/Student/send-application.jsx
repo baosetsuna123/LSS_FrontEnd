@@ -343,24 +343,38 @@ export function SendApplication() {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6">Send Application</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+        Send Application
+      </h1>
       <Tabs defaultValue="withdraw" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="withdraw">Withdraw Application</TabsTrigger>
-          <TabsTrigger value="other">Other Application</TabsTrigger>
+          <TabsTrigger
+            value="withdraw"
+            className="text-gray-900 dark:text-white"
+          >
+            Withdraw Application
+          </TabsTrigger>
+          <TabsTrigger value="other" className="text-gray-900 dark:text-white">
+            Other Application
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="withdraw">
-          <Card>
+          <Card className="bg-white dark:bg-gray-800">
             <CardHeader>
-              <CardTitle>Withdraw Application</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">
+                Withdraw Application
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
                 Submit a request to withdraw funds from your account.
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleWithdrawalSubmit}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="accountHolderName">
+                  <Label
+                    htmlFor="accountHolderName"
+                    className="text-gray-900 dark:text-white"
+                  >
                     <User className="w-4 h-4 inline-block mr-2" />
                     Account Holder Name
                   </Label>
@@ -370,10 +384,14 @@ export function SendApplication() {
                     value={withdrawalData.accountHolderName}
                     onChange={handleWithdrawalChange}
                     required
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="accountNumber">
+                  <Label
+                    htmlFor="accountNumber"
+                    className="text-gray-900 dark:text-white"
+                  >
                     <CreditCard className="w-4 h-4 inline-block mr-2" />
                     Account Number
                   </Label>
@@ -383,17 +401,23 @@ export function SendApplication() {
                     value={withdrawalData.accountNumber}
                     onChange={handleWithdrawalChange}
                     required
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="bank">Bank</Label>
+                  <Label
+                    htmlFor="bank"
+                    className="text-gray-900 dark:text-white"
+                  >
+                    Bank
+                  </Label>
                   <select
                     id="bank"
                     name="bank"
                     value={withdrawalData.bank}
                     onChange={handleWithdrawalChange}
                     required
-                    className="w-full border rounded px-3 py-2"
+                    className="w-full border rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="" disabled>
                       Select a bank
@@ -406,7 +430,10 @@ export function SendApplication() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="amount">
+                  <Label
+                    htmlFor="amount"
+                    className="text-gray-900 dark:text-white"
+                  >
                     <DollarSign className="w-4 h-4 inline-block mr-2" />
                     Amount
                   </Label>
@@ -417,16 +444,20 @@ export function SendApplication() {
                     value={formatWithCommas(withdrawalData.amount)}
                     onChange={handleInputChange}
                     required
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 {withdrawalData.amount && (
-                  <p className="text-gray-600 text-sm">
-                    {formatAmount(withdrawalData.amount)}{" "}
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    {formatAmount(withdrawalData.amount)}
                   </p>
                 )}
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-500 dark:bg-blue-700 text-white"
+                >
                   <Send className="w-4 h-4 mr-2" />
                   Submit Withdrawal Application
                 </Button>
@@ -437,12 +468,11 @@ export function SendApplication() {
           {/* Modal for confirming withdrawal */}
           {showModal && (
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-96">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
                 {updatedBalance < 0 ? (
                   // When balance is negative, show the "X" icon and "Deposit now" button
                   <div className="text-center text-red-500">
-                    <FaTimesCircle className="text-red-500 w-12 h-12 mb-4 mx-auto" />{" "}
-                    {/* Center the X icon */}
+                    <FaTimesCircle className="text-red-500 w-12 h-12 mb-4 mx-auto" />
                     <p>
                       Your current balance is not enough to withdraw this
                       amount.
@@ -455,7 +485,7 @@ export function SendApplication() {
                         Deposit now
                       </button>
                       <button
-                        onClick={handleCancel} // Close modal action
+                        onClick={handleCancel}
                         className="py-2 px-4 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400"
                       >
                         No
@@ -468,7 +498,7 @@ export function SendApplication() {
                     <div className="flex justify-center mb-4">
                       <FaCheckCircle className="text-green-500 w-12 h-12" />
                     </div>
-                    <h2 className="text-xl font-semibold text-center mb-4">
+                    <h2 className="text-xl font-semibold text-center mb-4 text-gray-900 dark:text-white">
                       Are you sure you want to submit the withdrawal request?
                     </h2>
                     <div className="text-center text-green-600">
@@ -496,17 +526,22 @@ export function SendApplication() {
         </TabsContent>
 
         <TabsContent value="other">
-          <Card>
+          <Card className="bg-white dark:bg-gray-800">
             <CardHeader>
-              <CardTitle>Other Application</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900 dark:text-white">
+                Other Application
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
                 Submit a request for other purposes.
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleOtherRequestSubmit}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="studentName">
+                  <Label
+                    htmlFor="studentName"
+                    className="text-gray-900 dark:text-white"
+                  >
                     <User className="w-4 h-4 inline-block mr-2" />
                     Name
                   </Label>
@@ -516,11 +551,15 @@ export function SendApplication() {
                     value={otherRequestData.studentName}
                     onChange={handleOtherRequestChange}
                     required
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                {role != "TEACHER" && (
+                {role !== "TEACHER" && (
                   <div className="space-y-2">
-                    <Label htmlFor="studentRollNo">
+                    <Label
+                      htmlFor="studentRollNo"
+                      className="text-gray-900 dark:text-white"
+                    >
                       <FileText className="w-4 h-4 inline-block mr-2" />
                       Student Roll Number
                     </Label>
@@ -530,24 +569,34 @@ export function SendApplication() {
                       value={otherRequestData.studentRollNo}
                       onChange={handleOtherRequestChange}
                       required
+                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="reason">Reason for Application</Label>
+                  <Label
+                    htmlFor="reason"
+                    className="text-gray-900 dark:text-white"
+                  >
+                    Reason for Application
+                  </Label>
                   <Textarea
                     id="reason"
                     name="reason"
                     value={otherRequestData.reason}
                     onChange={handleOtherRequestChange}
                     required
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-500 dark:bg-blue-700 text-white"
+                >
                   <Send className="w-4 h-4 mr-2" />
-                  Submit Other Application
+                  Submit Application
                 </Button>
               </CardFooter>
             </form>

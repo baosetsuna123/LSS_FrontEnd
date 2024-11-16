@@ -72,27 +72,30 @@ const News = () => {
 
   return (
     <>
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-gray-100 dark:bg-gray-800">
         <div className="container px-4 md:px-6">
           <Breadcrumb items={breadcrumbItems} />
         </div>
       </section>
+
       <div className="news-container py-6 px-4 ml-10">
         <ul className="space-y-4">
           {displayedNews.length === 0 ? (
-            <li>No news available.</li>
+            <li className="text-gray-700 dark:text-gray-300">
+              No news available.
+            </li>
           ) : (
             displayedNews.map((newsItem) => (
               <li
                 key={newsItem.id}
-                className="border-b pb-4 cursor-pointer hover:bg-gray-100" // Add hover effect to the entire row
+                className="border-b pb-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700" // Hover effect in dark mode
                 onClick={() => handleClick(newsItem.id)} // Add onClick to navigate
               >
-                <span className="mr-2 text-gray-500">•</span>
-                <span className="text-blue-500 pl-2">
+                <span className="mr-2 text-gray-500 dark:text-gray-400">•</span>
+                <span className="text-blue-500 pl-2 dark:text-blue-400">
                   {formatDateTime(newsItem.date, newsItem.time)} :
                 </span>
-                <span className="font-medium text-gray-800 pl-2 hover:text-blue-400">
+                <span className="font-medium text-gray-800 pl-2 hover:text-blue-400 dark:text-gray-100 dark:hover:text-blue-400">
                   {newsItem.title}
                 </span>
               </li>
@@ -106,19 +109,23 @@ const News = () => {
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
             className={`${
-              currentPage === 1 ? "text-gray-400" : "text-blue-500"
+              currentPage === 1
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-blue-500 dark:text-blue-400"
             }`}
           >
             <AiOutlineLeft size={24} />
           </button>
-          <span className="text-gray-700">
+          <span className="text-gray-700 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </span>
           <button
             onClick={handleNextPage}
             disabled={currentPage === totalPages}
             className={`${
-              currentPage === totalPages ? "text-gray-400" : "text-blue-500"
+              currentPage === totalPages
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-blue-500 dark:text-blue-400"
             }`}
           >
             <AiOutlineRight size={24} />

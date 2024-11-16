@@ -226,12 +226,12 @@ export function ApplicationManagement() {
                         <Badge
                           className={`px-3 py-1 rounded-full font-semibold text-sm transition-colors duration-200 ${
                             app.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700 border border-yellow-400 hover:bg-yellow-200"
+                              ? "bg-yellow-100 text-yellow-700 border border-yellow-400 hover:bg-yellow-200 dark:bg-yellow-800 dark:text-yellow-300 dark:border-yellow-600 dark:hover:bg-yellow-700"
                               : app.status === "completed"
-                              ? "bg-green-100 text-green-700 border border-green-400 hover:bg-green-200"
+                              ? "bg-green-100 text-green-700 border border-green-400 hover:bg-green-200 dark:bg-green-800 dark:text-green-300 dark:border-green-600 dark:hover:bg-green-700"
                               : app.status === "Canceled"
-                              ? "bg-red-100 text-red-700 border border-red-400 hover:bg-red-200"
-                              : "bg-gray-100 text-gray-700 border border-gray-400 hover:bg-gray-200"
+                              ? "bg-red-100 text-red-700 border border-red-400 hover:bg-red-200 dark:bg-red-800 dark:text-red-300 dark:border-red-600 dark:hover:bg-red-700"
+                              : "bg-gray-100 text-gray-700 border border-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
                           }`}
                         >
                           {app.status.charAt(0).toUpperCase() +
@@ -377,12 +377,12 @@ export function ApplicationManagement() {
                         <Badge
                           className={`px-3 py-1 rounded-full font-semibold text-sm transition-colors duration-200 ${
                             app.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700 border border-yellow-400 hover:bg-yellow-200"
+                              ? "bg-yellow-100 text-yellow-700 border border-yellow-400 hover:bg-yellow-200 dark:bg-yellow-800 dark:text-yellow-300 dark:border-yellow-600 dark:hover:bg-yellow-700"
                               : app.status === "completed"
-                              ? "bg-green-100 text-green-700 border border-green-400 hover:bg-green-200"
+                              ? "bg-green-100 text-green-700 border border-green-400 hover:bg-green-200 dark:bg-green-800 dark:text-green-300 dark:border-green-600 dark:hover:bg-green-700"
                               : app.status === "rejected"
-                              ? "bg-red-100 text-red-700 border border-red-400 hover:bg-red-200"
-                              : "bg-gray-100 text-gray-700 border border-gray-400 hover:bg-gray-200"
+                              ? "bg-red-100 text-red-700 border border-red-400 hover:bg-red-200 dark:bg-red-800 dark:text-red-300 dark:border-red-600 dark:hover:bg-red-700"
+                              : "bg-gray-100 text-gray-700 border border-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
                           }`}
                         >
                           {app.status.charAt(0).toUpperCase() +

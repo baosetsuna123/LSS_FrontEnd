@@ -16,7 +16,6 @@ import defaults from "../../assets/default.jfif";
 
 export function CourseLandingPage() {
   const [majorClasses, setMajorClasses] = useState([]);
-
   useEffect(() => {
     const fetchMajorClasses = async () => {
       try {
@@ -167,45 +166,45 @@ export function CourseLandingPage() {
           </Carousel>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
           <div className="container px-4 mx-auto md:px-6">
             <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
               Why Choose EduCourse?
             </h2>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
+              <Card className="transition-transform transform hover:scale-105 bg-card shadow-md rounded-lg p-4">
                 <CardHeader>
                   <CheckCircle className="w-10 h-10 mb-2 text-green-500 hover:text-green-700 transition duration-300" />
-                  <CardTitle className="text-xl font-semibold text-gray-800">
+                  <CardTitle className="text-xl font-semibold text-card-foreground">
                     Expert Instructors
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-600">
+                <CardContent className="text-muted-foreground">
                   Learn from industry professionals with years of experience.
                 </CardContent>
               </Card>
 
-              <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
+              <Card className="transition-transform transform hover:scale-105 bg-card shadow-md rounded-lg p-4">
                 <CardHeader>
                   <Users className="w-10 h-10 mb-2 text-blue-500 hover:text-blue-700 transition duration-300" />
-                  <CardTitle className="text-xl font-semibold text-gray-800">
+                  <CardTitle className="text-xl font-semibold text-card-foreground">
                     Interactive Learning
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-600">
+                <CardContent className="text-muted-foreground">
                   Engage with peers and instructors through forums and live
                   sessions.
                 </CardContent>
               </Card>
 
-              <Card className="transition-transform transform hover:scale-105 bg-white shadow-md rounded-lg p-4">
+              <Card className="transition-transform transform hover:scale-105 bg-card shadow-md rounded-lg p-4">
                 <CardHeader>
                   <Star className="w-10 h-10 mb-2 text-yellow-500 hover:text-yellow-700 transition duration-300" />
-                  <CardTitle className="text-xl font-semibold text-gray-800">
+                  <CardTitle className="text-xl font-semibold text-card-foreground">
                     Flexible Schedule
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-600">
+                <CardContent className="text-muted-foreground">
                   Learn at your own pace with lifetime access to course
                   materials.
                 </CardContent>
@@ -213,6 +212,7 @@ export function CourseLandingPage() {
             </div>
           </div>
         </section>
+
         {isLoggedIn &&
           majorClasses.length > 0 &&
           majorClasses.some(
@@ -406,9 +406,9 @@ export function CourseLandingPage() {
           </section>
         )}
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-zinc-900">
           <div className="container px-4 md:px-6 mx-auto">
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8 text-zinc-800 dark:text-zinc-200">
               What Our Students Say
             </h2>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -428,7 +428,7 @@ export function CourseLandingPage() {
               ].map((testimonial, index) => (
                 <Card
                   key={index}
-                  className="transition-transform transform hover:scale-105"
+                  className="transition-transform transform hover:scale-105 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg shadow-md p-6"
                 >
                   <CardHeader>
                     <CardTitle className="text-xl font-semibold">
@@ -445,14 +445,15 @@ export function CourseLandingPage() {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-zinc-900 dark:bg-zinc-50">
+
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-black">
           <div className="container px-4 mx-auto md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-white">
                   Ready to Start Learning?
                 </h2>
-                <p className="mx-auto max-w-[600px] text-gray-300 md:text-xl">
+                <p className="mx-auto max-w-[600px] text-white md:text-xl">
                   Join thousands of students and start your learning journey
                   today.
                 </p>
@@ -460,21 +461,24 @@ export function CourseLandingPage() {
               <div className="w-full max-w-sm space-y-2">
                 <form className="flex space-x-2">
                   <Input
-                    className="max-w-lg flex-1 bg-white rounded-lg shadow-md"
+                    className="flex-1 bg-zinc-900 text-white placeholder-gray-500 rounded-lg shadow-md"
                     placeholder="Enter your email"
                     type="email"
                   />
                   <Button
                     type="submit"
                     variant="secondary"
-                    className="rounded-lg shadow-md"
+                    className="rounded-lg shadow-md bg-indigo-600 text-white hover:bg-indigo-500"
                   >
                     Get Started
                   </Button>
                 </form>
-                <p className="text-xs text-gray-300">
+                <p className="text-xs text-white">
                   By signing up, you agree to our{" "}
-                  <a className="underline underline-offset-2" href="#">
+                  <a
+                    className="underline underline-offset-2 text-white hover:text-gray-300"
+                    href="#"
+                  >
                     Terms & Conditions
                   </a>
                 </p>

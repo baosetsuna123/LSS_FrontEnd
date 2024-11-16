@@ -79,7 +79,7 @@ export function ViewAllClasses() {
     setMaxPrice(250000);
     setSelectedCourseCodes([]);
   };
-
+  console.log("maxPrice:", maxPrice);
   // Calculate total pages
   const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
 
@@ -96,11 +96,15 @@ export function ViewAllClasses() {
   ];
   return (
     <>
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-gray-100 dark:bg-gray-800">
         <div className="container px-4 md:px-6">
-          <Breadcrumb items={breadcrumbItems} />
+          <Breadcrumb
+            items={breadcrumbItems}
+            className="text-gray-900 dark:text-white"
+          />
         </div>
       </section>
+
       <div className="container mx-auto p-4 max-w-6xl">
         <h1 className="text-3xl font-bold mb-6">View All Classes</h1>
 
@@ -191,7 +195,7 @@ export function ViewAllClasses() {
                     <Card
                       key={classItem.classId}
                       onClick={() => handleClassClick(classItem.classId)}
-                      className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                      className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl bg-white dark:bg-gray-800"
                     >
                       <CardContent className="p-6">
                         <div className="flex flex-col gap-4">
@@ -201,24 +205,24 @@ export function ViewAllClasses() {
                             className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
                           />
                           <div>
-                            <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 transition-colors duration-300">
                               {classItem.name}
                             </h2>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               Class Code: {classItem.code}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               Course Code: {classItem.courseCode}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               Instructor: {classItem.teacherName}
                             </p>
                           </div>
                           <div className="flex justify-between items-center">
-                            <p className="text-lg font-bold text-gray-900 flex items-center">
+                            <p className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
                               {formatCurrency(classItem.price)}
                             </p>
-                            <Button className="transition-colors duration-300 hover:bg-blue-500 hover:text-white">
+                            <Button className="transition-colors duration-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400">
                               View Details
                             </Button>
                           </div>
@@ -235,9 +239,7 @@ export function ViewAllClasses() {
                 )}
               </div>
             </div>
-
-            {/* Pagination Controls only when there is no search term */}
-            {contextClasses.length > itemsPerPage && (
+            {contextClasses.length > itemsPerPage && maxPrice != 100000 && (
               <div className="flex justify-between mt-4">
                 <Button
                   disabled={currentPage === 1}

@@ -211,17 +211,24 @@ const MyClass = () => {
 
   return (
     <div className="my-6 px-4">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">My TimeTable</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
+        My TimeTable
+      </h2>
       <YearWeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+        <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg dark:bg-gray-800 dark:border-gray-600">
           <thead>
-            <tr className="bg-gray-200 *:text-center">
-              <th className="py-2 px-4 border-b border-r">Slot</th>
+            <tr className="bg-gray-200 dark:bg-gray-700 text-center">
+              <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-200">
+                Slot
+              </th>
               {datesInTheWeek.map((date, index) => {
                 const dayOfWeek = days[index % 7];
                 return (
-                  <th key={index} className="py-2 px-4 border-b text-center">
+                  <th
+                    key={index}
+                    className="py-2 px-4 border-b text-center text-gray-800 dark:text-gray-200"
+                  >
                     <p>{dayOfWeek}</p>
                     <p>{date}</p>
                   </th>
@@ -233,18 +240,18 @@ const MyClass = () => {
             {slots.map((slot, index) => (
               <tr
                 key={index}
-                className="hover:bg-gray-100 transition duration-150"
+                className="hover:bg-gray-100 transition duration-150 dark:hover:bg-gray-600"
               >
-                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
+                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-200">
                   Slot {slot.period}
-                  <div className="text-xs text-gray-600">
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
                     {"(" + slot.start + " - " + slot.end + ")"}
                   </div>
                 </td>
                 {days.map((day) => (
                   <td
                     key={`${day}-${slot.period}`}
-                    className="border-b border-r p-2 text-center max-w-[150px]"
+                    className="border-b border-r p-2 text-center max-w-[150px] text-gray-800 dark:text-gray-200"
                   >
                     {renderTimetableCell(day, slot.period)}
                   </td>

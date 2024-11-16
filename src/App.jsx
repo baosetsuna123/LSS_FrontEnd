@@ -40,7 +40,8 @@ import NewsDetail from "./components/Student/NewsDetail";
 import TeacherProfile from "./components/Student/TeacherProfile";
 import ProfileTeacher from "./components/Teacher/ProfileTeacher";
 import { WalletTeacher } from "./components/Teacher/WalletTeacher";
-import User from "./components/Admin/User";
+import User from "./components/Admin/ListUser";
+import CreateStaff from "./components/Admin/CreateStaff";
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
         >
           <Route index element={<AdminHome />} />
           <Route path="User" element={<User />} />
+          <Route path="User/create-staff" element={<CreateStaff />} />
         </Route>
 
         {/* Teacher Dashboard Routes */}

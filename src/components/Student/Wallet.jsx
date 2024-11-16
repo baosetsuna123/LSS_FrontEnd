@@ -262,24 +262,28 @@ export function MyWallet() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8"
       style={{
         backgroundImage: `url(${wallet})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <div className="container mx-auto p-4 max-w-4xl bg-white bg-opacity-80 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+      <div className="container mx-auto p-4 max-w-4xl bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-90 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200">
           My Wallet
         </h1>
-        <Card className="mb-6 shadow-md">
+        <Card className="mb-6 shadow-md dark:bg-gray-700">
           <CardHeader className="text-center">
-            <CardTitle>Current Balance</CardTitle>
-            <CardDescription>Your available funds</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-gray-100">
+              Current Balance
+            </CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">
+              Your available funds
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <p className="text-4xl font-bold text-gray-900">
+            <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
               {formatCurrency(balance)} {/* Hiển thị số dư đã định dạng */}
             </p>
           </CardContent>
@@ -288,7 +292,7 @@ export function MyWallet() {
           <TabsList className="flex w-full">
             <TabsTrigger
               value="add-funds"
-              className="flex-grow w-full hover:bg-gray-200 transition duration-200"
+              className="flex-grow w-full hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200"
             >
               Add Funds
             </TabsTrigger>
@@ -296,34 +300,44 @@ export function MyWallet() {
           <TabsContent value="add-funds">
             <Card>
               <CardHeader>
-                <CardTitle>Add Funds to Your Wallet</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900 dark:text-gray-100">
+                  Add Funds to Your Wallet
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
                   Choose an amount to add to your balance
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="space-y-1">
-                  <Label htmlFor="amount">Amount</Label>
+                  <Label
+                    htmlFor="amount"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Amount
+                  </Label>
                   <Input
                     id="amount"
                     type="text" // Use "text" instead of "number" to allow formatting with commas
                     placeholder="Enter amount"
                     value={formatWithCommas(amount)} // Display the formatted value
                     onChange={handleInputChange} // Handle input changes
+                    className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                   {amount && (
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       {formatAmount(amount)}
                     </p>
                   )}
                   {errorMessage && (
-                    <p className="text-red-500 text-sm">{errorMessage}</p>
+                    <p className="text-red-500 dark:text-red-300 text-sm">
+                      {errorMessage}
+                    </p>
                   )}
                 </div>
               </CardContent>
               <CardFooter>
                 <Button
-                  className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                  className="w-full bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition duration-200"
                   onClick={handleRecharge} // Call handleRecharge on button click
                 >
                   <DollarSign className="mr-2 h-4 w-4" />
@@ -337,8 +351,12 @@ export function MyWallet() {
           {transactions.length > 0 && (
             <>
               <CardHeader>
-                <CardTitle>Recent Transactions</CardTitle>
-                <CardDescription>Your latest wallet activity</CardDescription>
+                <CardTitle className="text-gray-900 dark:text-gray-100">
+                  Recent Transactions
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
+                  Your latest wallet activity
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
@@ -349,25 +367,25 @@ export function MyWallet() {
                     return (
                       <li
                         key={transaction.id}
-                        className="flex items-center justify-between border-b pb-2"
+                        className="flex items-center justify-between border-b pb-2 dark:border-gray-600"
                       >
                         <div className="flex items-center">
                           {isCredit ? (
-                            <ArrowUpRight className="mr-2 h-4 w-4 text-green-500" />
+                            <ArrowUpRight className="mr-2 h-4 w-4 text-green-500 dark:text-green-400" />
                           ) : (
-                            <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500" />
+                            <ArrowDownLeft className="mr-2 h-4 w-4 text-red-500 dark:text-red-400" />
                           )}
                           <div>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-300">
                               {formatTransactionDate(
                                 transaction.transactionDate
                               )}{" "}
                               {/* Display formatted date */}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
                               Transaction ID: {index + 1}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
                               Type: {transaction.note} {/* Display the note */}
                             </p>
                           </div>
@@ -376,12 +394,12 @@ export function MyWallet() {
                           <p
                             className={`font-medium ${
                               isCredit ? "text-green-500" : "text-red-500"
-                            }`}
+                            } dark:text-green-400`}
                           >
                             {isCredit ? "+ " : "- "}
                             {formatCurrency(formattedAmount)}
                           </p>
-                          <p className="text-sm text-gray-400">
+                          <p className="text-sm text-gray-400 dark:text-gray-500">
                             New Balance:{" "}
                             {formatCurrency(transaction.transactionBalance)}
                           </p>
@@ -394,7 +412,7 @@ export function MyWallet() {
               {transactions.length > 3 && (
                 <CardFooter>
                   <Button
-                    className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
+                    className="w-full bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition duration-200"
                     onClick={() => navigate("/all-transactions")} // Navigate to all transactions
                   >
                     Show All Transactions

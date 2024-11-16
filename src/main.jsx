@@ -8,6 +8,7 @@ import { WalletProvider } from "./context/WalletContext.jsx";
 import { FeedbackProvider } from "./context/FeedbackContext.jsx";
 import { QuestionProvider } from "./context/QuestionContext.jsx";
 import { AvatarProvider } from "./context/AvatarContext.jsx";
+import { ThemeProvider } from "./context/Theme-Provider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
@@ -16,8 +17,10 @@ createRoot(document.getElementById("root")).render(
         <FeedbackProvider>
           <QuestionProvider>
             <AvatarProvider>
-              <Toaster />
-              <App />
+              <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+                <Toaster />
+                <App />
+              </ThemeProvider>
             </AvatarProvider>
           </QuestionProvider>
         </FeedbackProvider>

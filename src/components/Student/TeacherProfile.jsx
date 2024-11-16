@@ -142,8 +142,8 @@ const TeacherProfile = () => {
 
   return (
     <>
-      <section className="w-full py-4 bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900">
-        <div className="container px-4 md:px-6">
+      <section className="w-full dark:text-white py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-900 ">
+        <div className="container dark:text-white  px-4 md:px-6">
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
@@ -160,27 +160,27 @@ const TeacherProfile = () => {
 
       <div className="teacher-profile-container px-6 mt-6 flex justify-between items-center">
         <div className="flex-1">
-          <Button className="mb-2 mr-4 text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 rounded-full px-4 py-1 text-sm">
+          <Button className="mb-2 mr-4 text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 rounded-full px-4 py-1 text-sm dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600">
             Teacher
           </Button>
 
-          <h1 className="text-4xl font-semibold text-gray-800">
+          <h1 className="text-4xl font-semibold text-gray-800 dark:text-gray-100">
             {teacherName}
           </h1>
           <div className="flex items-center gap-2 mt-2">
             <StarRating averageRating={average} />
-            <span className="text-xl text-gray-600">
+            <span className="text-xl text-gray-600 dark:text-gray-300">
               ({average.toFixed(2)})
             </span>
           </div>
 
           {/* Display Total Students */}
-          <div className="mt-4 text-2xl text-gray-700">
+          <div className="mt-4 text-2xl text-gray-700 dark:text-gray-300">
             Total Students: <span className="font-bold">{totalStudents}</span>
           </div>
 
           {/* Display My Major */}
-          <div className="mt-4 text-2xl text-gray-700">
+          <div className="mt-4 text-2xl text-gray-700 dark:text-gray-300">
             My Major:{" "}
             <span className="font-bold">
               {Array.isArray(info.major) && info.major.length > 0
@@ -199,14 +199,17 @@ const TeacherProfile = () => {
           )}
         </div>
       </div>
+
       <div className="about-me-section px-6 mt-6">
-        <h3 className="text-3xl font-semibold text-gray-800">About Me</h3>
-        <p className="text-lg text-gray-700 mt-4">
+        <h3 className="text-3xl font-semibold text-gray-800 dark:text-gray-100">
+          About Me
+        </h3>
+        <p className="text-lg text-gray-700 mt-4 dark:text-gray-300">
           {info.description ? info.description : "No description available."}
         </p>
       </div>
 
-      <h2 className="text-3xl font-semibold text-gray-800 mt-6 ml-5">
+      <h2 className="text-3xl font-semibold text-gray-800 mt-6 ml-5 dark:text-gray-100">
         My Class ({classes.length})
       </h2>
       <div className="grid grid-cols-12 gap-6 mt-6">
@@ -215,7 +218,7 @@ const TeacherProfile = () => {
             <div key={classItem.classId} className="col-span-6 md:col-span-3">
               <Card
                 onClick={() => handleClassClick(classItem.classId)}
-                className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col gap-4">
@@ -225,21 +228,21 @@ const TeacherProfile = () => {
                       className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
                     />
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300">
+                      <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 dark:text-gray-100 dark:hover:text-blue-500">
                         {classItem.name}
                       </h2>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Class Code: {classItem.code}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         Course Code: {classItem.courseCode}
                       </p>
                     </div>
                     <div className="flex justify-between items-center">
-                      <p className="text-lg font-bold flex items-center">
+                      <p className="text-lg font-bold flex items-center text-gray-900 dark:text-gray-100">
                         {formatCurrency(classItem.price)}
                       </p>
-                      <Button className="hover:bg-blue-500 hover:text-white transition-colors duration-300">
+                      <Button className="hover:bg-blue-500 hover:text-white transition-colors duration-300 dark:hover:bg-blue-600 dark:hover:text-gray-900">
                         View Details
                       </Button>
                     </div>
@@ -249,7 +252,9 @@ const TeacherProfile = () => {
             </div>
           ))
         ) : (
-          <p>No classes found for this teacher.</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            No classes found for this teacher.
+          </p>
         )}
       </div>
     </>

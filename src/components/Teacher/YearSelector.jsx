@@ -78,11 +78,11 @@ const YearWeekSelector = ({ onWeekChange }) => {
 
   return (
     <div className="mb-4">
-      <label className="text-gray-700">Choose year:</label>
+      <label className="text-gray-700 dark:text-gray-200">Choose year:</label>
       <select
         value={selectedYear}
         onChange={handleYearChange}
-        className="border p-2 ml-2 rounded border-gray-300"
+        className="border p-2 ml-2 rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
       >
         {Array.from({ length: 10 }, (_, i) => {
           const year = getCurrentYear() - 3 + i;
@@ -94,11 +94,13 @@ const YearWeekSelector = ({ onWeekChange }) => {
         })}
       </select>
 
-      <label className="text-gray-700 ml-4">Choose week:</label>
+      <label className="text-gray-700 ml-4 dark:text-gray-200">
+        Choose week:
+      </label>
       <select
         value={selectedWeek?.weekNumber || ""}
         onChange={handleWeekChange}
-        className="border p-2 ml-2 rounded border-gray-300 px-3"
+        className="border p-2 ml-2 rounded border-gray-300 px-3 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
       >
         {weeks.map((week) => (
           <option key={week.weekNumber} value={week.weekNumber}>

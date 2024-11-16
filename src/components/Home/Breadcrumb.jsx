@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Breadcrumb = ({ items }) => {
   return (
-    <nav className="flex items-center space-x-2 text-gray-600">
+    <nav className="flex items-center space-x-2 text-gray-600 dark:text-white ">
       {items.map((item, index) => (
         <span key={index} className="flex items-center">
           {index > 0 && <span className="mx-2">{">"}</span>}

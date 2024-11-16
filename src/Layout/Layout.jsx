@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
+import { ModeToggle } from "@/components/ui/Mode-Toggle";
 
 export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -149,7 +150,9 @@ export function Layout({ children }) {
                 placeholder="Search classes ..."
                 value={searchTerm}
                 onChange={handleSearchInputChange}
-                className="border rounded px-4 py-1 w-96"
+                className="border rounded px-4 py-1 w-96 
+    bg-white text-gray-800 placeholder-gray-500 
+    dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:placeholder-gray-400"
               />
 
               {/* Search Results Popup */}
@@ -183,7 +186,7 @@ export function Layout({ children }) {
             </div>
           )}
 
-          <nav className="ml-auto flex gap-4 sm:gap-6">
+          <nav className="ml-auto flex items-center gap-4 sm:gap-6">
             {isLoggedIn && (
               <Link
                 className="text-sm font-medium hover:underline underline-offset-4"
@@ -199,16 +202,17 @@ export function Layout({ children }) {
               About
             </Link>
             {isLoggedIn ? (
-              <div className="relative">
+              <div className="relative flex items-center gap-4">
                 <User
                   className="h-6 w-6 cursor-pointer"
                   onClick={togglePopup}
                   aria-hidden="true"
                 />
+                <ModeToggle />
                 {isUserPopupVisible && (
                   <div
                     ref={popupRef}
-                    className="absolute right-0 mt-2 w-96 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-2 grid grid-cols-2 gap-2"
+                    className="absolute right-5 mt-56 w-max bg-white border border-gray-300 rounded-md shadow-lg z-50 p-2 grid grid-cols-2 gap-2"
                   >
                     <Link
                       to="/profile"

@@ -18,11 +18,16 @@ import {
 import { useWallet } from "@/context/WalletContext";
 
 const statusColors = {
-  COMPLETED: "bg-green-100 text-green-800 hover:bg-green-200",
-  PENDING: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-  ACTIVE: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-  CANCELLED: "bg-red-100 text-red-800 hover:bg-red-200",
-  ONGOING: "bg-orange-100 text-orange-800 hover:bg-orange-200",
+  COMPLETED:
+    "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-green-100 dark:hover:bg-green-700",
+  PENDING:
+    "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800 dark:text-yellow-100 dark:hover:bg-yellow-700",
+  ACTIVE:
+    "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-800 dark:text-blue-100 dark:hover:bg-blue-700",
+  CANCELLED:
+    "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-800 dark:text-red-100 dark:hover:bg-red-700",
+  ONGOING:
+    "bg-orange-100 text-orange-800 hover:bg-orange-200 dark:bg-orange-800 dark:text-orange-100 dark:hover:bg-orange-700",
 };
 
 const formatCurrency = (amount) => {
@@ -120,22 +125,24 @@ export function MyOrders() {
     <>
       <div className="container mx-auto p-4 max-w-4xl">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Orders</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            My Orders
+          </h1>
           {/* Search Input */}
-          <div className="flex items-center border rounded p-2">
+          <div className="flex items-center border rounded p-2 dark:bg-gray-700">
             <input
               type="text"
               placeholder="Search by Class Name"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border border-gray-300 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm"
+              className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm dark:text-white dark:bg-gray-700"
             />
           </div>
         </div>
 
         {/* Display message if no orders */}
         {filteredOrders.length === 0 && (
-          <div className="text-center text-xl font-semibold text-gray-500 mt-8">
+          <div className="text-center text-xl font-semibold text-gray-500 dark:text-gray-300 mt-8">
             No Data
           </div>
         )}
@@ -144,28 +151,42 @@ export function MyOrders() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead className="pl-12">Start Date</TableHead>
-                <TableHead className="pl-12">Class Name</TableHead>
-                <TableHead className="text-right">Total Price</TableHead>
-                <TableHead className="text-right">Teacher Name</TableHead>
-                <TableHead className="pl-5">Status</TableHead>
+                <TableHead className="text-gray-900 dark:text-white">
+                  Order ID
+                </TableHead>
+                <TableHead className="pl-12 text-gray-900 dark:text-white">
+                  Start Date
+                </TableHead>
+                <TableHead className="pl-12 text-gray-900 dark:text-white">
+                  Class Name
+                </TableHead>
+                <TableHead className="text-right text-gray-900 dark:text-white">
+                  Total Price
+                </TableHead>
+                <TableHead className="text-right text-gray-900 dark:text-white">
+                  Teacher Name
+                </TableHead>
+                <TableHead className="pl-5 text-gray-900 dark:text-white">
+                  Status
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentData.map((order, index) => (
                 <TableRow key={order.orderDetailId}>
-                  <TableCell className="font-medium pl-7">
+                  <TableCell className="font-medium pl-7 text-gray-900 dark:text-white">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </TableCell>
-                  <TableCell className="pl-10">
+                  <TableCell className="pl-10 text-gray-900 dark:text-white">
                     {new Date(order.classDTO.startDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="pl-10">{order.classDTO.name}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="pl-10 text-gray-900 dark:text-white">
+                    {order.classDTO.name}
+                  </TableCell>
+                  <TableCell className="text-right text-gray-900 dark:text-white">
                     {formatCurrency(order.price)}
                   </TableCell>
-                  <TableCell className="pl-20">
+                  <TableCell className="pl-20 text-gray-900 dark:text-white">
                     {order.classDTO.teacherName}
                   </TableCell>
                   <TableCell className="text-center">
@@ -201,15 +222,17 @@ export function MyOrders() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 ease-in-out mr-2"
+              className="p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 ease-in-out mr-2 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               <FaChevronLeft />
             </button>
-            <span className="px-4 py-2 text-lg font-medium">{currentPage}</span>
+            <span className="px-4 py-2 text-lg font-medium text-gray-900 dark:text-white">
+              {currentPage}
+            </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 ease-in-out ml-2"
+              className="p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 ease-in-out ml-2 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               <FaChevronRight />
             </button>
@@ -220,18 +243,18 @@ export function MyOrders() {
       {/* Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full dark:bg-gray-800">
             <div className="flex items-center justify-center mb-4">
               <FaExclamationTriangle className="text-red-500 text-4xl" />
             </div>
-            <h2 className="text-xl font-semibold text-center text-gray-800">
+            <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white">
               Are you sure you want to cancel this order?
             </h2>
             <div className="mt-4 text-center">
-              <p className="mb-4 text-lg font-medium text-green-600">
+              <p className="mb-4 text-lg font-medium text-green-600 dark:text-green-400">
                 Current Balance: {formatCurrency(balance)}
               </p>
-              <p className="mb-6 text-lg font-medium text-green-600">
+              <p className="mb-6 text-lg font-medium text-green-600 dark:text-green-400">
                 New Balance:{" "}
                 {newBalance !== null
                   ? formatCurrency(newBalance)
@@ -240,13 +263,13 @@ export function MyOrders() {
               <div className="flex justify-between">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCancelOrder}
-                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-24"
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 w-24 dark:bg-red-600 dark:hover:bg-red-700"
                 >
                   Confirm
                 </button>
