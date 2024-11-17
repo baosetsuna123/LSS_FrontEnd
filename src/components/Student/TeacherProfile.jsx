@@ -242,7 +242,7 @@ const TeacherProfile = () => {
                       <p className="text-lg font-bold flex items-center text-gray-900 dark:text-gray-100">
                         {formatCurrency(classItem.price)}
                       </p>
-                      <Button className="hover:bg-blue-500 hover:text-white transition-colors duration-300 dark:hover:bg-blue-600 dark:hover:text-gray-900">
+                      <Button className="hover:bg-blue-500 dark:bg-orange-500 hover:text-white transition-colors duration-300 dark:hover:bg-blue-600 dark:hover:text-gray-900">
                         View Details
                       </Button>
                     </div>

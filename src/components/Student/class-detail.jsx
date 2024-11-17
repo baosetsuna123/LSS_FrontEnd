@@ -244,7 +244,7 @@ export function ClassDetail() {
                     className={`px-6 py-2 font-semibold rounded-lg ${
                       isEnrolled
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-600 hover:bg-blue-700 dark:bg-orange-500 dark:hover:bg-orange-600"
                     } text-white`}
                     onClick={handleEnrollClick}
                     disabled={isEnrolled}

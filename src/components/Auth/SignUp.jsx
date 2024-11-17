@@ -128,12 +128,12 @@ export default function SignUp() {
         height: "100vh",
       }}
     >
-      <div className="max-w-md w-full space-y-8 bg-white p-5 rounded-xl shadow-md">
+      <div className="max-w-md w-full space-y-6 bg-white p-5 rounded-xl shadow-md">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          <p className=" text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600">
             Or{" "}
             <a
               onClick={() => navigate("/login")}
@@ -143,12 +143,12 @@ export default function SignUp() {
             </a>
           </p>
         </div>
-        <div className="flex justify-center space-x-2 mb-4">
+        <div className="flex justify-center space-x-1">
           {["student", "teacher"].map((type) => (
             <button
               key={type}
               onClick={() => setUserType(type)}
-              className={`py-2 px-4 rounded-md transition-colors duration-200 ${
+              className={`py-1 px-4 rounded-md transition-colors duration-200 ${
                 userType === type
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -443,24 +443,6 @@ export default function SignUp() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
           </div>
-        </div>
-        <div className="mt-2 text-center">
-          <p className="text-sm text-gray-600">
-            By signing up, you agree to our{" "}
-            <a
-              href="#"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Privacy Policy
-            </a>
-          </p>
         </div>
       </div>
     </div>

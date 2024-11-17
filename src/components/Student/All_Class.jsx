@@ -208,13 +208,13 @@ export function ViewAllClasses() {
                             <h2 className="text-2xl font-bold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 transition-colors duration-300">
                               {classItem.name}
                             </h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
                               Class Code: {classItem.code}
                             </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
                               Course Code: {classItem.courseCode}
                             </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
                               Instructor: {classItem.teacherName}
                             </p>
                           </div>
@@ -222,7 +222,7 @@ export function ViewAllClasses() {
                             <p className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
                               {formatCurrency(classItem.price)}
                             </p>
-                            <Button className="transition-colors duration-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400">
+                            <Button className="transition-colors dark:bg-orange-500 duration-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400">
                               View Details
                             </Button>
                           </div>

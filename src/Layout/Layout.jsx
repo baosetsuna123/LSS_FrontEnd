@@ -7,11 +7,9 @@ import {
   Dock,
   LayoutGrid,
   LogOut,
-  Newspaper,
   Search,
   ShoppingBag,
   User,
-  Wallet,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
@@ -154,7 +152,28 @@ export function Layout({ children }) {
     bg-white text-gray-800 placeholder-gray-500 
     dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:placeholder-gray-400"
               />
-
+              {searchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm(""); // Clear the search term
+                    setIsSearchPopupVisible(false); // Hide the popup if visible
+                  }}
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9l-3.5-3.5a1 1 0 00-1.414 0L4.293 6.293a1 1 0 000 1.414L7.5 10l-3.5 3.5a1 1 0 000 1.414l1.293 1.293a1 1 0 001.414 0L10 11l3.5 3.5a1 1 0 001.414 0l1.293-1.293a1 1 0 000-1.414L12.5 10l3.5-3.5a1 1 0 000-1.414L14.707 5.293a1 1 0 00-1.414 0L10 9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              )}
               {/* Search Results Popup */}
               {isSearchPopupVisible && filteredClasses.length > 0 && (
                 <div
@@ -175,8 +194,10 @@ export function Layout({ children }) {
                         alt={course.name}
                         className="w-10 h-10 object-cover rounded mr-4"
                       />
-                      <span className="font-semibold">{course.name}</span>
-                      <span className="ml-auto text-gray-500">
+                      <span className="font-semibold dark:text-green-600">
+                        {course.name}
+                      </span>
+                      <span className="ml-auto text-gray-500 dark:text-green-400">
                         {course.courseCode}
                       </span>
                     </div>
@@ -186,14 +207,28 @@ export function Layout({ children }) {
             </div>
           )}
 
-          <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+          <nav className="ml-auto font-semibold flex items-center gap-8 sm:gap-10">
             {isLoggedIn && (
-              <Link
-                className="text-sm font-medium hover:underline underline-offset-4"
-                to="/class"
-              >
-                Classes
-              </Link>
+              <>
+                <Link
+                  className="text-sm font-semibold hover:underline underline-offset-4"
+                  to="/class"
+                >
+                  Classes
+                </Link>
+                <Link
+                  className="text-sm font-semibold hover:underline underline-offset-4"
+                  to="/wallet"
+                >
+                  Wallet
+                </Link>
+                <Link
+                  className="text-sm font-semibold hover:underline underline-offset-4"
+                  to="/news"
+                >
+                  News
+                </Link>
+              </>
             )}
             <Link
               className="text-sm font-medium hover:underline underline-offset-4"
@@ -202,9 +237,9 @@ export function Layout({ children }) {
               About
             </Link>
             {isLoggedIn ? (
-              <div className="relative flex items-center gap-4">
+              <div className="relative flex items-center gap-6">
                 <User
-                  className="h-6 w-6 cursor-pointer"
+                  className="h-6 w-6 cursor-pointer mr-3"
                   onClick={togglePopup}
                   aria-hidden="true"
                 />
@@ -212,7 +247,7 @@ export function Layout({ children }) {
                 {isUserPopupVisible && (
                   <div
                     ref={popupRef}
-                    className="absolute right-5 mt-56 w-max bg-white border border-gray-300 rounded-md shadow-lg z-50 p-2 grid grid-cols-2 gap-2"
+                    className="absolute right-5 mr-7 mt-44 w-max bg-white border border-gray-300 rounded-md shadow-lg z-50 p-2 grid grid-cols-2 gap-2"
                   >
                     <Link
                       to="/profile"
@@ -220,13 +255,6 @@ export function Layout({ children }) {
                     >
                       <User className="h-4 w-4 mr-2" />
                       My Profile
-                    </Link>
-                    <Link
-                      to="/wallet"
-                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    >
-                      <Wallet className="h-4 w-4 mr-2" />
-                      My Wallet
                     </Link>
                     <Link
                       to="/order"
@@ -257,13 +285,6 @@ export function Layout({ children }) {
                     >
                       <Dock className="h-4 w-4 mr-2" />
                       View Applications
-                    </Link>
-                    <Link
-                      to="/news"
-                      className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    >
-                      <Newspaper className="h-4 w-4 mr-2" />
-                      News
                     </Link>
                     <button
                       onClick={handleLogout}

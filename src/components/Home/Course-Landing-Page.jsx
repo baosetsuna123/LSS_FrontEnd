@@ -12,6 +12,7 @@ import home1 from "../../assets/home-carousel-1.png";
 import home2 from "../../assets/home-2.png";
 import home3 from "../../assets/home-3.jpg";
 import defaults from "../../assets/default.jfif";
+import "./Course-Landing-Page.css";
 
 export function CourseLandingPage() {
   const [majorClasses, setMajorClasses] = useState([]);
@@ -164,8 +165,7 @@ export function CourseLandingPage() {
             ))}
           </Carousel>
         </section>
-
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+        <section className="w-full py-3 md:py-6 lg:py-12 bg-background">
           <div className="container px-4 mx-auto md:px-6">
             <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
               Why Choose EduCourse?
@@ -182,7 +182,6 @@ export function CourseLandingPage() {
                   Learn from industry professionals with years of experience.
                 </CardContent>
               </Card>
-
               <Card className="transition-transform transform hover:scale-105 bg-card shadow-md rounded-lg p-4">
                 <CardHeader>
                   <Users className="w-10 h-10 mb-2 text-blue-500 hover:text-blue-700 transition duration-300" />
@@ -211,14 +210,13 @@ export function CourseLandingPage() {
             </div>
           </div>
         </section>
-
         {isLoggedIn &&
           majorClasses.length > 0 &&
           majorClasses.some(
             (classItem) =>
               classItem.status === "PENDING" || classItem.status === "ACTIVE"
           ) && (
-            <section className="w-full py-12 md:py-24 lg:py-32">
+            <section className="w-full py-4 md:py-16 lg:py-24">
               <div className="container px-4 mx-auto md:px-6">
                 <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
                   Hot Topic
@@ -274,12 +272,12 @@ export function CourseLandingPage() {
                               <p className="text-2xl font-bold">
                                 {formatCurrency(course.price)}
                               </p>
-                              <p className="text-lg font-light text-gray-500">
+                              <p className="text-lg font-medium text-gray-500 dark:text-gray-300">
                                 Created by {course.teacherName}
                               </p>
                             </div>
                             <Button
-                              className="mt-4 w-full"
+                              className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
                               disabled={enrollmentStatus[course.classId]}
                             >
                               {enrollmentStatus[course.classId]
@@ -294,7 +292,7 @@ export function CourseLandingPage() {
                 <div className="flex justify-center mt-8">
                   <Button
                     onClick={() => navigate("/class")}
-                    className={`${
+                    className={`dark:bg-orange-500 dark:hover:bg-orange-600 ${
                       majorClasses.filter(
                         (course) =>
                           course.status === "PENDING" ||
@@ -312,7 +310,7 @@ export function CourseLandingPage() {
           )}
 
         {isLoggedIn && (
-          <section className="w-full py-12 md:py-24 lg:py-32">
+          <section className="w-full py-3 md:py-6 lg:py-12">
             <div className="container px-4 mx-auto md:px-6">
               <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
                 Featured Classes
@@ -368,12 +366,12 @@ export function CourseLandingPage() {
                             <p className="text-2xl font-bold">
                               {formatCurrency(course.price)}
                             </p>
-                            <p className="text-lg font-light text-gray-500">
+                            <p className="text-lg  text-gray-500 dark:text-gray-300 font-medium">
                               Created by {course.teacherName}
                             </p>
                           </div>
                           <Button
-                            className="mt-4 w-full"
+                            className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
                             disabled={enrollmentStatus[course.classId]}
                           >
                             {enrollmentStatus[course.classId]
@@ -388,7 +386,7 @@ export function CourseLandingPage() {
               <div className="flex justify-center mt-8">
                 <Button
                   onClick={() => navigate("/class")}
-                  className={`${
+                  className={`dark:bg-orange-500 dark:hover:bg-orange-600 ${
                     classes.filter(
                       (course) =>
                         course.status === "PENDING" ||
@@ -405,7 +403,7 @@ export function CourseLandingPage() {
           </section>
         )}
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-zinc-900">
+        <section className="w-full py-3 md:py-6 lg:py-12 bg-gray-100 dark:bg-zinc-900">
           <div className="container px-4 md:px-6 mx-auto">
             <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8 text-zinc-800 dark:text-zinc-200">
               What Our Students Say
@@ -461,7 +459,7 @@ export function CourseLandingPage() {
                 <Button
                   type="submit"
                   variant="secondary"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/signup")}
                   className="rounded-lg text-center dark:bg-orange-500 dark:hover:bg-orange-700 shadow-md bg-indigo-600 text-white hover:bg-indigo-500"
                 >
                   Get Started
