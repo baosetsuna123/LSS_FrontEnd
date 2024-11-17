@@ -7,7 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchFeedbackByclassid, fetchFeedbackDetail } from "@/data/api"; // Import the API function
+import {
+  fetchFeedbackByclassid,
+  fetchFeedbackDetail,
+  fetchSendEmailStaff,
+} from "@/data/api"; // Import the API function
 import { useQuestionContext } from "@/context/QuestionContext";
 import { toast } from "react-hot-toast";
 
@@ -24,6 +28,13 @@ const FeedbackDetail = ({ classId }) => {
     acc[item.questionId] = item;
     return acc;
   }, {});
+  useEffect(() => {
+    const feedbackSent = localStorage.getItem(`feedbackSent-${classId}`);
+    if (feedbackSent) {
+      setIsFeedbackSent(true); // Set state to true if feedback was sent previously
+    }
+  }, [classId]);
+
   const ratingOptions = [
     { value: 1, label: "Extremely dissatisfied" },
     { value: 2, label: "Dissatisfied" },
@@ -84,6 +95,8 @@ const FeedbackDetail = ({ classId }) => {
 
   useEffect(() => {
     const fetchFeedback = async () => {
+      if (!classId) return; // Move the condition here to prevent unnecessary fetch calls
+
       try {
         const data = await fetchFeedbackByclassid(token, classId);
         setFeedback(data);
@@ -93,10 +106,20 @@ const FeedbackDetail = ({ classId }) => {
       }
     };
 
-    if (classId) {
-      fetchFeedback();
-    }
+    fetchFeedback();
   }, [classId, token]);
+  const [isFeedbackSent, setIsFeedbackSent] = useState(false);
+  const fetchSendEmail = async () => {
+    try {
+      await fetchSendEmailStaff(token, classId);
+      toast.success("Feedback sent successfully!");
+      setIsFeedbackSent(true);
+      localStorage.setItem(`feedbackSent-${classId}`, "true");
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      toast.error("Failed to fetch feedback.");
+    }
+  };
 
   const handleFetchDetailedFeedback = async () => {
     if (!isDetailedFetched) {
@@ -163,7 +186,8 @@ const FeedbackDetail = ({ classId }) => {
         </TableBody>
       </Table>
 
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-4 space-x-4">
+        {/* Show Detail Button */}
         {detailedFeedback.length === 0 || !isDetailedFetched ? (
           <button
             type="button"
@@ -181,6 +205,17 @@ const FeedbackDetail = ({ classId }) => {
             Load More
           </button>
         ) : null}
+
+        {/* Send Feedback Button */}
+        {!isFeedbackSent && (
+          <button
+            type="button"
+            className="btn btn-primary bg-green-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+            onClick={fetchSendEmail}
+          >
+            Send Feedback
+          </button>
+        )}
       </div>
 
       {/* Render detailed feedback if available */}

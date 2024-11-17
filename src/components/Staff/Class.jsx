@@ -1,7 +1,8 @@
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../Staff/Modal";
 import FeedbackDetail from "./FeedbackDetail";
+import { fetchFeedbackByclassid } from "@/data/api";
 
 const ClassLayout = ({
   currentPage,
@@ -11,7 +12,28 @@ const ClassLayout = ({
   classes,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedbackCounts, setFeedbackCounts] = useState({});
   const [selectedClassId, setSelectedClassId] = useState(null);
+  useEffect(() => {
+    console.log(classes);
+    const fetchFeedbackCounts = async () => {
+      const counts = {};
+      for (const cls of classes) {
+        try {
+          const data = await fetchFeedbackByclassid(
+            sessionStorage.getItem("token"),
+            cls.classId
+          );
+          counts[cls.classId] = data.length;
+        } catch (error) {
+          console.error("Error fetching feedback count:", error);
+        }
+      }
+      setFeedbackCounts(counts);
+    };
+
+    fetchFeedbackCounts();
+  }, [classes]);
   const handleClick = (classId) => {
     setSelectedClassId(classId);
     setIsModalOpen(true); // Open the modal
@@ -112,12 +134,14 @@ const ClassLayout = ({
                     {formatCurrency(app.price) || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      className="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 transition duration-200"
-                      onClick={() => handleClick(app.classId)}
-                    >
-                      Show Feedback
-                    </button>
+                    {feedbackCounts[app.classId] > 0 && (
+                      <button
+                        className="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 transition duration-200"
+                        onClick={() => handleClick(app.classId)}
+                      >
+                        Show Feedback
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

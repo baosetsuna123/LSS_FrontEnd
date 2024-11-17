@@ -42,6 +42,7 @@ import ProfileTeacher from "./components/Teacher/ProfileTeacher";
 import { WalletTeacher } from "./components/Teacher/WalletTeacher";
 import User from "./components/Admin/ListUser";
 import CreateStaff from "./components/Admin/CreateStaff";
+import Notifications from "./components/Student/Notifications";
 
 function App() {
   return (
@@ -130,6 +131,7 @@ function App() {
             element={<ApplicationManagement />}
           />
           <Route path="/send-applications" element={<SendApplication />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/" element={<CourseLandingPage />} />

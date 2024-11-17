@@ -697,6 +697,77 @@ export const rejectApplication = async (id, rejectionReason, token) => {
     throw error;
   }
 };
+//feedback/send-email
+export const fetchSendEmailStaff = async (token, classId) => {
+  try {
+    const response = await api.get(`/feedback/send-email/${classId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+//notification
+export const viewallNoti = async (token) => {
+  try {
+    const response = await api.get(`/api/notifications/user/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const putAllNoti = async (token) => {
+  try {
+    const response = await api.put(`/api/notifications/readAll`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const deleteNoti = async (token, id) => {
+  try {
+    const response = await api.delete(`/api/notifications/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const putNotificationstatus = async (token, notificationId) => {
+  try {
+    const response = await api.put(
+      `/api/notifications/${notificationId}/read`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+//application
 export const viewAllApplications = async (token) => {
   try {
     const response = await api.get(
