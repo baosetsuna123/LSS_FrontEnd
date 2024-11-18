@@ -784,6 +784,34 @@ export const viewAllApplications = async (token) => {
     throw error;
   }
 };
+//list user
+export const listUser = async (token) => {
+  try {
+    const response = await api.get(`/admin/students`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+//active user
+export const activeUser = async (token, username) => {
+  try {
+    const response = await api.put(`/admin/${username}/deactive`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
 export const fetchCancelApplication = async (id, token) => {
   try {
     const response = await api.put(

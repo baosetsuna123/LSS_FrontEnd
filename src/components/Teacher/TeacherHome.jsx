@@ -120,7 +120,7 @@ function TeacherHome() {
       timetable[day][classItem.slotId] = {
         subject: classItem.courseName,
         code: classItem.courseCode,
-        class: classItem.code,
+        class: classItem.name,
         room: classItem.location,
       };
       return timetable;
@@ -219,7 +219,6 @@ function TeacherHome() {
   const handleCreateClass = async () => {
     const requiredFields = [
       "name",
-      "code",
       "startDate",
       "dayOfWeek",
       "slotId",
@@ -307,12 +306,18 @@ function TeacherHome() {
     if (lesson) {
       return (
         <div
-          className="p-4 bg-blue-50 h-full border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer"
+          className="p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer inline-block"
           onClick={() => handleShowDetail(lesson)}
         >
-          <p className="font-bold text-base text-blue-800">{lesson.subject}</p>
-          <p className="text-sm text-gray-600">Code: {lesson.code}</p>
-          <p className="text-sm text-gray-600">Name: {lesson.class}</p>
+          <p className="font-bold text-base text-blue-800 whitespace-nowrap">
+            {lesson.class}
+          </p>
+          <p className="text-sm text-gray-600 whitespace-nowrap">
+            Course: {lesson.code}
+          </p>
+          <p className="text-sm text-gray-600 whitespace-nowrap">
+            CourseName: {lesson.subject}
+          </p>
           {lesson.room && (
             <button
               onClick={() => window.open(lesson.room, "_blank")}
@@ -339,8 +344,8 @@ function TeacherHome() {
         </button>
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
+      <div className="w-full">
+        <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               <th className="py-2 px-4 border-b border-r">Slot</th>
@@ -370,7 +375,7 @@ function TeacherHome() {
                 {days.map((day) => (
                   <td
                     key={`${day}-${slot.period}`}
-                    className="border-b border-r p-2 text-center max-w-[150px]"
+                    className="border-b border-r p-2 text-center"
                   >
                     {renderTimetableCell(day, slot.period)}
                   </td>
@@ -396,14 +401,6 @@ function TeacherHome() {
             type="text"
             name="name"
             placeholder="Class Name"
-            onChange={handleInputChange}
-            required
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-          <input
-            type="text"
-            name="code"
-            placeholder="Class Code"
             onChange={handleInputChange}
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"

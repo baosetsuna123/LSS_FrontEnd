@@ -33,24 +33,7 @@ const Notifications = () => {
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 5);
   };
-  const formatCurrency = (amount) => {
-    const cleanedAmount = parseFloat(amount.replace(/[^\d.-]/g, ""));
 
-    if (cleanedAmount === 0) return "";
-
-    return (
-      cleanedAmount
-        .toLocaleString("vi-VN", { style: "currency", currency: "VND" })
-        .replace(/,/g, "")
-        .replace("₫", "") + " ₫"
-    );
-  };
-
-  const formatDescriptionWithCurrency = (description) => {
-    return description.replace(/-?\d+(?:,\d{3})*(?:\.\d+)?/g, (match) =>
-      formatCurrency(match.replace(/,/g, ""))
-    );
-  };
   const handleMarkAsRead = async (notificationId) => {
     try {
       await putNotificationstatus(token, notificationId);
@@ -83,7 +66,7 @@ const Notifications = () => {
       await putAllNoti(token);
       toast.success("All notifications marked as read successfully");
       setNotifications((prevState) =>
-        prevState.map((noti) => ({ ...noti, read: true }))
+        prevState.map((noti) => ({ ...noti, readStatus: true }))
       );
       setShowMarkAllMenu(false); // Close the menu after action
     } catch (error) {
@@ -189,7 +172,7 @@ const Notifications = () => {
                     {notification.type}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {formatDescriptionWithCurrency(notification.description)}
+                    {notification.description}
                   </div>
 
                   {/* Ellipsis icon */}

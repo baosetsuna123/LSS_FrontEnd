@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { listUser, activeUser } from "@/data/api";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import toast from "react-hot-toast";
 
 export default function User() {
   const [users, setUsers] = useState([]);
@@ -74,11 +73,10 @@ export default function User() {
   const toggleUserStatus = async (user) => {
     try {
       const newStatus = user.status === "ACTIVE" ? "DEACTIVATED" : "ACTIVE";
-      await activeUser(token, user.userName);
-      toast.success(`User ${user.userName} is now ${newStatus.toLowerCase()}`);
+      await activeUser(user.id, newStatus, token); // Call the API to update status
       setUsers((prevUsers) =>
         prevUsers.map((u) =>
-          u.userName === user.userName ? { ...u, status: newStatus } : u
+          u.id === user.id ? { ...u, status: newStatus } : u
         )
       );
     } catch (error) {

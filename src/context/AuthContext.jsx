@@ -22,15 +22,20 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     sessionStorage.clear();
 
-    // Preserve "submittedFeedbackOrderIds" before clearing localStorage
     const submittedFeedbackOrderIds = localStorage.getItem(
       "submittedFeedbackOrderIds"
     );
 
-    // Clear all localStorage
+    const feedbackSentKeys = Object.keys(localStorage).filter((key) =>
+      key.startsWith("feedbackSent-")
+    );
+    const feedbackSentData = feedbackSentKeys.reduce((acc, key) => {
+      acc[key] = localStorage.getItem(key);
+      return acc;
+    }, {});
+
     localStorage.clear();
 
-    // Restore the preserved data
     if (submittedFeedbackOrderIds) {
       localStorage.setItem(
         "submittedFeedbackOrderIds",
@@ -38,7 +43,10 @@ export const AuthProvider = ({ children }) => {
       );
     }
 
-    // Change theme to light explicitly
+    feedbackSentKeys.forEach((key) => {
+      localStorage.setItem(key, feedbackSentData[key]);
+    });
+
     setTheme("light");
   };
 
