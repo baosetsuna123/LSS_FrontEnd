@@ -26,14 +26,6 @@ export const AuthProvider = ({ children }) => {
       "submittedFeedbackOrderIds"
     );
 
-    const feedbackSentKeys = Object.keys(localStorage).filter((key) =>
-      key.startsWith("feedbackSent-")
-    );
-    const feedbackSentData = feedbackSentKeys.reduce((acc, key) => {
-      acc[key] = localStorage.getItem(key);
-      return acc;
-    }, {});
-
     localStorage.clear();
 
     if (submittedFeedbackOrderIds) {
@@ -42,11 +34,6 @@ export const AuthProvider = ({ children }) => {
         submittedFeedbackOrderIds
       );
     }
-
-    feedbackSentKeys.forEach((key) => {
-      localStorage.setItem(key, feedbackSentData[key]);
-    });
-
     setTheme("light");
   };
 

@@ -28,12 +28,6 @@ const FeedbackDetail = ({ classId }) => {
     acc[item.questionId] = item;
     return acc;
   }, {});
-  useEffect(() => {
-    const feedbackSent = localStorage.getItem(`feedbackSent-${classId}`);
-    if (feedbackSent) {
-      setIsFeedbackSent(true); // Set state to true if feedback was sent previously
-    }
-  }, [classId]);
 
   const ratingOptions = [
     { value: 1, label: "Extremely dissatisfied" },
@@ -108,13 +102,15 @@ const FeedbackDetail = ({ classId }) => {
 
     fetchFeedback();
   }, [classId, token]);
-  const [isFeedbackSent, setIsFeedbackSent] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const fetchSendEmail = async () => {
     try {
       await fetchSendEmailStaff(token, classId);
       toast.success("Feedback sent successfully!");
-      setIsFeedbackSent(true);
-      localStorage.setItem(`feedbackSent-${classId}`, "true");
+      setIsDisabled(true); // Disable the button
+      setTimeout(() => {
+        setIsDisabled(false); // Re-enable after 2 seconds
+      }, 2000);
     } catch (error) {
       console.error("Error fetching feedback:", error);
       toast.error("Failed to fetch feedback.");
@@ -206,16 +202,16 @@ const FeedbackDetail = ({ classId }) => {
           </button>
         ) : null}
 
-        {/* Send Feedback Button */}
-        {!isFeedbackSent && (
-          <button
-            type="button"
-            className="btn btn-primary bg-green-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
-            onClick={fetchSendEmail}
-          >
-            Send Feedback
-          </button>
-        )}
+        <button
+          type="button"
+          className={`btn btn-primary bg-green-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 ${
+            isDisabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={fetchSendEmail}
+          disabled={isDisabled}
+        >
+          {isDisabled ? "Please Wait..." : "Send Feedback"}
+        </button>
       </div>
 
       {/* Render detailed feedback if available */}
