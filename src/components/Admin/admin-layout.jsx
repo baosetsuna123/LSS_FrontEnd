@@ -64,7 +64,8 @@ export function AdminLayout({ children }) {
   ];
 
   const usersSubMenuItems = [
-    { label: "List User", path: "/admin/User" },
+    { label: "List User", path: "/admin/User/ListUser" },
+    { label: "List Teacher", path: "/admin/User/ListTeacher" },
     { label: "Create Staff", path: "/admin/User/create-staff" }, // Example path for creating staff
   ];
 

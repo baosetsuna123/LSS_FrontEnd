@@ -43,6 +43,7 @@ import { WalletTeacher } from "./components/Teacher/WalletTeacher";
 import User from "./components/Admin/ListUser";
 import CreateStaff from "./components/Admin/CreateStaff";
 import Notifications from "./components/Student/Notifications";
+import Teacher from "./components/Admin/ListTeacher";
 
 function App() {
   return (
@@ -65,8 +66,9 @@ function App() {
           }
         >
           <Route index element={<AdminHome />} />
-          <Route path="User" element={<User />} />
-          <Route path="User/create-staff" element={<CreateStaff />} />
+          <Route path="User/ListUser" element={<User />} />
+          <Route path="User/ListTeacher" element={<Teacher />} />
+          <Route path="User/Create-staff" element={<CreateStaff />} />
         </Route>
 
         {/* Teacher Dashboard Routes */}

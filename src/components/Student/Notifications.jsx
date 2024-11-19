@@ -40,7 +40,7 @@ const Notifications = () => {
       toast.success("Notification marked as read successfully");
       setNotifications((prevState) =>
         prevState.map((noti) =>
-          noti.id === notificationId ? { ...noti, read: true } : noti
+          noti.id === notificationId ? { ...noti, readStatus: true } : noti
         )
       );
     } catch (error) {
@@ -60,10 +60,22 @@ const Notifications = () => {
     }
   };
   const [showMarkAllMenu, setShowMarkAllMenu] = useState(false);
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
 
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   const handleMarkAllAsRead = async () => {
     try {
-      await putAllNoti(token);
+      const response = await putAllNoti(token);
+      console.log("Response from putAllNoti:", response); // Log response
       toast.success("All notifications marked as read successfully");
       setNotifications((prevState) =>
         prevState.map((noti) => ({ ...noti, readStatus: true }))
@@ -173,6 +185,9 @@ const Notifications = () => {
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     {notification.description}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {formatDateTime(notification.createAt)}
                   </div>
 
                   {/* Ellipsis icon */}

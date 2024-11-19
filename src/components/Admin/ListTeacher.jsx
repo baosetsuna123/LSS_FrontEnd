@@ -20,7 +20,7 @@ import {
 import { listUser, activeUser } from "@/data/api";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
-export default function User() {
+export default function Teacher() {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");

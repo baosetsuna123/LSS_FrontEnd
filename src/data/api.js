@@ -727,11 +727,15 @@ export const viewallNoti = async (token) => {
 };
 export const putAllNoti = async (token) => {
   try {
-    const response = await api.put(`/api/notifications/readAll`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.put(
+      `/api/notifications/readAll`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error rejecting application:", error);

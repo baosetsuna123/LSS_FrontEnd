@@ -161,7 +161,7 @@ export function Layout({ children }) {
       toast.success("Notification marked as read successfully");
       setNotifications((prevState) =>
         prevState.map((noti) =>
-          noti.id === notificationId ? { ...noti, read: true } : noti
+          noti.id === notificationId ? { ...noti, readStatus: true } : noti
         )
       );
     } catch (error) {
@@ -181,6 +181,18 @@ export function Layout({ children }) {
     }
   };
   const [showMarkAllMenu, setShowMarkAllMenu] = useState(false);
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   const handleMarkAllAsRead = async () => {
     try {
       await putAllNoti(token);
@@ -327,10 +339,16 @@ export function Layout({ children }) {
                   onClick={togglePopupBell}
                   aria-hidden="true"
                 />
-                {notifications.some(
+                {notifications.filter(
                   (notification) => !notification.readStatus
-                ) && (
-                  <span className="absolute top-0 right-16 h-2 w-2 bg-red-500 rounded-full"></span>
+                ).length > 0 && (
+                  <span className="absolute top-0 right-16 bg-red-500 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full">
+                    {
+                      notifications.filter(
+                        (notification) => !notification.readStatus
+                      ).length
+                    }
+                  </span>
                 )}
                 <ModeToggle />
                 {isbellPopupVisible && (
@@ -415,7 +433,7 @@ export function Layout({ children }) {
                         </div>
                       ) : (
                         filteredNotifications
-                          .slice(0, 5)
+                          .slice(0, 3)
                           .map((notification) => (
                             <div
                               key={notification.id}
@@ -426,6 +444,9 @@ export function Layout({ children }) {
                               </div>
                               <div className="text-sm text-gray-600 dark:text-gray-400">
                                 {notification.description}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {formatDateTime(notification.createAt)}
                               </div>
 
                               {/* Show Ellipsis icon when hovering over the notification */}
