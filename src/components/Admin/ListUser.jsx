@@ -115,47 +115,51 @@ export default function User() {
         <div>Loading...</div>
       ) : (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentUsers.map((user, index) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">
-                    {indexOfFirstItem + index + 1}
-                  </TableCell>
-                  <TableCell>{user.userName}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`${
-                        user.status === "ACTIVE"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {user.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell className="text-right">
-                    <Switch
-                      checked={user.status === "ACTIVE"}
-                      disabled={user.status === "PENDING"}
-                      onCheckedChange={() => toggleUserStatus(user)}
-                      aria-label={`Toggle status for ${user.userName}`}
-                    />
-                  </TableCell>
+          {filteredUsers.length === 0 ? (
+            <p className="text-center text-red-500">No data</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">ID</TableHead>
+                  <TableHead>Username</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {currentUsers.map((user, index) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">
+                      {indexOfFirstItem + index + 1}
+                    </TableCell>
+                    <TableCell>{user.userName}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`${
+                          user.status === "ACTIVE"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {user.status}
+                      </span>
+                    </TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell className="text-right">
+                      <Switch
+                        checked={user.status === "ACTIVE"}
+                        disabled={user.status === "PENDING"}
+                        onCheckedChange={() => toggleUserStatus(user)}
+                        aria-label={`Toggle status for ${user.userName}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-sm text-muted-foreground">
               Showing {indexOfFirstItem + 1} to{" "}

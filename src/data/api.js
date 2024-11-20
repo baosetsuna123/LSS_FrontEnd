@@ -725,6 +725,30 @@ export const viewallNoti = async (token) => {
     throw error;
   }
 };
+export const registerStaff = async (staffData, token) => {
+  try {
+    const response = await api.post("/admin/register-staff", staffData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
+};
+export const listTeacher = async (token) => {
+  try {
+    const response = await api.get("/admin", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
+};
 export const putAllNoti = async (token) => {
   try {
     const response = await api.put(
@@ -791,7 +815,7 @@ export const viewAllApplications = async (token) => {
 //list user
 export const listUser = async (token) => {
   try {
-    const response = await api.get(`/admin/students`, {
+    const response = await api.get(`/admin/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -805,11 +829,32 @@ export const listUser = async (token) => {
 //active user
 export const activeUser = async (token, username) => {
   try {
-    const response = await api.put(`/admin/${username}/deactive`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.put(
+      `/admin/${username}/UserNamedeactivate`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+export const activeTeacher = async (token, username) => {
+  try {
+    const response = await api.put(
+      `/admin/${username}/deactivate`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error rejecting application:", error);
