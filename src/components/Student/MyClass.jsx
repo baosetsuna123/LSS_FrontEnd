@@ -80,6 +80,7 @@ const MyClass = () => {
           subject: classItem.name,
           code: classItem.courseCode,
           class: classItem.code,
+          teacherName: classItem.teacherName,
           room: classItem.location,
           id: classItem.classId,
           orderId: orderItem.orderId, // Get orderId from orderDTO
@@ -171,8 +172,10 @@ const MyClass = () => {
           >
             {lesson.subject}
           </p>
-          <p className="text-sm text-gray-600">Code: {lesson.code}</p>
-          <p className="text-sm text-gray-600">Name: {lesson.class}</p>
+          <p className="text-sm text-gray-600">CourseCode: {lesson.code}</p>
+          <p className="text-sm text-gray-600">
+            Instructor: {lesson.teacherName}
+          </p>
 
           {lessonStatus === "COMPLETED" &&
           !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (

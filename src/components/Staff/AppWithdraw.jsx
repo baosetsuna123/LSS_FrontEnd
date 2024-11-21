@@ -14,8 +14,7 @@ const AppWithDraw = ({
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [selectedApp, setSelectedApp] = useState(null); // Store selected application
-
-  // Function to handle click on Approve button, which will trigger the modal
+  console.log(appwithdraw);
   const handleClick = (app) => {
     setSelectedApp(app); // Store the selected application
     setShowModal(true); // Show the confirmation modal
@@ -63,6 +62,15 @@ const AppWithDraw = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const parseDescription = (description) => {
+    const accountMatch = description.match(/Account number: (\d+)/);
+    const bankMatch = description.match(/Bank: ([^,]+)/);
+
+    return {
+      accountNumber: accountMatch ? accountMatch[1] : "N/A",
+      bank: bankMatch ? bankMatch[1] : "N/A",
+    };
+  };
 
   return (
     <div>
@@ -113,6 +121,9 @@ const AppWithDraw = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.length > 0 ? (
               currentData.map((app, index) => {
+                const { accountNumber, bank } = parseDescription(
+                  app.description
+                );
                 return (
                   <tr
                     key={app.applicationUserId}
@@ -125,10 +136,10 @@ const AppWithDraw = ({
                       {app.name || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {app.accountNumber || "N/A"}
+                      {accountNumber || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {app.bank || "N/A"}
+                      {bank || "N/A"}
                     </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
@@ -141,8 +152,9 @@ const AppWithDraw = ({
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {app.status}
+                      {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       {formatCurrency(app.amountFromDescription) || "N/A"}
                     </td>

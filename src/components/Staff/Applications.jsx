@@ -5,8 +5,9 @@ import {
   rejectApplication,
 } from "@/data/api"; // Import the API function
 import { toast } from "react-hot-toast";
-import { Search } from "lucide-react";
+import { CheckCircle, Search } from "lucide-react";
 import RejectModal from "../Helper/RejectModal";
+import ModalApprove from "./ModalApprove";
 
 const ApplicationLayout = ({
   currentPage,
@@ -18,24 +19,36 @@ const ApplicationLayout = ({
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [selectedApplication, setSelectedApplication] = useState(null); // Currently selected application for rejection
   const [rejectionReason, setRejectionReason] = useState(""); // State for rejection reason
-
+  const [isApproveModalOpen, setIsApproveModalOpen] = useState(false); // For approve modal
+  const [teacherNameToApprove, setTeacherNameToApprove] = useState("");
   const token = sessionStorage.getItem("token"); // Get the token from session storage
+  const handleApproveClick = (app) => {
+    console.log(app);
+    setTeacherNameToApprove(app.teacherName); // Set teacher's name for the modal
+    setSelectedApplication(app.applicationId); // Set selected application ID
+    setIsApproveModalOpen(true); // Open the approval confirmation modal
+  };
 
-  const handleClick = async (id) => {
+  const handleApproveApplication = async () => {
+    if (!selectedApplication) return; // If no application is selected, do nothing
     try {
-      const response = await fetchApproveApplication(id, token);
-      console.log(response);
+      await fetchApproveApplication(selectedApplication, token);
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
-          app.applicationId === id ? { ...app, status: "APPROVED" } : app
+          app.applicationId === selectedApplication
+            ? { ...app, status: "APPROVED" }
+            : app
         )
       );
       toast.success("Application approved successfully");
+      setIsApproveModalOpen(false); // Close modal after approval
     } catch (error) {
       console.error("Failed to approve application:", error);
       toast.error("Failed to approve application.");
+      setIsApproveModalOpen(false);
     }
   };
+
   const handleReject = async () => {
     if (!rejectionReason) {
       toast.error("Rejection reason must not be empty.");
@@ -87,7 +100,23 @@ const ApplicationLayout = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [certificateUrl, setCertificateUrl] = useState("");
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
+  const handleViewCertificate = (url) => {
+    setCertificateUrl(url); // Set the certificate URL
+    setIsModalVisible(true); // Show the modal with the certificate image
+    setIsImageLoaded(false); // Reset image load state before showing the image
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false); // Close the modal
+  };
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true); // Set image as loaded when it's fully loaded
+  };
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -148,26 +177,72 @@ const ApplicationLayout = ({
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                    {app.title || "N/A"}
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={app.title}
+                  >
+                    {app.title
+                      ? app.title.length > 10
+                        ? `${app.title.slice(0, 10)}...`
+                        : app.title
+                      : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={app.description}
+                  >
                     {app.description && typeof app.description === "string"
-                      ? app.description.length > 12
-                        ? `${app.description.slice(0, 12)}...`
+                      ? app.description.length > 10
+                        ? `${app.description.slice(0, 10)}...`
                         : app.description
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.certificate ? (
-                      <a
-                        href={app.certificate}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        View Certificate
-                      </a>
+                      <div>
+                        <button
+                          onClick={() => handleViewCertificate(app.certificate)}
+                          className="text-blue-600 hover:underline"
+                        >
+                          View Certificate
+                        </button>
+
+                        {/* Modal to display the certificate */}
+                        {isModalVisible && (
+                          <div
+                            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                            onClick={handleCloseModal} // Close the modal when clicking outside
+                          >
+                            <div
+                              className="bg-white p-4 rounded-lg max-w-3xl mx-4 relative"
+                              onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
+                            >
+                              {/* Show a loader or empty state until the image is loaded */}
+                              {!isImageLoaded && (
+                                <div className="w-full h-60 bg-gray-200 flex items-center justify-center">
+                                  <span>Loading...</span>
+                                </div>
+                              )}
+
+                              <img
+                                src={certificateUrl}
+                                alt="Certificate"
+                                className={`w-full h-auto ${
+                                  isImageLoaded ? "block" : "hidden"
+                                }`}
+                                onLoad={handleImageLoad} // Trigger when the image is fully loaded
+                              />
+
+                              <button
+                                onClick={handleCloseModal}
+                                className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       "N/A"
                     )}
@@ -195,8 +270,8 @@ const ApplicationLayout = ({
                     title={app.rejectionReason}
                   >
                     {app.status === "REJECTED"
-                      ? app.rejectionReason && app.rejectionReason.length > 12
-                        ? `${app.rejectionReason.slice(0, 12)}...`
+                      ? app.rejectionReason && app.rejectionReason.length > 10
+                        ? `${app.rejectionReason.slice(0, 10)}...`
                         : app.rejectionReason || "-"
                       : "-"}
                   </td>
@@ -206,7 +281,7 @@ const ApplicationLayout = ({
                       <>
                         <button
                           className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
-                          onClick={() => handleClick(app.applicationId)}
+                          onClick={() => handleApproveClick(app)} // Open the approval modal
                         >
                           Approve
                         </button>
@@ -253,7 +328,37 @@ const ApplicationLayout = ({
           </tbody>
         </table>
       </div>
+      {isApproveModalOpen && (
+        <ModalApprove onClose={() => setIsApproveModalOpen(false)}>
+          <div className="flex justify-center items-center flex-col">
+            <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
+            <div className="flex justify-center items-center text-center p-2">
+              <h2 className="text-xl font-semibold">
+                Are you sure you want to approve the application for{" "}
+                <span className="font-bold text-blue-600">
+                  {teacherNameToApprove}
+                </span>{" "}
+                ?
+              </h2>
+            </div>
 
+            <div className="mt-4">
+              <button
+                className="px-5 py-3 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition duration-200 mr-5"
+                onClick={handleApproveApplication}
+              >
+                Yes
+              </button>
+              <button
+                className="px-5 py-3 rounded-md bg-gray-300 text-black hover:bg-gray-400 transition duration-200"
+                onClick={() => setIsApproveModalOpen(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </ModalApprove>
+      )}
       <RejectModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
