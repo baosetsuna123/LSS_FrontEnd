@@ -6,9 +6,8 @@ import backgroundImage from "../../assets/background2.png";
 import { FaInfoCircle, FaSpinner } from "react-icons/fa";
 export function Application() {
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [certificate, setCertificate] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Loading state for button
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -18,7 +17,6 @@ export function Application() {
 
     const applicationData = {
       title,
-      description,
       status: "PENDING",
     };
 
@@ -29,7 +27,6 @@ export function Application() {
       navigate("/login");
       // Reset form fields after successful submission
       setTitle("");
-      setDescription("");
       setCertificate(null);
     } catch (error) {
       toast.error(error.message || "Failed to create application");
@@ -53,41 +50,23 @@ export function Application() {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Title Section */}
-          <div className="flex flex-col space-y-2">
-            <label
-              htmlFor="title"
-              className="text-gray-700 flex items-center font-semibold"
-            >
-              Title
-              <FaInfoCircle className="ml-2 text-gray-500" />
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-              placeholder="Enter the title"
-              required
-            />
-          </div>
 
           {/* Description Section */}
           <div className="flex flex-col space-y-2">
             <label
-              htmlFor="description"
+              htmlFor="title"
               className="text-gray-700 flex items-center font-semibold"
             >
               Description
               <FaInfoCircle className="ml-2 text-gray-500" />
             </label>
             <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
               rows="4"
-              placeholder="Enter a detailed description"
+              placeholder="Tell us more about yourself and your major (Describe your certifications, projects, etc.)"
               required
             />
           </div>

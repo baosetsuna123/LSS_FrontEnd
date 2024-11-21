@@ -75,7 +75,7 @@ const Notifications = () => {
   const handleMarkAllAsRead = async () => {
     try {
       const response = await putAllNoti(token);
-      console.log("Response from putAllNoti:", response); // Log response
+      console.log("Response from putAllNoti:", response);
       toast.success("All notifications marked as read successfully");
       setNotifications((prevState) =>
         prevState.map((noti) => ({ ...noti, readStatus: true }))

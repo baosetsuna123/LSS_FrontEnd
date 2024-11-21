@@ -146,9 +146,6 @@ const ApplicationLayout = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Title
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                Description
-              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ">
                 Certificate
               </th>
@@ -177,26 +174,20 @@ const ApplicationLayout = ({
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td
-                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                    title={app.title}
-                  >
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer relative group">
+                    <span
+                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-sm font-medium px-3 py-2 rounded-md shadow-lg"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      {app.title}
+                    </span>
                     {app.title
                       ? app.title.length > 10
                         ? `${app.title.slice(0, 10)}...`
                         : app.title
                       : "N/A"}
                   </td>
-                  <td
-                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                    title={app.description}
-                  >
-                    {app.description && typeof app.description === "string"
-                      ? app.description.length > 10
-                        ? `${app.description.slice(0, 10)}...`
-                        : app.description
-                      : "N/A"}
-                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.certificate ? (
                       <div>
@@ -258,22 +249,31 @@ const ApplicationLayout = ({
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {app.status}
+                    {app.status.charAt(0).toUpperCase() +
+                      app.status.slice(1).toLowerCase()}
                   </td>
+
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
                     {app.teacherName.length > 12
                       ? `${app.teacherName.slice(0, 12)}...`
                       : app.teacherName}
                   </td>
-                  <td
-                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                    title={app.rejectionReason}
-                  >
-                    {app.status === "REJECTED"
-                      ? app.rejectionReason && app.rejectionReason.length > 10
-                        ? `${app.rejectionReason.slice(0, 10)}...`
-                        : app.rejectionReason || "-"
-                      : "-"}
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer relative group">
+                    {app.status === "REJECTED" && app.rejectionReason ? (
+                      <>
+                        <span
+                          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-sm font-medium px-3 py-2 rounded-md shadow-lg z-10"
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          {app.rejectionReason}
+                        </span>
+                        {app.rejectionReason.length > 10
+                          ? `${app.rejectionReason.slice(0, 10)}...`
+                          : app.rejectionReason}
+                      </>
+                    ) : (
+                      "-"
+                    )}
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">

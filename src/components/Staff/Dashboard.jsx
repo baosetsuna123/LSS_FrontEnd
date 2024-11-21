@@ -312,21 +312,6 @@ export function Dashboard() {
               <LayoutGrid size={20} className="mr-2" />
               Category
             </button>
-
-            <button
-              onClick={() => {
-                setActiveCategory("application");
-                setCurrentPage(1); // Reset to page 1 when changing category
-              }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "application" ? "bg-gray-200" : ""
-              }`}
-            >
-              <AppWindowMac size={20} className="mr-2" />
-              Application (Register)
-            </button>
-
-            {/* New Button for Application (Withdraw) */}
             <button
               onClick={() => {
                 setIsWithdrawMenuOpen(!isWithdrawMenuOpen); // Toggle Withdraw menu
@@ -334,7 +319,7 @@ export function Dashboard() {
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200`}
             >
               <AppWindowMac size={20} className="mr-2" />
-              Application (Withdraw)
+              Applications
             </button>
 
             {isWithdrawMenuOpen && (
@@ -360,6 +345,17 @@ export function Dashboard() {
                   }`}
                 >
                   Others
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveCategory("application");
+                    setCurrentPage(1); // Reset to page 1 when changing category
+                  }}
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
+                    activeCategory === "application" ? "bg-gray-200" : ""
+                  }`}
+                >
+                  Register
                 </button>
               </div>
             )}

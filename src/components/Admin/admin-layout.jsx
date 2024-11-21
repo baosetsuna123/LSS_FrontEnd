@@ -50,7 +50,7 @@ export function AdminLayout({ children }) {
     navigate("/login");
     toast.success("Logged out successfully!");
   };
-
+  const [isAppMenuExpanded, setIsAppMenuExpanded] = useState(false); // State to toggle the applications
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     {
@@ -59,16 +59,25 @@ export function AdminLayout({ children }) {
       path: "#",
       onClick: () => setIsUsersMenuExpanded(!isUsersMenuExpanded), // Toggle child menu
     },
-    { icon: FileText, label: "Applications", path: "#" },
-    { icon: Settings, label: "Settings", path: "#" },
+    {
+      icon: FileText,
+      label: "Applications",
+      path: "#",
+      onClick: () => setIsAppMenuExpanded(!isAppMenuExpanded), // Toggle child menu
+    },
+    { icon: Settings, label: "Edit Params", path: "EditParams" },
   ];
 
   const usersSubMenuItems = [
     { label: "List User", path: "/admin/User/ListUser" },
     { label: "List Teacher", path: "/admin/User/ListTeacher" },
-    { label: "Create Staff", path: "/admin/User/create-staff" }, // Example path for creating staff
+    { label: "Create Staff", path: "/admin/User/create-staff" },
   ];
-
+  const appsSubMenuItems = [
+    { label: "Register", path: "/admin/Application/Register" },
+    { label: "Withdraw", path: "/admin/Application/Withdraw" },
+    { label: "Other", path: "/admin/Application/Other" },
+  ];
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -109,6 +118,21 @@ export function AdminLayout({ children }) {
                 {isUsersMenuExpanded &&
                   item.label === "Users" &&
                   usersSubMenuItems.map((subItem, subIndex) => (
+                    <Link
+                      key={subIndex}
+                      to={subItem.path}
+                      className={`flex items-center pl-6 p-2 rounded-lg hover:bg-gray-700 transition-colors ${
+                        isExpanded ? "justify-start" : "justify-center"
+                      }`}
+                    >
+                      {isExpanded && (
+                        <span className="ml-3">{subItem.label}</span>
+                      )}
+                    </Link>
+                  ))}
+                {isAppMenuExpanded &&
+                  item.label === "Applications" &&
+                  appsSubMenuItems.map((subItem, subIndex) => (
                     <Link
                       key={subIndex}
                       to={subItem.path}

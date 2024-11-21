@@ -390,6 +390,19 @@ export const fetchApproveApplication = async (id, token) => {
     throw error;
   }
 };
+export const fetchAppAdmin = async (token) => {
+  try {
+    const response = await api.get("/applications/all", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting course:", error);
+    throw error;
+  }
+};
 //--------------------------Payment API--------------------------
 // Function to call the recharge API
 export const fetchRecharge = async (amount, token) => {
