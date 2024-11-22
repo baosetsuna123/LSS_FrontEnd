@@ -9,6 +9,7 @@ import {
   FileText,
   Settings,
   LogOut,
+  School,
 } from "lucide-react";
 import Modal from "@/components/Helper/Modal"; // Adjust the import path
 import { useAuth } from "@/context/AuthContext";
@@ -52,6 +53,11 @@ export function AdminLayout({ children }) {
       label: "Applications",
       path: "#",
       onClick: () => setIsAppMenuExpanded(!isAppMenuExpanded), // Toggle child menu
+    },
+    {
+      icon: School,
+      label: "Classes",
+      path: "Classes",
     },
     { icon: Settings, label: "Params", path: "EditParams" },
   ];

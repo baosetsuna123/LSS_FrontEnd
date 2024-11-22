@@ -533,6 +533,28 @@ export const deleteParam = async (id, token) => {
     throw error;
   }
 };
+export const completeClassImmediately = async (classId, token) => {
+  try {
+    const response = await api.put(
+      `/admin/${classId}/complete`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data);
+    } else if (error.request) {
+      throw new Error("No response from server. Please try again later.");
+    } else {
+      throw new Error("An error occurred. Please try again.");
+    }
+  }
+};
 //update-user
 export const updateCurrentUser = async (token, userData) => {
   try {
