@@ -1,7 +1,8 @@
-import { fetchAppAdmin } from "@/data/api";
+import { AssignApplication, fetchAppAdmin } from "@/data/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
+import { Button } from "../ui/button";
 
 const RegisterApp = () => {
   const [applications, setApplications] = useState([]);
@@ -39,7 +40,15 @@ const RegisterApp = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  const handleClick = async () => {
+    try {
+      await AssignApplication();
+      toast.success("Application assigned successfully!");
+    } catch (error) {
+      console.error("Error assigning application", error);
+      toast.error("Already assigned for Staff!");
+    }
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
@@ -152,6 +161,16 @@ const RegisterApp = () => {
             )}
           </tbody>
         </table>
+        <footer className="bg-white shadow-sm p-4 flex justify-end">
+          <Button
+            variant="default"
+            onClick={() => handleClick()}
+            className="bg-blue-500 text-white hover:bg-blue-600"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Assign Application
+          </Button>
+        </footer>
       </div>
 
       {pageCount > 1 && (

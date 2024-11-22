@@ -77,6 +77,7 @@ const TeacherProfile = () => {
     const fetchInfo = async () => {
       try {
         const data = await fetchInfoTeacher(teacherName, token);
+        console.log(data);
         setInfo(data);
       } catch (error) {
         console.error("Error fetching teacher info:", error);
@@ -142,7 +143,7 @@ const TeacherProfile = () => {
 
   return (
     <>
-      <section className="w-full dark:text-white py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-900 ">
+      <section className="w-full dark:text-white py-4 bg-gray-100 text-gray-100 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-900 ">
         <div className="container dark:text-white  px-4 md:px-6">
           <Breadcrumb
             items={[
@@ -187,6 +188,39 @@ const TeacherProfile = () => {
                 ? info.major.join(" & ")
                 : "N/A"}
             </span>
+          </div>
+          <div className="certificate-section px-6 mt-6 ml-[-1.5rem]">
+            <h3 className="text-3xl font-semibold text-gray-800 dark:text-gray-100">
+              Certificates
+            </h3>
+            {info.certificate && info.certificate.length > 0 ? (
+              <div className="mt-4 space-y-4">
+                {info.certificate.map((certificate) => (
+                  <div
+                    key={certificate.id}
+                    className="flex justify-between items-center"
+                  >
+                    <div className="flex-1 flex items-center gap-4">
+                      <p className="text-lg text-gray-700 dark:text-gray-300 font-semibold">
+                        {certificate.name}
+                      </p>
+                      <a
+                        href={certificate.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
+                      >
+                        View
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">
+                No certificates available.
+              </p>
+            )}
           </div>
         </div>
         <div className="ml-6">
