@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -21,13 +21,12 @@ import {
   Landmark,
   File,
 } from "lucide-react";
-import { submitOther, submitWithdrawal } from "@/data/api";
+import { fetchBalanceTeacher, submitOther, submitWithdrawal } from "@/data/api";
 import toast from "react-hot-toast";
-import { useWallet } from "@/context/WalletContext";
 import { useNavigate } from "react-router-dom";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-export function SendApplication() {
+export function SendApplicationTeacher() {
   const banks = [
     "ABBANK",
     "ACB",
@@ -78,9 +77,30 @@ export function SendApplication() {
     "VRB",
     "Woori",
   ];
-  const { balance, loadBalance } = useWallet();
   const token = sessionStorage.getItem("token");
-  console.log(balance);
+  const [balance, setBalance] = useState(0);
+  useEffect(() => {
+    const loadBalance = async (token) => {
+      try {
+        const data = await fetchBalanceTeacher(token);
+        setBalance(data.balance);
+      } catch (error) {
+        console.error("Failed to fetch balance:", error);
+      }
+    };
+
+    if (token) {
+      loadBalance(token);
+    }
+  }, []);
+  const loadBalance = useCallback(async (token) => {
+    try {
+      const data = await fetchBalanceTeacher(token);
+      setBalance(data.balance);
+    } catch (err) {
+      console.log(err.message || "Error fetching balance");
+    }
+  }, []);
   const navigate = useNavigate(); // For navigation to "/wallet"
   const [showModal, setShowModal] = useState(false);
   const formatCurrency = (amount) => {

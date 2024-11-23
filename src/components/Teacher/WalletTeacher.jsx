@@ -2,11 +2,9 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import wallet from "../../assets/wallet.jpg"; // Ensure the path is correct
 import { useEffect, useState } from "react";
@@ -135,7 +133,7 @@ export function WalletTeacher() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
-                  {transactions.slice(0, 3).map((transaction, index) => {
+                  {transactions.map((transaction, index) => {
                     const isCredit = transaction.amount >= 0;
                     const formattedAmount = Math.abs(transaction.amount);
 
@@ -184,16 +182,6 @@ export function WalletTeacher() {
                   })}
                 </ul>
               </CardContent>
-              {transactions.length > 3 && (
-                <CardFooter>
-                  <Button
-                    className="w-full bg-blue-600 text-white hover:bg-blue-700 transition duration-200"
-                    onClick={() => navigate("/all-transactions")}
-                  >
-                    Show All Transactions
-                  </Button>
-                </CardFooter>
-              )}
             </>
           )}
         </Card>

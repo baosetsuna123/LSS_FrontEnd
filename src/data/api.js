@@ -449,6 +449,19 @@ export const fetchBalance = async (token) => {
     throw error;
   }
 };
+export const fetchBalanceTeacher = async (token) => {
+  try {
+    const response = await api.get("/wallet/Teacher/wallet", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //----------------class-----------------
 //get all classes
 export const fetchClasses = async (token) => {

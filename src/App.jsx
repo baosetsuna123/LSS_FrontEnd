@@ -49,6 +49,7 @@ import WithdrawApp from "./components/Admin/WithdrawApp";
 import OtherApp from "./components/Admin/OtherApp";
 import EditParams from "./components/Admin/EditParams";
 import Classes from "./components/Admin/Classes";
+import { SendApplicationTeacher } from "./components/Teacher/SendApplicationTeacher";
 
 function App() {
   return (
@@ -91,7 +92,10 @@ function App() {
         >
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
-            <Route path="send-applications" element={<SendApplication />} />
+            <Route
+              path="send-applications"
+              element={<SendApplicationTeacher />}
+            />
             <Route
               path="view-applications"
               element={<ApplicationManagement />}
