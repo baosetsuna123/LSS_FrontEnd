@@ -614,6 +614,15 @@ export const fetchClassbyteacherName = async (name, token) => {
     throw error;
   }
 };
+export const fetchCommentsHome = async () => {
+  try {
+    const response = await api.get(`/feedback/comments`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 export const fetchAverageTeacher = async (name, token) => {
   try {
     const response = await api.get(
