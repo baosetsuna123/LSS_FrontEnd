@@ -2,7 +2,8 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import Modal from "../Staff/Modal";
 import FeedbackDetail from "./FeedbackDetail";
-import { fetchFeedbackByclassid } from "@/data/api";
+import { fetchFeedbackByclassid, fetchSystemParam } from "@/data/api";
+import toast from "react-hot-toast";
 
 const ClassLayout = ({
   currentPage,
@@ -14,6 +15,23 @@ const ClassLayout = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedbackCounts, setFeedbackCounts] = useState({});
   const [selectedClassId, setSelectedClassId] = useState(null);
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [params, setParams] = useState([]);
+  const token = sessionStorage.getItem("token");
+  useEffect(() => {
+    const fetchParam = async () => {
+      try {
+        const data = await fetchSystemParam(token);
+        setParams(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+        toast.error("Failed to fetch feedback.");
+      }
+    };
+
+    fetchParam();
+  }, []);
   useEffect(() => {
     console.log(classes);
     const fetchFeedbackCounts = async () => {
@@ -34,10 +52,11 @@ const ClassLayout = ({
 
     fetchFeedbackCounts();
   }, [classes]);
-  const handleClick = (classId) => {
+  const handleClick = (classId, startDate) => {
     setSelectedClassId(classId);
     setIsModalOpen(true); // Open the modal
-    console.log(classId);
+    setSelectedStartDate(startDate);
+    console.log(classId, startDate);
   };
 
   const handleCloseModal = () => {
@@ -137,7 +156,7 @@ const ClassLayout = ({
                     {feedbackCounts[app.classId] > 0 && (
                       <button
                         className="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 transition duration-200"
-                        onClick={() => handleClick(app.classId)}
+                        onClick={() => handleClick(app.classId, app.startDate)}
                       >
                         Show Feedback
                       </button>
@@ -160,7 +179,11 @@ const ClassLayout = ({
       </div>
       {isModalOpen && (
         <Modal onClose={handleCloseModal}>
-          <FeedbackDetail classId={selectedClassId} />
+          <FeedbackDetail
+            classId={selectedClassId}
+            params={params}
+            startDate={selectedStartDate}
+          />
         </Modal>
       )}
     </div>
