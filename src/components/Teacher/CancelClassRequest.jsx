@@ -5,12 +5,9 @@ function CancelClassRequest() {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [reason, setReason] = useState("");
-  const [cancelDate, setCancelDate] = useState("");
-  const [urgency, setUrgency] = useState("normal");
-  const [additionalInfo, setAdditionalInfo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
-  const result = localStorage.getItem("result")
+  const result = localStorage.getItem("result");
   let token;
   if (result) {
     try {
@@ -26,42 +23,12 @@ function CancelClassRequest() {
       const res = await fetchClassbyteacher(token);
       setClasses(res);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   useEffect(() => {
     fetchClasses();
-  }, [token])
-
-  useEffect(() => {
-    // Mock fetching data from an API
-    const fetchClasses = async () => {
-      // Replace with real API call
-      const mockClasses = [
-        {
-          id: 1,
-          name: "Class A",
-          course: "Graphic Design",
-          schedule: "Mon, Wed, Fri - 18:00-20:00",
-        },
-        {
-          id: 2,
-          name: "Class B",
-          course: "Computer Engineering",
-          schedule: "Tue, Thu, Sat - 19:00-21:00",
-        },
-        {
-          id: 3,
-          name: "Class C",
-          course: "Market Economics",
-          schedule: "Mon, Wed, Fri - 14:00-16:00",
-        },
-      ];
-      setClasses(mockClasses);
-    };
-
-    fetchClasses();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,9 +42,6 @@ function CancelClassRequest() {
       console.log("Class cancellation request:", {
         class: selectedClass,
         reason,
-        cancelDate,
-        urgency,
-        additionalInfo,
       });
       setSubmitMessage(
         "Class cancellation request sent successfully. We will review and respond as soon as possible."
@@ -85,12 +49,11 @@ function CancelClassRequest() {
       // Reset form
       setSelectedClass("");
       setReason("");
-      setCancelDate("");
-      setUrgency("normal");
-      setAdditionalInfo("");
     } catch (error) {
       console.error("An error occurred while submitting the request:", error);
-      setSubmitMessage("An error occurred while submitting the request. Please try again later.");
+      setSubmitMessage(
+        "An error occurred while submitting the request. Please try again later."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -138,54 +101,6 @@ function CancelClassRequest() {
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="4"
             required
-          ></textarea>
-        </div>
-        <div>
-          <label
-            htmlFor="cancelDate"
-            className="block mb-2 font-medium text-gray-700"
-          >
-            Cancellation Date
-          </label>
-          <input
-            type="date"
-            id="cancelDate"
-            value={cancelDate}
-            onChange={(e) => setCancelDate(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="urgency"
-            className="block mb-2 font-medium text-gray-700"
-          >
-            Urgency Level
-          </label>
-          <select
-            id="urgency"
-            value={urgency}
-            onChange={(e) => setUrgency(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="normal">Normal</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
-        <div>
-          <label
-            htmlFor="additionalInfo"
-            className="block mb-2 font-medium text-gray-700"
-          >
-            Additional Information (if any)
-          </label>
-          <textarea
-            id="additionalInfo"
-            value={additionalInfo}
-            onChange={(e) => setAdditionalInfo(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
           ></textarea>
         </div>
         <button

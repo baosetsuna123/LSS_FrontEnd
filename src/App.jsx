@@ -50,6 +50,7 @@ import OtherApp from "./components/Admin/OtherApp";
 import EditParams from "./components/Admin/EditParams";
 import Classes from "./components/Admin/Classes";
 import { SendApplicationTeacher } from "./components/Teacher/SendApplicationTeacher";
+import { ApplicationManagementTeacher } from "./components/Teacher/ViewApplicationTeacher";
 
 function App() {
   return (
@@ -98,7 +99,7 @@ function App() {
             />
             <Route
               path="view-applications"
-              element={<ApplicationManagement />}
+              element={<ApplicationManagementTeacher />}
             />
             <Route path="profile" element={<ProfileTeacher />} />
             <Route path="wallet" element={<WalletTeacher />} />
