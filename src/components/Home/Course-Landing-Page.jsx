@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
-import { fetchMajorClassByStudent } from "@/data/api";
+import { fetchMajorClassByStudent, fetchCommentsHome } from "@/data/api";
 import { useEffect, useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -31,6 +31,20 @@ export function CourseLandingPage() {
     };
 
     fetchMajorClasses();
+  }, []);
+  const [comments, setComments] = useState([]);
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const data = await fetchCommentsHome();
+        setComments(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching major classes:", error);
+      }
+    };
+
+    fetchComments();
   }, []);
   const responsive = {
     superLargeDesktop: {
@@ -403,42 +417,38 @@ export function CourseLandingPage() {
           </section>
         )}
 
-        <section className="w-full py-3 md:py-6 lg:py-12 bg-gray-100 dark:bg-zinc-900">
-          <div className="container px-4 md:px-6 mx-auto">
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8 text-zinc-800 dark:text-zinc-200">
+        <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800">
+          <div className="container px-4 md:px-8 lg:px-12 mx-auto">
+            <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-center mb-12 text-zinc-800 dark:text-zinc-100">
               What Our Students Say
             </h2>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  name: "Alex Johnson",
-                  text: "The Web Development Bootcamp was exactly what I needed to switch careers. Highly recommended!",
-                },
-                {
-                  name: "Sarah Lee",
-                  text: "Data Science Fundamentals gave me a solid foundation. The instructors were knowledgeable and supportive.",
-                },
-                {
-                  name: "Mike Brown",
-                  text: "Digital Marketing Mastery helped me take my business to the next level. Great practical insights!",
-                },
-              ].map((testimonial, index) => (
-                <Card
-                  key={index}
-                  className="transition-transform transform hover:scale-105 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-lg shadow-md p-6"
-                >
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">
-                      {testimonial.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-zinc-500 dark:text-zinc-400">
-                      {testimonial.text}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+              {comments
+                .filter(
+                  (_, index) => index === 0 || index === 12 || index === 24
+                )
+                .map((testimonial, index) => (
+                  <Card
+                    key={index}
+                    className="transition-transform transform hover:scale-105 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 rounded-lg shadow-lg hover:shadow-xl p-8 relative border border-gray-200 dark:border-zinc-700"
+                  >
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center rounded-full shadow-md">
+                      <span className="text-xl font-bold uppercase">
+                        {testimonial.username[0]}
+                      </span>
+                    </div>
+                    <CardHeader className="mt-6 text-center">
+                      <CardTitle className="text-xl font-semibold tracking-wide">
+                        {testimonial.username}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="relative text-zinc-500 dark:text-zinc-400 italic text-lg leading-relaxed before:content-['“'] before:text-4xl before:font-bold before:absolute before:-top-2 before:-left-6 before:text-blue-500 after:content-['”'] after:text-4xl after:font-bold after:absolute after:-bottom-2 after:-right-6 after:text-purple-500 transition-transform duration-300 hover:scale-105">
+                        {testimonial.comment}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </div>
         </section>

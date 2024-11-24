@@ -9,13 +9,12 @@ import {
   FileText,
   Settings,
   LogOut,
-  UserPlus,
+  School,
 } from "lucide-react";
 import Modal from "@/components/Helper/Modal"; // Adjust the import path
 import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { AssignApplication } from "@/data/api";
 
 export function AdminLayout({ children }) {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -31,16 +30,6 @@ export function AdminLayout({ children }) {
   const handleLogoutClick = () => {
     console.log("Logout button clicked"); // Debugging line
     setIsModalOpen(true);
-  };
-
-  const handleClick = async () => {
-    try {
-      await AssignApplication();
-      toast.success("Application assigned successfully!");
-    } catch (error) {
-      console.error("Error assigning application", error);
-      toast.error("Already assigned for Staff!");
-    }
   };
 
   const navigate = useNavigate();
@@ -65,7 +54,12 @@ export function AdminLayout({ children }) {
       path: "#",
       onClick: () => setIsAppMenuExpanded(!isAppMenuExpanded), // Toggle child menu
     },
-    { icon: Settings, label: "Edit Params", path: "EditParams" },
+    {
+      icon: School,
+      label: "Classes",
+      path: "Classes",
+    },
+    { icon: Settings, label: "Params", path: "EditParams" },
   ];
 
   const usersSubMenuItems = [
@@ -184,16 +178,6 @@ export function AdminLayout({ children }) {
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
 
         {/* Footer with Assign Application button */}
-        <footer className="bg-white shadow-sm p-4 flex justify-end">
-          <Button
-            variant="default"
-            onClick={() => handleClick()}
-            className="bg-blue-500 text-white hover:bg-blue-600"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Assign Application
-          </Button>
-        </footer>
       </div>
 
       {/* Logout Confirmation Modal */}

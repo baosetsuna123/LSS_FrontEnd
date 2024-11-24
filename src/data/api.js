@@ -69,35 +69,32 @@ export const fetchMajorClassByStudent = async (token) => {
   }
 };
 //create-application
-export const createApplication = async (applicationData, certificate) => {
-  const formData = new FormData();
-
-  // Append application data and certificate to FormData
-  formData.append("applicationDTO", JSON.stringify(applicationData));
-  if (certificate) {
-    formData.append("certificate", certificate);
-  }
-
-  // Make the API call
+export const createApplication = async (
+  applicationDTO,
+  certificates,
+  certificateNames
+) => {
   try {
+    const formData = new FormData();
+    formData.append("applicationDTO", JSON.stringify(applicationDTO));
+    certificates.forEach((file) => {
+      if (file) formData.append("certificates", file);
+    });
+    certificateNames.forEach((name) => {
+      if (name) formData.append("certificateNames", name);
+    });
     const response = await api.post(
       "/applications/create-application",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
     );
     return response.data;
   } catch (error) {
-    // Handle errors appropriately
-    if (error.response) {
-      throw new Error(error.response.data || "Failed to create application");
-    }
-    throw new Error("An error occurred while creating the application");
+    throw error.response
+      ? error.response.data
+      : new Error("Unexpected error occurred.");
   }
 };
+
 //forgot-password
 export const fetchForgotPassword = async (phoneNumber) => {
   try {
@@ -452,6 +449,19 @@ export const fetchBalance = async (token) => {
     throw error;
   }
 };
+export const fetchBalanceTeacher = async (token) => {
+  try {
+    const response = await api.get("/wallet/Teacher/wallet", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //----------------class-----------------
 //get all classes
 export const fetchClasses = async (token) => {
@@ -493,6 +503,69 @@ export const fetchInfoTeacher = async (name, token) => {
   } catch (error) {
     console.error("Error fetch balance:", error);
     throw error;
+  }
+};
+//system
+export const fetchSystemParam = async (token) => {
+  try {
+    const response = await api.get(`/api/system/params`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const updateParam = async (params, token) => {
+  try {
+    const response = await api.put(`/api/system/param`, params, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // return the updated data
+  } catch (error) {
+    console.error("Error updating parameter:", error);
+    throw error;
+  }
+};
+export const deleteParam = async (id, token) => {
+  try {
+    const response = await api.delete(`/api/system/param/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; // Return success message
+  } catch (error) {
+    console.error("Error deleting parameter:", error);
+    throw error;
+  }
+};
+export const completeClassImmediately = async (classId, token) => {
+  try {
+    const response = await api.put(
+      `/admin/${classId}/complete`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data);
+    } else if (error.request) {
+      throw new Error("No response from server. Please try again later.");
+    } else {
+      throw new Error("An error occurred. Please try again.");
+    }
   }
 };
 //update-user
@@ -548,6 +621,15 @@ export const fetchClassbyteacherName = async (name, token) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const fetchCommentsHome = async () => {
+  try {
+    const response = await api.get(`/feedback/comments`);
     return response.data;
   } catch (error) {
     console.error("Error fetch balance:", error);

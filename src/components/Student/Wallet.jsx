@@ -61,130 +61,13 @@ export function MyWallet() {
   // Format the input value with commas
   const formatWithCommas = (num) => {
     if (!num) return "";
-    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas to the number string
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
-  const numberToWords = (num, includeZero = false, isThousandPart = false) => {
-    const units = [
-      "",
-      "một",
-      "hai",
-      "ba",
-      "bốn",
-      "năm",
-      "sáu",
-      "bảy",
-      "tám",
-      "chín",
-    ];
-    const tens = [
-      "",
-      "mười",
-      "hai mươi",
-      "ba mươi",
-      "bốn mươi",
-      "năm mươi",
-      "sáu mươi",
-      "bảy mươi",
-      "tám mươi",
-      "chín mươi",
-    ];
-    const hundreds = [
-      "",
-      "một trăm",
-      "hai trăm",
-      "ba trăm",
-      "bốn trăm",
-      "năm trăm",
-      "sáu trăm",
-      "bảy trăm",
-      "tám trăm",
-      "chín trăm",
-    ];
-
-    let result = "";
-
-    // Handle case where number is zero but includeZero is true
-    if (num === 0 && includeZero) {
-      return isThousandPart ? "không trăm lẻ" : "không";
-    }
-
-    // Handle hundreds part
-    const hundredPart = Math.floor(num / 100);
-    const tenPart = Math.floor((num % 100) / 10);
-    const unitPart = num % 10;
-
-    // Add hundreds part
-    if (hundredPart > 0) {
-      result += `${hundreds[hundredPart]} `;
-    }
-
-    // Add tens part
-    if (tenPart > 0) {
-      result += `${tens[tenPart]} `;
-    } else if (hundredPart > 0 && unitPart > 0) {
-      result += "lẻ "; // Read "lẻ" when tens is 0 but there are units
-    }
-
-    // Add units part
-    if (unitPart > 0) {
-      if (tenPart > 0 && unitPart === 5) {
-        result += "lăm "; // Read as "lăm" when unit is 5 and there are tens
-      } else {
-        result += `${units[unitPart]} `;
-      }
-    }
-
-    return result.trim();
-  };
-
-  const formatAmount = (amount) => {
-    if (amount === "" || isNaN(amount) || parseFloat(amount) < 0) return ""; // Validate input
-
-    const num = Math.floor(parseFloat(amount)); // Round down to avoid decimals
-    const billion = Math.floor(num / 1_000_000_000);
-    const million = Math.floor((num % 1_000_000_000) / 1_000_000);
-    const thousand = Math.floor((num % 1_000_000) / 1_000);
-    const remainder = Math.floor(num % 1_000);
-
-    let result = "";
-
-    // Handle billions
-    if (billion > 0) {
-      result += `${numberToWords(billion)} tỷ `;
-    }
-
-    // Handle millions
-    if (million > 0) {
-      result += `${numberToWords(million)} triệu `;
-    } else if (billion > 0 && thousand > 0) {
-      result += "không trăm lẻ "; // Add "không trăm lẻ" if millions are 0 but there are thousands
-    }
-
-    // Handle thousands
-    if (thousand > 0) {
-      result += `${numberToWords(thousand)} nghìn `;
-    } else if ((billion > 0 || million > 0) && remainder > 0) {
-      result += "không trăm lẻ "; // Add "không trăm lẻ" if there's billion/million but no thousands
-    }
-
-    // Handle remainder (less than 1000)
-    if (remainder > 0 || result === "") {
-      // Ensure "đồng" is added even for amounts less than 1000
-      result += `${numberToWords(remainder, true)} đồng`;
-    } else {
-      result = result.trim() + " đồng"; // Ensure "đồng" is added if there are no remainder
-    }
-
-    return result.trim(); // Remove extra spaces
-  };
-
-  // Hàm để lấy số dư
   useEffect(() => {
-    // Hàm để lấy số dư
     const getBalance = async () => {
       try {
-        const data = await fetchBalance(token); // Gọi hàm fetchBalance
-        setBalance(data.balance); // Cập nhật số dư từ dữ liệu trả về
+        const data = await fetchBalance(token);
+        setBalance(data.balance);
       } catch (error) {
         console.error("Failed to fetch balance:", error);
       }
@@ -323,11 +206,6 @@ export function MyWallet() {
                     onChange={handleInputChange} // Handle input changes
                     className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
-                  {amount && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {formatAmount(amount)}
-                    </p>
-                  )}
                   {errorMessage && (
                     <p className="text-red-500 dark:text-red-300 text-sm">
                       {errorMessage}

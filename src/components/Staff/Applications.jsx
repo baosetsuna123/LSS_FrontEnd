@@ -21,6 +21,16 @@ const ApplicationLayout = ({
   const [rejectionReason, setRejectionReason] = useState(""); // State for rejection reason
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false); // For approve modal
   const [teacherNameToApprove, setTeacherNameToApprove] = useState("");
+  const [isModalApp, setIsModalApp] = useState(false);
+  const [selectedCertificates, setSelectedCertificates] = useState([]);
+  const handleViewCertificateClick = (certificates) => {
+    setSelectedCertificates(certificates); // Set the full array of certificates
+    setIsModalApp(true); // Open the modal
+  };
+
+  const handleCloseModalApp = () => {
+    setIsModalApp(false);
+  };
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   const handleApproveClick = (app) => {
     console.log(app);
@@ -100,23 +110,7 @@ const ApplicationLayout = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [certificateUrl, setCertificateUrl] = useState("");
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
-  const handleViewCertificate = (url) => {
-    setCertificateUrl(url); // Set the certificate URL
-    setIsModalVisible(true); // Show the modal with the certificate image
-    setIsImageLoaded(false); // Reset image load state before showing the image
-  };
-
-  const handleCloseModal = () => {
-    setIsModalVisible(false); // Close the modal
-  };
-
-  const handleImageLoad = () => {
-    setIsImageLoaded(true); // Set image as loaded when it's fully loaded
-  };
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -144,7 +138,7 @@ const ApplicationLayout = ({
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
-                Title
+                Description
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ">
                 Certificate
@@ -179,57 +173,73 @@ const ApplicationLayout = ({
                       className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-sm font-medium px-3 py-2 rounded-md shadow-lg"
                       style={{ whiteSpace: "nowrap" }}
                     >
-                      {app.title}
+                      {app.description}
                     </span>
-                    {app.title
-                      ? app.title.length > 10
-                        ? `${app.title.slice(0, 10)}...`
-                        : app.title
+                    {app.description
+                      ? app.description.length > 10
+                        ? `${app.description.slice(0, 10)}...`
+                        : app.description
                       : "N/A"}
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                    {app.certificate ? (
+                    {app.certificate && app.certificate.length > 0 ? (
                       <div>
                         <button
-                          onClick={() => handleViewCertificate(app.certificate)}
+                          onClick={
+                            () => handleViewCertificateClick(app.certificate) // Pass the full certificate array to the modal
+                          }
                           className="text-blue-600 hover:underline"
                         >
                           View Certificate
                         </button>
 
-                        {/* Modal to display the certificate */}
-                        {isModalVisible && (
-                          <div
-                            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                            onClick={handleCloseModal} // Close the modal when clicking outside
-                          >
-                            <div
-                              className="bg-white p-4 rounded-lg max-w-3xl mx-4 relative"
-                              onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
-                            >
-                              {/* Show a loader or empty state until the image is loaded */}
-                              {!isImageLoaded && (
-                                <div className="w-full h-60 bg-gray-200 flex items-center justify-center">
-                                  <span>Loading...</span>
-                                </div>
-                              )}
-
-                              <img
-                                src={certificateUrl}
-                                alt="Certificate"
-                                className={`w-full h-auto ${
-                                  isImageLoaded ? "block" : "hidden"
-                                }`}
-                                onLoad={handleImageLoad} // Trigger when the image is fully loaded
-                              />
-
+                        {/* Modal to display certificate details */}
+                        {isModalApp && selectedCertificates && (
+                          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+                            <div className="bg-white p-6 rounded-lg w-3/4 relative overflow-x-auto">
+                              <h3 className="text-xl font-semibold mb-4">
+                                Certificate Details
+                              </h3>
                               <button
-                                onClick={handleCloseModal}
-                                className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+                                onClick={handleCloseModalApp}
+                                className="absolute top-2 right-2 px-5 py-5 text-lg font-bold"
                               >
-                                ×
+                                X
                               </button>
+
+                              {/* Table to display all certificates */}
+                              <table className="min-w-full table-auto">
+                                <thead>
+                                  <tr className="bg-gray-100">
+                                    <th className="px-4 py-2 text-left">ID</th>
+                                    <th className="px-4 py-2 text-left">
+                                      Name
+                                    </th>
+                                    <th className="px-4 py-2 text-left">
+                                      File
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {selectedCertificates.map((cert) => (
+                                    <tr key={cert.id} className="border-t">
+                                      <td className="px-4 py-2">{cert.id}</td>
+                                      <td className="px-4 py-2">{cert.name}</td>
+                                      <td className="px-4 py-2">
+                                        <a
+                                          href={cert.fileUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-500"
+                                        >
+                                          View File
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
                             </div>
                           </div>
                         )}
@@ -238,6 +248,7 @@ const ApplicationLayout = ({
                       "N/A"
                     )}
                   </td>
+
                   <td
                     className={`px-6 py-4 whitespace-nowrap font-semibold cursor-pointer text-sm rounded-lg ${
                       app.status === "APPROVED"

@@ -48,6 +48,8 @@ import RegisterApp from "./components/Admin/RegisterApp";
 import WithdrawApp from "./components/Admin/WithdrawApp";
 import OtherApp from "./components/Admin/OtherApp";
 import EditParams from "./components/Admin/EditParams";
+import Classes from "./components/Admin/Classes";
+import { SendApplicationTeacher } from "./components/Teacher/SendApplicationTeacher";
 
 function App() {
   return (
@@ -71,6 +73,7 @@ function App() {
         >
           <Route index element={<AdminHome />} />
           <Route path="User/ListUser" element={<User />} />
+          <Route path="Classes" element={<Classes />} />
           <Route path="User/ListTeacher" element={<Teacher />} />
           <Route path="User/Create-staff" element={<CreateStaff />} />
           <Route path="Application/Register" element={<RegisterApp />} />
@@ -89,7 +92,10 @@ function App() {
         >
           <Route path="/teacher" element={<TeacherDashboardLayout />}>
             <Route index element={<TeacherHome />} />
-            <Route path="send-applications" element={<SendApplication />} />
+            <Route
+              path="send-applications"
+              element={<SendApplicationTeacher />}
+            />
             <Route
               path="view-applications"
               element={<ApplicationManagement />}

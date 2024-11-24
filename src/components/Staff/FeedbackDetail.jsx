@@ -14,10 +14,10 @@ import {
 } from "@/data/api"; // Import the API function
 import { useQuestionContext } from "@/context/QuestionContext";
 import { toast } from "react-hot-toast";
+import dayjs from "dayjs";
 
-const FeedbackDetail = ({ classId }) => {
+const FeedbackDetail = ({ classId, params, startDate }) => {
   const { questions } = useQuestionContext();
-  console.log(questions);
   const safeQuestions = Array.isArray(questions) ? questions : [];
   const [feedback, setFeedback] = useState([]);
   const [detailedFeedback, setDetailedFeedback] = useState([]);
@@ -28,7 +28,7 @@ const FeedbackDetail = ({ classId }) => {
     acc[item.questionId] = item;
     return acc;
   }, {});
-
+  const [canSendFeedback, setCanSendFeedback] = useState(true);
   const ratingOptions = [
     { value: 1, label: "Extremely dissatisfied" },
     { value: 2, label: "Dissatisfied" },
@@ -102,6 +102,18 @@ const FeedbackDetail = ({ classId }) => {
 
     fetchFeedback();
   }, [classId, token]);
+  // Determine if the feedback deadline has passed
+  useEffect(() => {
+    const feedbackDeadlineParam = params.find(
+      (param) => param.name === "feedback_deadline"
+    );
+    if (feedbackDeadlineParam && startDate) {
+      const feedbackDeadlineDays = parseInt(feedbackDeadlineParam.value, 10);
+      const deadlineDate = dayjs(startDate).add(feedbackDeadlineDays, "day");
+      console.log("param" + feedbackDeadlineDays, "deadline" + deadlineDate);
+      setCanSendFeedback(dayjs().isBefore(deadlineDate));
+    }
+  }, [params, startDate]);
   const [isDisabled, setIsDisabled] = useState(false);
   const fetchSendEmail = async () => {
     try {
@@ -187,7 +199,7 @@ const FeedbackDetail = ({ classId }) => {
         {detailedFeedback.length === 0 || !isDetailedFetched ? (
           <button
             type="button"
-            className="btn btn-primary bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+            className="w-32 btn btn-primary bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
             onClick={handleFetchDetailedFeedback}
           >
             Show Detail
@@ -195,23 +207,23 @@ const FeedbackDetail = ({ classId }) => {
         ) : hasMoreFeedback ? (
           <button
             type="button"
-            className="btn btn-primary bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+            className="w-32 btn btn-primary bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
             onClick={loadMore}
           >
             Load More
           </button>
         ) : null}
 
-        <button
-          type="button"
-          className={`btn btn-primary bg-green-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 ${
-            isDisabled ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={fetchSendEmail}
-          disabled={isDisabled}
-        >
-          {isDisabled ? "Please Wait..." : "Send Feedback"}
-        </button>
+        {canSendFeedback && (
+          <button
+            type="button"
+            className="w-32 btn btn-primary bg-green-500 whitespace-nowrap text-white font-semibold py-2 px-3 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+            onClick={fetchSendEmail}
+            disabled={isDisabled}
+          >
+            {isDisabled ? "Please wait ..." : "Send Feedback"}
+          </button>
+        )}
       </div>
 
       {/* Render detailed feedback if available */}

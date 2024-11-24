@@ -68,13 +68,16 @@ const CreateStaff = () => {
   };
 
   return (
-    <Card className="max-w-lg mx-auto">
+    <Card className="max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Register Staff</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <div className="space-y-2 flex flex-col">
             <Label htmlFor="username">Username</Label>
             <Input
               type="text"
@@ -85,7 +88,7 @@ const CreateStaff = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 flex flex-col">
             <Label htmlFor="email">Email</Label>
             <Input
               type="email"
@@ -96,7 +99,7 @@ const CreateStaff = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 flex flex-col">
             <Label htmlFor="password">Password</Label>
             <Input
               type="password"
@@ -107,7 +110,7 @@ const CreateStaff = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 flex flex-col">
             <Label htmlFor="fullName">Full Name</Label>
             <Input
               type="text"
@@ -118,7 +121,7 @@ const CreateStaff = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 flex flex-col">
             <Label htmlFor="phoneNumber">Phone Number</Label>
             <Input
               type="tel"
@@ -132,7 +135,7 @@ const CreateStaff = () => {
               <p className="text-sm text-red-500">{errors.phoneNumber}</p>
             )}
           </div>
-          <CardFooter className="px-0">
+          <CardFooter className="px-0 col-span-2">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Registering..." : "Register Staff"}
             </Button>

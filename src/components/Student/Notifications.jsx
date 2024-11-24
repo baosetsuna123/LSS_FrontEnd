@@ -7,7 +7,7 @@ import {
 import { BellOff, Ellipsis, EllipsisVertical } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
+import profile from "../../assets/noti2.avif";
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [visibleCount, setVisibleCount] = useState(10);
@@ -95,30 +95,42 @@ const Notifications = () => {
     return true;
   });
   return (
-    <div className="flex justify-center items-start min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
-      <div className="w-full max-w-2xl p-4 bg-white dark:bg-gray-800 rounded-md shadow-md">
-        <div className="flex justify-between items-center border-b border-gray-200 p-2 dark:border-gray-700">
-          <h1 className="font-semibold text-gray-900 dark:text-gray-100">
+    <div
+      className="flex justify-center items-start min-h-screen p-4 bg-gray-100 dark:bg-gray-900 relative"
+      style={{
+        backgroundImage: `url(${profile})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* Background Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-10 dark:bg-opacity-40 z-0"></div>
+
+      <div className="w-full max-w-2xl p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 relative z-10 overflow-hidden">
+        {/* Gradient Border Effect */}
+        <div className="absolute inset-0 -z-10 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 p-0.5">
+          <div className="h-full w-full rounded-lg bg-white dark:bg-gray-800"></div>
+        </div>
+
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">
+          <h1 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
             Notifications
           </h1>
-          {/* Ellipsis icon to show the "Mark all as read" menu */}
-          <div
-            className="relative"
-            onClick={() => setShowMarkAllMenu((prev) => !prev)} // Toggle the menu on icon click
-          >
-            <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold">
-              {/* Replace with your Ellipsis icon */}
+          <div className="relative">
+            <button
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold"
+              onClick={() => setShowMarkAllMenu((prev) => !prev)}
+            >
               <Ellipsis />
             </button>
-
-            {/* Dropdown for "Mark all as read" */}
             {showMarkAllMenu && (
-              <div className="absolute right-0 top-full w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20">
+              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="flex whitespace-nowrap items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 w-full"
+                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
-                  {/* Icon for "Mark all as read" */}
                   <svg
                     className="h-5 w-5 mr-2 text-green-500"
                     xmlns="http://www.w3.org/2000/svg"
@@ -141,23 +153,23 @@ const Notifications = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 dark:border-gray-700 mt-4">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
           <button
             onClick={() => handleTabChange("All")}
-            className={`flex-1 text-center py-1.5 text-sm ${
+            className={`flex-1 py-2 text-sm font-medium text-center ${
               activeTab === "All"
                 ? "bg-blue-500 text-white"
-                : "text-gray-700 dark:text-gray-300"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
             All
           </button>
           <button
             onClick={() => handleTabChange("Not Read")}
-            className={`flex-1 text-center py-1.5 text-sm ${
+            className={`flex-1 py-2 text-sm font-medium text-center ${
               activeTab === "Not Read"
                 ? "bg-blue-500 text-white"
-                : "text-gray-700 dark:text-gray-300"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
             Not Read
@@ -165,11 +177,10 @@ const Notifications = () => {
         </div>
 
         {/* Notification List */}
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4">
           {filteredNotifications.length === 0 ? (
-            // Show this section when there are no notifications and filter is 0
             <div className="flex flex-col items-center justify-center text-center text-gray-500 dark:text-gray-400">
-              <BellOff className="h-12 w-12 text-gray-500 dark:text-gray-400 mb-4" />
+              <BellOff className="h-12 w-12 mb-4" />
               <p>No Notifications Left</p>
             </div>
           ) : (
@@ -178,7 +189,7 @@ const Notifications = () => {
               .map((notification, index) => (
                 <div
                   key={index}
-                  className="group relative border-b border-gray-200 dark:border-gray-700 pb-2 transition-all duration-200 ease-in-out hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="relative border-b border-gray-200 dark:border-gray-700 pb-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                 >
                   <div className="font-medium text-gray-800 dark:text-gray-100">
                     {notification.type}
@@ -190,8 +201,8 @@ const Notifications = () => {
                     {formatDateTime(notification.createAt)}
                   </div>
 
-                  {/* Ellipsis icon */}
-                  <div className="absolute right-2 top-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {/* Dropdown Icon */}
+                  <div className="absolute top-0 right-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -199,20 +210,19 @@ const Notifications = () => {
                           prev === notification.id ? null : notification.id
                         );
                       }}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold px-2"
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                       <EllipsisVertical />
                     </button>
                   </div>
 
-                  {/* Dropdown menu */}
+                  {/* Dropdown Menu */}
                   {hoveredNoti === notification.id && (
-                    <div className="absolute right-2 top-8 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20">
+                    <div className="absolute right-2 top-8 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
                       <button
                         onClick={() => handleMarkAsRead(notification.id)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 w-full"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                       >
-                        {/* Icon for "Mark as Read" */}
                         <svg
                           className="h-5 w-5 mr-2 text-green-500"
                           xmlns="http://www.w3.org/2000/svg"
@@ -233,9 +243,8 @@ const Notifications = () => {
                         onClick={() =>
                           handleRemoveNotification(notification.id)
                         }
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 w-full"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                       >
-                        {/* Icon for "Remove" */}
                         <svg
                           className="h-5 w-5 mr-2 text-red-500"
                           xmlns="http://www.w3.org/2000/svg"
@@ -250,7 +259,7 @@ const Notifications = () => {
                             d="M6 18L18 6M6 6l12 12"
                           />
                         </svg>
-                        Remove This
+                        Remove
                       </button>
                     </div>
                   )}
@@ -261,7 +270,7 @@ const Notifications = () => {
             <div className="text-center mt-4">
               <button
                 onClick={loadMore}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-800"
               >
                 Load More
               </button>
