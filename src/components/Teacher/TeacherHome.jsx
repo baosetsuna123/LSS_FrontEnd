@@ -270,7 +270,7 @@ function TeacherHome() {
       const date = new Date(selectedDate);
       setDate(date);
       const classList = classesCreate.filter(
-        (c) => c.startDate === formatDate(date)
+        (c) => c.startDate === formatDate(date) && c.status !== "CANCELED"
       );
       setSelectedSlots(classList.map((item) => item.slotId));
       // Ensure selected date is at least two days from today
@@ -296,9 +296,19 @@ function TeacherHome() {
   };
 
   const handleShowDetail = (lesson) => {
-    const data = classes.find((c) => c.code === lesson.class);
-    setShowDetail(true);
-    setInfoClass(data);
+    // Ensure `classes` exists and is an array
+    if (!classes || !Array.isArray(classes)) {
+      console.error("Classes array is not available or not an array.");
+      return;
+    }
+    const data = classes.find((c) => c.name === lesson.class);
+    if (data) {
+      setInfoClass(data);
+      setShowDetail(true);
+    } else {
+      console.warn("No matching class found for lesson:", lesson);
+      setShowDetail(false);
+    }
   };
 
   const renderTimetableCell = (day, period) => {

@@ -36,7 +36,7 @@ const AppWithDraw = ({
         )
       );
       toast.success("Application approved successfully");
-      setShowModal(false); // Close the modal after approval
+      setShowModal(false);
     } catch (error) {
       console.error("Failed to approve application:", error);
       toast.error("Failed to approve application.");

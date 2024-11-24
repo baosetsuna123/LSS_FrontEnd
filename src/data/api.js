@@ -1007,15 +1007,11 @@ export const fetchSlots = async (token) => {
 
 export const updateSlot = async (id, data, token) => {
   try {
-    const response = await api.put(
-      `/slots/${id}`,
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.put(`/slots/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error rejecting application:", error);
@@ -1298,6 +1294,31 @@ export const getSystemWalletTransactionHistory = async (token) => {
     throw error;
   }
 };
+//cancel-class
+export const cancelClass = async (classId, token) => {
+  try {
+    const response = await api.post(
+      `/classes/cancel/${classId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; // Success message or response
+  } catch (error) {
+    if (error.response) {
+      // Check if it's a 400 or 403 error and handle them separately
+      if (error.response.status === 400) {
+        throw new Error(error.response.data); // Return the error message from backend
+      } else if (error.response.status === 403) {
+        throw new Error("You do not have permission to cancel this class.");
+      }
+    }
+    throw new Error("Something went wrong, please try again later");
+  }
+};
 
 export const getUserCountByRole = async (token) => {
   try {
@@ -1345,6 +1366,20 @@ export const getTotalClasses = async (token) => {
 export const getActiveClassesByMonth = async (year, token) => {
   try {
     const response = await api.get(`/admin/statistics/active`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching active classes by month:", error);
+    throw error;
+  }
+};
+export const getCancelClassesByMonth = async (year, token) => {
+  try {
+    const response = await api.get(`/admin/statistics/canceled`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -1456,7 +1491,6 @@ export const getDepositsByMonth = async (year, token) => {
     throw error;
   }
 };
-
 
 export const getTotalCourses = async (token) => {
   try {

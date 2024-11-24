@@ -323,99 +323,104 @@ export function CourseLandingPage() {
             </section>
           )}
 
-        {isLoggedIn && (
-          <section className="w-full py-3 md:py-6 lg:py-12">
-            <div className="container px-4 mx-auto md:px-6">
-              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
-                Featured Classes
-              </h2>
-              {loading ? (
-                <div className="flex justify-center">
-                  <Loader className="w-10 h-10 animate-spin" />
+        {isLoggedIn &&
+          classes.length > 0 &&
+          classes.some(
+            (classItem) =>
+              classItem.status === "PENDING" || classItem.status === "ACTIVE"
+          ) && (
+            <section className="w-full py-3 md:py-6 lg:py-12">
+              <div className="container px-4 mx-auto md:px-6">
+                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
+                  Featured Classes
+                </h2>
+                {loading ? (
+                  <div className="flex justify-center">
+                    <Loader className="w-10 h-10 animate-spin" />
+                  </div>
+                ) : (
+                  <Carousel
+                    ref={carouselRef}
+                    responsive={responsive}
+                    arrows={true}
+                    className={
+                      classes.filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      ).length <= 2
+                        ? "flex justify-center"
+                        : ""
+                    }
+                  >
+                    {classes
+                      .filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      )
+                      .map((course, index) => (
+                        <Card
+                          key={index}
+                          onClick={() => handleClassClick(course.classId)}
+                          className="transition-transform transform hover:scale-105 mx-2"
+                        >
+                          <img
+                            src={course.imageUrl || defaults}
+                            alt={course.name}
+                            className="w-full h-[200px] object-cover rounded-t-lg"
+                          />
+                          <CardHeader>
+                            <div className="flex justify-between items-center">
+                              <CardTitle className="text-xl font-semibold">
+                                {course.name}
+                              </CardTitle>
+                              <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                                {course.courseCode}
+                              </p>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex justify-between items-center">
+                              <p className="text-2xl font-bold">
+                                {formatCurrency(course.price)}
+                              </p>
+                              <p className="text-lg  text-gray-500 dark:text-gray-300 font-medium">
+                                Created by {course.teacherName}
+                              </p>
+                            </div>
+                            <Button
+                              className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
+                              disabled={enrollmentStatus[course.classId]}
+                            >
+                              {enrollmentStatus[course.classId]
+                                ? "Enrolled"
+                                : "Enroll Now"}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </Carousel>
+                )}
+                <div className="flex justify-center mt-8">
+                  <Button
+                    onClick={() => navigate("/class")}
+                    className={`dark:bg-orange-500 dark:hover:bg-orange-600 ${
+                      classes.filter(
+                        (course) =>
+                          course.status === "PENDING" ||
+                          course.status === "ACTIVE"
+                      ).length <= 2
+                        ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                        : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
+                    }`}
+                  >
+                    View All
+                  </Button>
                 </div>
-              ) : (
-                <Carousel
-                  ref={carouselRef}
-                  responsive={responsive}
-                  arrows={true}
-                  className={
-                    classes.filter(
-                      (course) =>
-                        course.status === "PENDING" ||
-                        course.status === "ACTIVE"
-                    ).length <= 2
-                      ? "flex justify-center"
-                      : ""
-                  }
-                >
-                  {classes
-                    .filter(
-                      (course) =>
-                        course.status === "PENDING" ||
-                        course.status === "ACTIVE"
-                    )
-                    .map((course, index) => (
-                      <Card
-                        key={index}
-                        onClick={() => handleClassClick(course.classId)}
-                        className="transition-transform transform hover:scale-105 mx-2"
-                      >
-                        <img
-                          src={course.imageUrl || defaults}
-                          alt={course.name}
-                          className="w-full h-[200px] object-cover rounded-t-lg"
-                        />
-                        <CardHeader>
-                          <div className="flex justify-between items-center">
-                            <CardTitle className="text-xl font-semibold">
-                              {course.name}
-                            </CardTitle>
-                            <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                              {course.courseCode}
-                            </p>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex justify-between items-center">
-                            <p className="text-2xl font-bold">
-                              {formatCurrency(course.price)}
-                            </p>
-                            <p className="text-lg  text-gray-500 dark:text-gray-300 font-medium">
-                              Created by {course.teacherName}
-                            </p>
-                          </div>
-                          <Button
-                            className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
-                            disabled={enrollmentStatus[course.classId]}
-                          >
-                            {enrollmentStatus[course.classId]
-                              ? "Enrolled"
-                              : "Enroll Now"}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                </Carousel>
-              )}
-              <div className="flex justify-center mt-8">
-                <Button
-                  onClick={() => navigate("/class")}
-                  className={`dark:bg-orange-500 dark:hover:bg-orange-600 ${
-                    classes.filter(
-                      (course) =>
-                        course.status === "PENDING" ||
-                        course.status === "ACTIVE"
-                    ).length <= 2
-                      ? "w-full px-4 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-                      : "w-full px-6 py-2 text-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 transition duration-300 rounded"
-                  }`}
-                >
-                  View All
-                </Button>
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
         <section className="w-full py-12 md:py-16 lg:py-20 bg-gradient-to-b from-gray-100 to-gray-200 dark:from-zinc-900 dark:to-zinc-800">
           <div className="container px-4 md:px-8 lg:px-12 mx-auto">

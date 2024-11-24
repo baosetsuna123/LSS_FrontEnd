@@ -1,14 +1,16 @@
-import { fetchClassbyteacher } from "@/data/api";
+import { cancelClass } from "@/data/api"; // Import the cancelClass function from api.js
+import { fetchClassbyteacher } from "@/data/api"; // Keep fetchClassbyteacher to fetch classes
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 function CancelClassRequest() {
   const [classes, setClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [reason, setReason] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState(""); // Store only classId
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState("");
   const result = localStorage.getItem("result");
+
   let token;
+
   if (result) {
     try {
       const parsedResult = JSON.parse(result);
@@ -18,42 +20,46 @@ function CancelClassRequest() {
     }
   }
 
+  // Fetch classes that the teacher is associated with
   const fetchClasses = async () => {
     try {
       const res = await fetchClassbyteacher(token);
-      setClasses(res);
+      // Filter only classes with status ACTIVE or PENDING
+      const filteredClasses = res.filter(
+        (cls) => cls.status === "ACTIVE" || cls.status === "PENDING"
+      );
+      setClasses(filteredClasses);
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     fetchClasses();
   }, [token]);
 
+  // Handle cancellation form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitMessage("");
 
-    // Mock submitting the request to the server
+    if (!selectedClassId) {
+      toast.error("Please select a class to cancel.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      // Replace with real API call data
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Class cancellation request:", {
-        class: selectedClass,
-        reason,
-      });
-      setSubmitMessage(
-        "Class cancellation request sent successfully. We will review and respond as soon as possible."
-      );
-      // Reset form
-      setSelectedClass("");
-      setReason("");
+      console.log(selectedClassId);
+      await cancelClass(selectedClassId, token);
+      setSelectedClassId(""); // Reset class selection
+      toast.success("Cancellation request submitted successfully!");
     } catch (error) {
-      console.error("An error occurred while submitting the request:", error);
-      setSubmitMessage(
-        "An error occurred while submitting the request. Please try again later."
+      console.error(
+        "An error occurred while submitting the cancellation:",
+        error
       );
+      toast.error("An error occurred while submitting the cancellation.");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,35 +80,20 @@ function CancelClassRequest() {
           </label>
           <select
             id="class"
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
+            value={selectedClassId} // Use classId here
+            onChange={(e) => setSelectedClassId(e.target.value)} // Update the selected classId
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
           >
             <option value="">-- Select Class --</option>
             {classes.map((cls) => (
-              <option key={cls.id} value={cls.id}>
+              <option key={cls.classId} value={cls.classId}>
                 {cls.name}
               </option>
             ))}
           </select>
         </div>
-        <div>
-          <label
-            htmlFor="reason"
-            className="block mb-2 font-medium text-gray-700"
-          >
-            Reason for Cancellation
-          </label>
-          <textarea
-            id="reason"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="4"
-            required
-          ></textarea>
-        </div>
+
         <button
           type="submit"
           className="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors"
@@ -111,17 +102,6 @@ function CancelClassRequest() {
           {isSubmitting ? "Submitting..." : "Submit Cancellation Request"}
         </button>
       </form>
-      {submitMessage && (
-        <div
-          className={`mt-4 p-4 rounded-lg ${
-            submitMessage.includes("successfully")
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {submitMessage}
-        </div>
-      )}
     </div>
   );
 }
