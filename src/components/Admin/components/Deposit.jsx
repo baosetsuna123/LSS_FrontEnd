@@ -97,8 +97,8 @@ export default function Deposit() {
                     </FormControl>
                 </div>
                 <BarChart
-                    width={900}
-                    height={400}
+                    width={1000}
+                    height={500}
                     series={[
                         { data: chartData.totalBalance, label: 'Total Balance', id: 'totalBalanceId' },
                         { data: chartData.totalRefunded, label: 'Total Refunded', id: 'totalRefundedId' },

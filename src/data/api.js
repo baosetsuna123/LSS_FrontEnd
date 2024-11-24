@@ -1005,6 +1005,24 @@ export const fetchSlots = async (token) => {
   }
 };
 
+export const updateSlot = async (id, data, token) => {
+  try {
+    const response = await api.put(
+      `/slots/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    throw error;
+  }
+};
+
 // Get Order by UserToken
 export const fetchOrdersByUser = async (token) => {
   try {
@@ -1435,6 +1453,21 @@ export const getDepositsByMonth = async (year, token) => {
       "Error fetching completed classes by month (detailed):",
       error
     );
+    throw error;
+  }
+};
+
+
+export const getTotalCourses = async (token) => {
+  try {
+    const response = await api.get(`/admin/total-courses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching total classes:", error);
     throw error;
   }
 };
