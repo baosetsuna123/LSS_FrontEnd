@@ -160,9 +160,7 @@ const DetailClasses = ({ token }) => {
                           <TableCell>{classItem.teacherName}</TableCell>
                           <TableCell>{classItem.slotInfo?.period}</TableCell>
                           <TableCell>
-                            {getDayOfWeekString(
-                              new Date(classItem.startDate)
-                            )}
+                            {getDayOfWeekString(new Date(classItem.startDate))}
                           </TableCell>{" "}
                           {/* Day of the Week */}
                           <TableCell>
@@ -170,9 +168,7 @@ const DetailClasses = ({ token }) => {
                           </TableCell>
                           <TableCell>{classItem.maxStudents}</TableCell>
                           <TableCell>
-                            {classItem.students
-                              ? classItem.students.length
-                              : 0}
+                            {classItem.students ? classItem.students.length : 0}
                           </TableCell>
                         </TableRow>
                       ))}

@@ -1,9 +1,7 @@
 import Deposit from "./components/Deposit";
 import SessionsChart from "./components/SessionsChart";
-import Slot from "./components/Slot";
 import SystemWalletBalance from "./components/SystemWalletBalance";
 import TotalClasses from "./components/TotalClasses";
-import TotalCourses from "./components/TotalCourses";
 import TotalOrdersAmount from "./components/TotalOrdersAmount";
 import TransactionHistory from "./components/TransactionHistory";
 import UserCount from "./components/UserCount";
@@ -16,7 +14,7 @@ const AdminHome = () => {
           <TotalClasses />
           <UserCount />
           <SystemWalletBalance />
-          <TotalCourses />
+          {/* <TotalCourses /> */}
           {/* <Slot /> */}
         </div>
         <div className="flex flex-col gap-2">
