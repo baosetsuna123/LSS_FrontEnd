@@ -130,69 +130,66 @@ const DetailClasses = ({ token }) => {
                 });
               }}
             />
+            <div>
+              <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 750 }} aria-label="class table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Class ID</TableCell>
+                      <TableCell>Class Name</TableCell>
+                      <TableCell>Code</TableCell>
+                      <TableCell>Teacher</TableCell>
+                      <TableCell>Period</TableCell>
+                      <TableCell>Day of the Week</TableCell>
+                      <TableCell>Price</TableCell>
+                      <TableCell>Max Students</TableCell>
+                      <TableCell>Number of Students</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredData
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((classItem, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{classItem.classId}</TableCell>
+                          <TableCell>{classItem.name}</TableCell>
+                          <TableCell>{classItem.code}</TableCell>
+                          <TableCell>{classItem.teacherName}</TableCell>
+                          <TableCell>{classItem.slotInfo?.period}</TableCell>
+                          <TableCell>
+                            {getDayOfWeekString(
+                              new Date(classItem.startDate)
+                            )}
+                          </TableCell>{" "}
+                          {/* Day of the Week */}
+                          <TableCell>
+                            {formatWithCommas(classItem.price)}
+                          </TableCell>
+                          <TableCell>{classItem.maxStudents}</TableCell>
+                          <TableCell>
+                            {classItem.students
+                              ? classItem.students.length
+                              : 0}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-            {filteredData.length > 0 && (
-              <div>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 750 }} aria-label="class table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Class ID</TableCell>
-                        <TableCell>Class Name</TableCell>
-                        <TableCell>Code</TableCell>
-                        <TableCell>Teacher</TableCell>
-                        <TableCell>Period</TableCell>
-                        <TableCell>Day of the Week</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell>Max Students</TableCell>
-                        <TableCell>Number of Students</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredData
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((classItem, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{classItem.classId}</TableCell>
-                            <TableCell>{classItem.name}</TableCell>
-                            <TableCell>{classItem.code}</TableCell>
-                            <TableCell>{classItem.teacherName}</TableCell>
-                            <TableCell>{classItem.slotInfo?.period}</TableCell>
-                            <TableCell>
-                              {getDayOfWeekString(
-                                new Date(classItem.startDate)
-                              )}
-                            </TableCell>{" "}
-                            {/* Day of the Week */}
-                            <TableCell>
-                              {formatWithCommas(classItem.price)}
-                            </TableCell>
-                            <TableCell>{classItem.maxStudents}</TableCell>
-                            <TableCell>
-                              {classItem.students
-                                ? classItem.students.length
-                                : 0}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 15]}
-                  component="div"
-                  count={filteredData.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </div>
-            )}
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 15]}
+                component="div"
+                count={filteredData.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </div>
           </div>
         </Box>
       </Modal>
