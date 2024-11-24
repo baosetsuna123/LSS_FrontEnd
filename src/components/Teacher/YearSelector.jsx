@@ -14,6 +14,10 @@ const formatDateToMD = (date) => {
   return `${day}/${month}`;
 };
 
+function resetTimeToStartOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
 const getWeeksInYear = (year) => {
   const weeks = [];
   let startOfWeek = new Date(year, 0, 1);
@@ -29,8 +33,8 @@ const getWeeksInYear = (year) => {
 
     weeks.push({
       weekNumber,
-      start: new Date(startOfWeek),
-      end: new Date(endOfWeek),
+      start: resetTimeToStartOfDay(startOfWeek),
+      end: resetTimeToStartOfDay(endOfWeek),
     });
 
     startOfWeek.setDate(startOfWeek.getDate() + 7);
@@ -44,16 +48,15 @@ const YearWeekSelector = ({ onWeekChange }) => {
   const [selectedYear, setSelectedYear] = useState(getCurrentYear());
   const [weeks, setWeeks] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(null);
-
   useEffect(() => {
     const weeksInYear = getWeeksInYear(selectedYear);
-    console.log(selectedYear);
     setWeeks(weeksInYear);
 
-    const currentDate = new Date();
+    const currentDate = resetTimeToStartOfDay(new Date());
     const currentWeek = weeksInYear.find(
       (week) => currentDate >= week.start && currentDate <= week.end
     );
+    if (!weeksInYear.length) return;
     setSelectedWeek(currentWeek || weeksInYear[0]);
   }, [selectedYear]);
 
