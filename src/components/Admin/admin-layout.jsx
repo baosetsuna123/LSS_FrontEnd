@@ -73,12 +73,12 @@ export function AdminLayout({ children }) {
     { label: "Other", path: "/admin/Application/Other" },
   ];
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <div
         className={`bg-gray-800 text-white transition-all duration-300 ${
-          isExpanded ? "w-64" : "w-20"
-        }`}
+          isExpanded ? "w-64" : "w-32" // Adjust w-32 if 20 is too narrow
+        } h-screen`}
       >
         <div className="flex items-center justify-between p-4">
           {isExpanded && <h1 className="text-xl font-bold">Admin Panel</h1>}
@@ -157,7 +157,7 @@ export function AdminLayout({ children }) {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className={`text-gray-600 hover:text-gray-800 hover:bg-gray-100 ${
+              className={`text-gray-600 hover:text-gray-800 mr-3 hover:bg-gray-100 ${
                 isLogoutHovered ? "text-red-500" : ""
               }`}
               onMouseEnter={() => setIsLogoutHovered(true)}

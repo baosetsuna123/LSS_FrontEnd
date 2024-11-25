@@ -1,5 +1,4 @@
-// AvatarContext.js
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AvatarContext = createContext();
 
@@ -8,11 +7,14 @@ export const useAvatar = () => {
 };
 
 export const AvatarProvider = ({ children }) => {
-  const [userProfile, setUserProfile] = useState(() => {
-    // Initialize state from localStorage if available
+  const [userProfile, setUserProfile] = useState({});
+
+  useEffect(() => {
     const storedProfile = localStorage.getItem("result");
-    return storedProfile ? JSON.parse(storedProfile) : {};
-  });
+    if (storedProfile) {
+      setUserProfile(JSON.parse(storedProfile));
+    }
+  }, []); // This ensures the effect runs only once on initial mount
 
   const updateUserProfile = (updatedProfile) => {
     setUserProfile(updatedProfile);

@@ -1319,6 +1319,39 @@ export const cancelClass = async (classId, token) => {
     throw new Error("Something went wrong, please try again later");
   }
 };
+export const forgotPassword = async (email) => {
+  const response = await api.post("/auth/forgot-password", {
+    email,
+  });
+  return response.data;
+};
+
+export const verifyOtp = async (otp) => {
+  try {
+    const otpNumber = parseInt(otp, 10);
+
+    const response = await api.post(
+      "/auth/confirm-otpForgot",
+      { otp: otpNumber },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    throw error.response?.data || error;
+  }
+};
+
+export const resetPassword = async (newPassword) => {
+  const response = await api.post("/auth/reset-password", {
+    newPassword,
+  });
+  return response.data;
+};
 
 export const getUserCountByRole = async (token) => {
   try {

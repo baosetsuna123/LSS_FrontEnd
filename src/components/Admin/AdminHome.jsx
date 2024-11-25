@@ -7,13 +7,13 @@ import TransactionHistory from "./components/TransactionHistory";
 import UserCount from "./components/UserCount";
 const AdminHome = () => {
   return (
-    <div className="flex flex-col justify-center items-center w-full overflow-hidden">
+    <div className="flex flex-col justify-center items-center w-full overflow-hidden p-0">
       {" "}
       {/* Hides all overflow */}
       <div className="w-full overflow-hidden">
         {" "}
         {/* Hides both x and y overflow */}
-        <div className="grid grid-cols-4 gap-4 pb-8">
+        <div className="grid grid-cols-4 gap-4 pb-8 ">
           <TotalOrdersAmount />
           <TotalClasses />
           <UserCount />

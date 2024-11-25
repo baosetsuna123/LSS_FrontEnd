@@ -38,10 +38,11 @@ function TeacherDashboardLayout() {
     }
   }
 
-  const avatarImage = JSON.parse(localStorage.getItem("result")).avatarImage;
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { userProfile } = useAvatar();
+  const avatarImage = JSON.parse(localStorage.getItem("result")).avatarImage;
+
   const handleLogout = (e) => {
     e.stopPropagation();
     logout();

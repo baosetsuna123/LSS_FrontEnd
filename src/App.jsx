@@ -10,7 +10,6 @@ import { Layout } from "./Layout/Layout";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import SignUp from "./components/Auth/SignUp";
 import { Application } from "./components/Application/Application";
-import VerifyOtp from "./components/Auth/Verify-Otp";
 import ResetPassword from "./components/Auth/ResetPassword";
 import Profile from "./components/Student/Profile";
 import ProtectedRoute from "./components/Auth/ProtectedRoute"; // Import the ProtectedRoute
@@ -51,13 +50,16 @@ import EditParams from "./components/Admin/EditParams";
 import Classes from "./components/Admin/Classes";
 import { SendApplicationTeacher } from "./components/Teacher/SendApplicationTeacher";
 import { ApplicationManagementTeacher } from "./components/Teacher/ViewApplicationTeacher";
+import VerifyOtpRegister from "./components/Auth/Verify-Otp-Register";
+import VerifyOtpForgot from "./components/Auth/Verify-Otp-Forgot";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/verify-otp-register" element={<VerifyOtpRegister />} />
+        <Route path="/verify-otp-forgot" element={<VerifyOtpForgot />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
         {/* Staff Dashboard */}

@@ -84,7 +84,7 @@ export default function SignUp() {
           categoryIds
         );
         toast.success("Please verify your email with OTP");
-        navigate("/verify-otp");
+        navigate("/verify-otp-register");
       } else if (userType === "teacher") {
         await fetchSignUpTeacher(
           username,

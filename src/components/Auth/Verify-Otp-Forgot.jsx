@@ -3,47 +3,61 @@ import backgroundImage from "../../assets/background2.png";
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { confirmOtp } from "@/data/api";
+import { verifyOtp } from "@/data/api";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
-export default function VerifyOtp() {
+export default function VerifyOtpForgot() {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // API call to verify OTP
   const handleVerifyOtp = async (event) => {
     event.preventDefault();
+
+    // Check if OTP is exactly 6 characters long
     if (otp.length !== 6) {
       toast.error("Please enter a complete 6-digit OTP");
       return;
     }
+
+    // Convert OTP to integer (this ensures it's passed as a number)
+    const otpNumber = parseInt(otp, 10);
+
+    if (isNaN(otpNumber)) {
+      toast.error("Invalid OTP format. Please try again.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await confirmOtp(otp);
+      await verifyOtp(otpNumber);
       toast.success("Email verified successfully!");
-      navigate("/login");
+      navigate("/reset-password"); // Navigate to reset-password page on success
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      toast.error(
-        error.response?.data?.message || "Invalid OTP. Please try again"
-      );
+
+      // Display appropriate error message
+      const errorMessage =
+        error.response?.data?.message || "Invalid OTP. Please try again";
+      toast.error(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset loading state after API call
     }
   };
 
   const handleBackClick = () => {
-    setShowConfirm(true);
+    setShowConfirm(true); // Show confirmation modal when back button is clicked
   };
 
   const handleConfirmExit = () => {
-    navigate("/login");
+    navigate("/login"); // Navigate to login if user confirms exit
   };
 
   return (
@@ -95,12 +109,12 @@ export default function VerifyOtp() {
               type="submit"
               disabled={isLoading || otp.length !== 6}
               className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white 
-            ${
-              isLoading || otp.length !== 6
-                ? "bg-indigo-400 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700"
-            }
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                ${
+                  isLoading || otp.length !== 6
+                    ? "bg-indigo-400 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700"
+                }
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
             >
               {isLoading ? (
                 <>
@@ -159,8 +173,8 @@ export default function VerifyOtp() {
                 Confirm Exit
               </h2>
               <p className="text-gray-600">
-                Are you sure you want to exit? Your signup progress will be lost
-                and you will need to start over.
+                Are you sure you want to exit? Your change-password progress
+                will be lost and you will need to start over.
               </p>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
