@@ -749,6 +749,7 @@ export const fetchUpdateClass = async ({ token, data }) => {
       Authorization: `Bearer ${token}`,
     },
   });
+  console.log(response.data);
 
   return response.data;
 };
@@ -1169,22 +1170,57 @@ export const getApplicationsByType = async (applicationTypeId, token) => {
   }
 };
 
-export const completeWithdrawalRequest = async (applicationUserId, token) => {
+export const completeWithdrawalRequest = async (
+  applicationUserId,
+  token,
+  approvalImage = null
+) => {
   try {
-    const response = await api.post(`applicationUser/complete`, null, {
+    // Prepare the request payload with the applicationUserId inside a JSON string
+    const applicationUserJson = JSON.stringify({ applicationUserId });
+
+    // Prepare the FormData
+    const formData = new FormData();
+    // Append the applicationUserJson as a JSON string
+    formData.append("applicationUserJson", applicationUserJson);
+
+    // Append the approval image if provided
+    if (approvalImage) {
+      formData.append("approvalImage", approvalImage);
+    }
+
+    // Make the API call with FormData
+    const response = await api.post(`/applicationUser/complete`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-      },
-      params: {
-        applicationUserId: applicationUserId, // Pass the application ID as a request param
+        "Content-Type": "multipart/form-data",
       },
     });
+
     return response.data;
   } catch (error) {
     console.error("Error completing withdrawal request:", error);
     throw error;
   }
 };
+//get application withdraw detail
+export const getApprovalDetail = async (applicationUserId, token) => {
+  try {
+    const response = await api.get(
+      `/admin/getAprroveRecord/${applicationUserId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data; // Return the ApprovalRecord data from the response
+  } catch (error) {
+    console.error("Error fetching approval record:", error);
+    throw error; // Propagate the error
+  }
+};
+//approve other application
 export const approveOtherApp = async (id, token) => {
   try {
     const response = await api.put(`applicationUser/approve/${id}`, null, {

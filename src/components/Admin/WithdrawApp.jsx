@@ -1,7 +1,16 @@
-import { getApplicationsByType } from "@/data/api";
+import { getApplicationsByType, getApprovalDetail } from "@/data/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  Calendar,
+  X,
+  User,
+} from "lucide-react";
+import { Button } from "../ui/button";
 
 const WithdrawApp = () => {
   const [appWithdraw, setAppWithdraw] = useState([]);
@@ -9,7 +18,7 @@ const WithdrawApp = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     const loadAppWithdraws = async () => {
       const token = sessionStorage.getItem("token");
@@ -48,7 +57,26 @@ const WithdrawApp = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  const [loading, setLoading] = useState(false);
+  const [approvalDetail, setApprovalDetail] = useState(null);
+  const token = sessionStorage.getItem("token");
+  const handleDetailsClick = async (applicationUserId) => {
+    setLoading(true); // Set loading to true when the Details button is clicked
+    try {
+      const approvalRecord = await getApprovalDetail(applicationUserId, token);
+      console.log("Approval Record: ", approvalRecord);
+      setApprovalDetail(approvalRecord);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching approval record:", error);
+      toast.error("Failed to fetch approval record.");
+    } finally {
+      setLoading(false); // Set loading to false when the API call is completed
+    }
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
@@ -143,6 +171,19 @@ const WithdrawApp = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                       {app.amountFromDescription.toLocaleString()} VND
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {app.status === "completed" && (
+                        <button
+                          onClick={() =>
+                            handleDetailsClick(app.applicationUserId)
+                          }
+                          className="text-blue-600 hover:text-blue-800"
+                          disabled={loading} // Disable button while loading
+                        >
+                          {loading ? "Loading..." : "Details"}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 );
               })
@@ -159,7 +200,69 @@ const WithdrawApp = () => {
           </tbody>
         </table>
       </div>
-
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+            <Button
+              onClick={closeModal}
+              variant="ghost"
+              className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+              Approval Details
+            </h2>
+            {approvalDetail ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <div>
+                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
+                      Approval Date
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {new Date(approvalDetail.approvalDate).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <User className="h-5 w-5 text-green-500" />
+                  <div>
+                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
+                      Approved By
+                    </p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {approvalDetail.approvedBy}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-4">
+                    <ImageIcon className="h-5 w-5 text-red-500" />
+                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
+                      Approval Image
+                    </p>
+                  </div>
+                  <img
+                    src={approvalDetail.approvalImage}
+                    alt="Approval Image"
+                    className="w-full h-auto rounded-lg shadow-md"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="py-4 text-center text-gray-500 dark:text-gray-400">
+                Loading approval details...
+              </div>
+            )}
+            <Button onClick={closeModal} className="mt-6 w-full">
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
       {pageCount > 1 && (
         <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
           <div className="flex flex-1 justify-between sm:hidden">

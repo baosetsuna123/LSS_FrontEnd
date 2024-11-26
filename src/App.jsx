@@ -63,15 +63,24 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/create-application" element={<Application />} />
         {/* Staff Dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
 
         <Route
           path="/admin"
           element={
-            <AdminLayout>
-              <Outlet />
-            </AdminLayout>
+            <ProtectedRoute>
+              <AdminLayout>
+                <Outlet />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         >
           <Route index element={<AdminHome />} />
@@ -93,7 +102,14 @@ function App() {
             </Layout>
           }
         >
-          <Route path="/teacher" element={<TeacherDashboardLayout />}>
+          <Route
+            path="/teacher"
+            element={
+              <ProtectedRoute>
+                <TeacherDashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route index element={<TeacherHome />} />
             <Route
               path="send-applications"
@@ -144,22 +160,96 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
-          <Route path="/all-transactions" element={<WalletHistory />} />
+          <Route
+            path="/all-transactions"
+            element={
+              <ProtectedRoute>
+                <WalletHistory />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/view-applications"
-            element={<ApplicationManagement />}
+            element={
+              <ProtectedRoute>
+                <ApplicationManagement />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/send-applications" element={<SendApplication />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route
+            path="/send-applications"
+            element={
+              <ProtectedRoute>
+                <SendApplication />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/news"
+            element={
+              <ProtectedRoute>
+                <News />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/news/:id"
+            element={
+              <ProtectedRoute>
+                <NewsDetail />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/" element={<CourseLandingPage />} />
           <Route path="/about-me" element={<AboutMe />} />
-          <Route path="/class/:id" element={<ClassDetail />} />
-          <Route path="/profile/:teacherName" element={<TeacherProfile />} />
-          <Route path="/class" element={<ViewAllClasses />} />
-          <Route path="/feedback/:orderId" element={<FeedbackForm />} />
-          <Route path="/my-class" element={<MyClass />} />
+          <Route
+            path="/class/:id"
+            element={
+              <ProtectedRoute>
+                <ClassDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:teacherName"
+            element={
+              <ProtectedRoute>
+                <TeacherProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/class"
+            element={
+              <ProtectedRoute>
+                <ViewAllClasses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback/:orderId"
+            element={
+              <ProtectedRoute>
+                <FeedbackForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-class"
+            element={
+              <ProtectedRoute>
+                <MyClass />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>

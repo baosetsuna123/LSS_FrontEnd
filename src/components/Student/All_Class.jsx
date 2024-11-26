@@ -21,7 +21,6 @@ export function ViewAllClasses() {
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-
   useEffect(() => {
     const filtered = contextClasses.filter(
       (c) =>

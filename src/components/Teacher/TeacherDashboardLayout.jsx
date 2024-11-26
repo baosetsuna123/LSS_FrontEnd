@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaChalkboardTeacher,
@@ -15,7 +15,6 @@ import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import { Dock, LogOut, Wallet } from "lucide-react";
 import misasa from "../../assets/misasa.jfif";
-import { useAvatar } from "@/context/AvatarContext";
 
 function TeacherDashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -37,11 +36,20 @@ function TeacherDashboardLayout() {
       console.error("Error parsing result from localStorage:", error);
     }
   }
-
+  const [avatarImage, setAvatarImage] = useState(null);
+  useEffect(() => {
+    const result = localStorage.getItem("result");
+    if (result) {
+      try {
+        const parsedResult = JSON.parse(result);
+        setAvatarImage(parsedResult.avatarImage || null);
+      } catch (error) {
+        console.error("Error parsing result from localStorage:", error);
+      }
+    }
+  }, []);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { userProfile } = useAvatar();
-  const avatarImage = JSON.parse(localStorage.getItem("result")).avatarImage;
 
   const handleLogout = (e) => {
     e.stopPropagation();
@@ -180,7 +188,7 @@ function TeacherDashboardLayout() {
             <div className="relative flex items-center gap-4">
               {avatarImage ? (
                 <img
-                  src={userProfile.avatarImage}
+                  src={avatarImage}
                   alt="Avatar"
                   className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
                   onClick={() => setShowLogoutText(!showLogoutText)}

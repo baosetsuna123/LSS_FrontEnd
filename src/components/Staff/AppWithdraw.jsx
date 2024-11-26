@@ -2,6 +2,8 @@ import { completeWithdrawalRequest } from "@/data/api"; // Import the API functi
 import { toast } from "react-hot-toast";
 import { Search } from "lucide-react";
 import { useState } from "react"; // Import useState for modal visibility
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
 
 const AppWithDraw = ({
   currentPage,
@@ -14,6 +16,8 @@ const AppWithDraw = ({
   const token = sessionStorage.getItem("token"); // Get the token from session storage
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [selectedApp, setSelectedApp] = useState(null); // Store selected application
+  const [approvalImage, setApprovalImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   console.log(appwithdraw);
   const handleClick = (app) => {
     setSelectedApp(app); // Store the selected application
@@ -21,13 +25,21 @@ const AppWithDraw = ({
   };
 
   const handleApprove = async () => {
+    if (!approvalImage) {
+      toast.error("Please choose an approval image before submitting.");
+      return;
+    }
+    setLoading(true);
     try {
+      // Call the completeWithdrawalRequest function with the required arguments
       const response = await completeWithdrawalRequest(
         selectedApp.applicationUserId,
-        token
+        token,
+        approvalImage
       );
       console.log("Withdraw", response);
 
+      // Update the application status to "completed"
       setAppWithdraw((prevApplications) =>
         prevApplications.map((app) =>
           app.applicationUserId === selectedApp.applicationUserId
@@ -35,11 +47,14 @@ const AppWithDraw = ({
             : app
         )
       );
+
       toast.success("Application approved successfully");
       setShowModal(false);
     } catch (error) {
       console.error("Failed to approve application:", error);
       toast.error("Failed to approve application.");
+    } finally {
+      setLoading(false); // Set loading state back to false
     }
   };
 
@@ -71,7 +86,16 @@ const AppWithDraw = ({
       bank: bankMatch ? bankMatch[1] : "N/A",
     };
   };
-
+  const [fileName, setFileName] = useState(null); // State to store the file name
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    if (file) {
+      setApprovalImage(file); // Set the file name state
+      setFileName(file.name); // Set the file name state
+    } else {
+      setApprovalImage(null); // If no file is selected, reset the file name state
+    } // Store the selected file
+  };
   return (
     <div>
       {/* Search Box */}
@@ -213,19 +237,59 @@ const AppWithDraw = ({
             <p className="text-center text-lg text-green-600">
               {formatCurrency(selectedApp.amountFromDescription)}
             </p>
+            <div className="mt-4 space-y-2">
+              <Label
+                htmlFor="file-upload"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Choose a file
+              </Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    document.getElementById("file-upload")?.click()
+                  }
+                >
+                  Select File
+                </Button>
+                <span className="text-sm text-gray-500">
+                  {fileName ? fileName : "No file chosen"}
+                </span>
+              </div>
+              <input
+                id="file-upload"
+                type="file"
+                onChange={handleFileChange}
+                className="sr-only"
+              />
+            </div>
             <div className="mt-4 flex justify-between">
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleApprove}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-24"
-              >
-                Yes
-              </button>
+              {!loading ? (
+                <>
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleApprove}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-24"
+                  >
+                    Yes
+                  </button>
+                </>
+              ) : (
+                <div className="w-full flex justify-center">
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md w-24"
+                  >
+                    Loading...
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

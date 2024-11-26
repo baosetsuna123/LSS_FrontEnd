@@ -6,7 +6,7 @@ import {
 } from "@/data/api";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FaClock } from "react-icons/fa";
+import { FaClock, FaSearch } from "react-icons/fa";
 
 function UpdateSchedule() {
   const [classes, setClasses] = useState([]);
@@ -42,7 +42,14 @@ function UpdateSchedule() {
     try {
       const res = await fetchClassbyteacher(token);
       console.log(res);
-      setClasses(res);
+
+      const filteredClasses = res.filter(
+        (classItem) =>
+          classItem.status === "PENDING" || classItem.status === "ACTIVE"
+      );
+
+      // Set the filtered classes to state
+      setClasses(filteredClasses);
     } catch (error) {
       console.log(error);
     }
@@ -74,7 +81,12 @@ function UpdateSchedule() {
       console.error("Error when fetching data:", error);
     }
   };
-
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   useEffect(() => {
     fetchSlotList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,6 +115,7 @@ function UpdateSchedule() {
   const handleEdit = (classInfo) => {
     setClassShow(classInfo);
     setEditingClass({ ...classInfo });
+    console.log(classInfo);
     setInitialMaxStudents(classInfo.maxStudents);
     setMaxStudentsError("");
     setIsPopupOpen(true);
@@ -112,42 +125,65 @@ function UpdateSchedule() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
+
+    // Update the state for all fields
+    setEditingClass((prev) => ({ ...prev, [name]: value }));
+    if (name === "price") {
+      const newPrice = Number(value);
+      setEditingClass((prev) => ({ ...prev, price: newPrice }));
+    }
     if (name === "maxStudents") {
       const newMaxStudents = Number(value);
 
-      if (value && newMaxStudents < initialMaxStudents) {
-        console.log(newMaxStudents, initialMaxStudents);
+      if (newMaxStudents && newMaxStudents < initialMaxStudents) {
         setMaxStudentsError(
           "Max Students cannot be less than the current number of students"
         );
       } else {
-        setMaxStudentsError("");
+        setMaxStudentsError(""); // Clear error when the value is valid
       }
     }
-    setEditingClass((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleSave = async (updatedClass) => {
+    console.log(updatedClass);
+    // Validate price range inside handleSave
+    if (updatedClass.price < 100000 || updatedClass.price > 500000) {
+      toast.error("Price must be between 100,000 and 500,000");
+      return; // Exit early if price is invalid
+    }
+
+    // If there's a maxStudents error, show the toast and return
     if (maxStudentsError) {
       toast.error(maxStudentsError);
       return;
     }
+
     try {
+      // Check if maxStudents is less than the current number of students
       if (updatedClass.maxStudents < classShow.maxStudents) {
         toast.error(
           `Max students cannot be less than the current number of students (${classShow.maxStudents})`
         );
-        return;
+        return; // Exit early if maxStudents is invalid
       }
 
+      // Proceed with saving the updated class
       await fetchUpdateClass({ data: { ...updatedClass }, token });
 
+      // Fetch the updated data after saving
       fetchCourses();
       fetchClasses();
+
+      // Close the popup and reset editing class state
       setIsPopupOpen(false);
       setEditingClass(null);
+
+      // Show success toast
       toast.success("Update Class Successfully!");
     } catch (error) {
       console.error(error);
+      toast.error("Failed to update the class. Please try again.");
     }
   };
 
@@ -162,41 +198,54 @@ function UpdateSchedule() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+    <div className="max-w-6xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl">
+      <h2 className="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
         Update Class Information
       </h2>
-      <div className="mb-6">
+      <div className="mb-6 relative">
+        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
           placeholder="Search for a class..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <ul className="space-y-4">
+      <ul className="space-y-6">
         {filteredClasses.map((cls) => (
           <li
             key={cls.id}
-            className="border p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="border border-gray-200 dark:border-gray-700 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-700"
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-lg">Class {cls.name}</h3>
-                <p className="text-gray-600">Subject: {cls.courseName}</p>
-                <p className="text-gray-600">Max students: {cls.maxStudents}</p>
-                <p className="text-gray-600">Start date: {cls.startDate}</p>
-                <p className="mt-2">
-                  <span className="font-medium"></span>
-                  {daysOfWeek.find((day) => day.value === Number(cls.dayOfWeek))
-                    ?.name || "Unknown"}
-                  : {cls.slotStart} - {cls.slotEnd}
+                <h3 className="font-bold text-xl text-gray-800 dark:text-white mb-2">
+                  {cls.name}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Subject: {cls.courseName}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Max students: {cls.maxStudents}
+                </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Start date:{" "}
+                  {new Date(cls.startDate).toLocaleDateString("en-GB")}
+                </p>
+                <p className="mt-2 text-gray-700 dark:text-gray-200">
+                  <span className="font-medium">
+                    {daysOfWeek.find(
+                      (day) => day.value === Number(cls.dayOfWeek)
+                    )?.name || "Unknown"}
+                    :
+                  </span>{" "}
+                  {cls.slotStart} - {cls.slotEnd}
                 </p>
               </div>
               <button
                 onClick={() => handleEdit(cls)}
-                className="px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
               >
                 Edit
               </button>
@@ -207,161 +256,179 @@ function UpdateSchedule() {
 
       {isPopupOpen && editingClass && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
-            <h3 className="text-2xl font-bold mb-4">Edit Class Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Class Name:
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  disabled
-                  value={editingClass.name}
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Subject:
-                </label>
-                <select
-                  id="course"
-                  name="course"
-                  value={editingClass.courseCode || ""}
-                  disabled
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="" disabled>
-                    Select a course
-                  </option>
-                  {courses.length > 0 ? (
-                    courses.map((course) => (
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
+            <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+              Edit Class Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Class Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    value={editingClass.name}
+                    onChange={handleInputChange}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="course"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Subject
+                  </label>
+                  <select
+                    name="course"
+                    value={editingClass.courseCode || ""}
+                    onChange={handleInputChange}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  >
+                    <option value="" disabled>
+                      Select a course
+                    </option>
+                    {courses.map((course) => (
                       <option key={course.courseCode} value={course.courseCode}>
                         {course.name}
                       </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      No available courses
-                    </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="maxStudents"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Number of Students
+                  </label>
+                  <input
+                    type="number"
+                    id="maxStudents"
+                    name="maxStudents"
+                    value={editingClass.maxStudents}
+                    onChange={handleInputChange}
+                    placeholder={`Current number of students is ${editingClass.maxStudents}`}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                  {maxStudentsError && (
+                    <p className="text-red-500 mt-1 text-sm">
+                      {maxStudentsError}
+                    </p>
                   )}
-                </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="teacher"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Teacher
+                  </label>
+                  <input
+                    id="teacher"
+                    name="teacher"
+                    value={editingClass.teacherName}
+                    onChange={handleInputChange}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                </div>
               </div>
-              <div>
-                <label
-                  htmlFor="students"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Number of Students:
-                </label>
-                <input
-                  type="number"
-                  id="maxStudents"
-                  name="maxStudents"
-                  placeholder={`Current number of students is ${classShow.maxStudents}`}
-                  value={editingClass.maxStudents}
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {maxStudentsError && (
-                  <p className="text-red-500 mt-1 text-sm">
-                    {maxStudentsError}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="teacher"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Teacher:
-                </label>
-                <select
-                  id="teacher"
-                  name="teacher"
-                  value={editingClass.teacherName}
-                  onChange={handleInputChange}
-                  disabled
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option>{editingClass.teacherName}</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="room"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Classroom Link:
-                </label>
-                <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  value={editingClass.location}
-                  onChange={handleInputChange}
-                  className="w-full border rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="room"
-                  className="block mb-2 font-medium text-gray-700"
-                >
-                  Day of the Week:
-                </label>
-                <select
-                  id="dayofWeek"
-                  name="dayofWeek"
-                  disabled
-                  value={editingClass.dayOfWeek}
-                  onChange={handleInputChange}
-                  className="w-full px-2 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {daysOfWeek.map((slot) => (
-                    <option key={slot.value} value={slot.value}>
-                      {slot.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block mb-2 font-medium text-gray-700">
-                  Class Time:
-                </label>
-                <div className="flex items-center space-x-4">
-                  <div className="relative flex-1">
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="location"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Classroom Link
+                  </label>
+                  <input
+                    id="location"
+                    name="location"
+                    value={editingClass.location}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="dayofWeek"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Day of the Week
+                  </label>
+                  <select
+                    name="dayofWeek"
+                    value={editingClass.dayOfWeek}
+                    onChange={handleInputChange}
+                    disabled
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  >
+                    {daysOfWeek.map((day) => (
+                      <option key={day.value} value={day.value.toString()}>
+                        {day.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="slotId"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Class Time
+                  </label>
+                  <div className="relative">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <select
-                      id="slotId"
                       name="slotId"
-                      disabled
                       value={editingClass.slotId}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled
+                      className="mt-1 block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                     >
                       {slots.map((slot) => (
-                        <option key={slot.slotId} value={slot.slotId}>
+                        <option
+                          key={slot.slotId}
+                          value={slot.slotId.toString()}
+                        >
                           Slot {slot.slotId} ({slot.start} - {slot.end})
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
+                <div>
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Price
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={editingClass.price}
+                    onChange={handleInputChange}
+                    min="100000"
+                    max="500000"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  />
+                  <span className="text-sm text-gray-500 mt-1 block">
+                    {formatCurrency(editingClass.price)}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-2 mt-4">
+            <div className="flex justify-end space-x-2 mt-6">
               <button
                 onClick={() => handleSave(editingClass)}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
@@ -369,7 +436,10 @@ function UpdateSchedule() {
                 Save
               </button>
               <button
-                onClick={handleCancel}
+                onClick={() => {
+                  handleCancel();
+                  setIsPopupOpen(false);
+                }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
               >
                 Cancel

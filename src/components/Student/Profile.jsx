@@ -53,7 +53,7 @@ export default function Profile() {
 
   const handleCategoryChange = (event) => {
     const { value } = event.target;
-    setCategoryIds(value);
+    setCategoryIds([value]);
   };
 
   const handleUpdateProfile = async () => {
@@ -84,7 +84,20 @@ export default function Profile() {
     try {
       await updateCurrentUser(token, updatedProfileData);
       toast.success("Profile updated successfully!");
-      setProfileData(updatedProfileData);
+
+      // Update localStorage to persist updated data
+      const updatedResult = {
+        ...result,
+        fullName: profileData.fullName, // Update fullName
+        address: profileData.address, // Update address
+        phoneNumber: profileData.phoneNumber, // Update phoneNumber
+        major: allCategories.filter((category) =>
+          categoryIds.includes(category.categoryId)
+        ),
+      };
+      localStorage.setItem("result", JSON.stringify(updatedResult));
+
+      setProfileData(updatedProfileData); // Optional: Sync state with UI
     } catch (e) {
       console.log(e);
       toast.error("Failed to update profile.");
@@ -143,7 +156,7 @@ export default function Profile() {
               Phone Number:
             </label>
             <TextField
-              name="fullName"
+              name="phoneNumber"
               value={profileData.phoneNumber}
               onChange={handleProfileChange}
               fullWidth
@@ -176,16 +189,15 @@ export default function Profile() {
             <FormControl variant="outlined" className="flex-1">
               <Select
                 labelId="category-label"
-                multiple
-                value={categoryIds}
+                value={categoryIds[0] || ""} // Display the first selected category or empty
                 onChange={handleCategoryChange}
                 renderValue={(selected) => {
-                  const selectedNames = allCategories
-                    .filter((category) =>
-                      selected.includes(category.categoryId)
-                    )
-                    .map((category) => category.name);
-                  return selectedNames.join(", ");
+                  const selectedCategory = allCategories.find(
+                    (category) => category.categoryId === selected
+                  );
+                  return selectedCategory
+                    ? selectedCategory.name
+                    : "Select a category";
                 }}
                 displayEmpty
                 className="text-lg dark:bg-gray-700 dark:text-white"

@@ -222,9 +222,9 @@ const ApplicationLayout = ({
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {selectedCertificates.map((cert) => (
+                                  {selectedCertificates.map((cert, index) => (
                                     <tr key={cert.id} className="border-t">
-                                      <td className="px-4 py-2">{cert.id}</td>
+                                      <td className="px-4 py-2">{index + 1}</td>
                                       <td className="px-4 py-2">{cert.name}</td>
                                       <td className="px-4 py-2">
                                         <a

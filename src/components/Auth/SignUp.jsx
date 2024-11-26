@@ -46,9 +46,13 @@ export default function SignUp() {
     const {
       target: { value },
     } = event;
-    setCategoryIds(value);
-    console.log("Selected categories:", value);
+    if (userType === "student") {
+      setCategoryIds([value]);
+    } else {
+      setCategoryIds(typeof value === "string" ? value.split(",") : value);
+    }
   };
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -118,7 +122,11 @@ export default function SignUp() {
       setIsLoading(false);
     }
   };
-
+  useEffect(() => {
+    if (userType === "student" && categoryIds.length > 1) {
+      setCategoryIds([categoryIds[0]]);
+    }
+  }, [userType, categoryIds]);
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
@@ -161,11 +169,16 @@ export default function SignUp() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="relative">
-              <InputLabel id="category-label">Choose your major</InputLabel>
+              <InputLabel id="category-label"></InputLabel>
               <FormControl fullWidth variant="outlined">
+                <InputLabel id="category-label">
+                  {userType === "teacher"
+                    ? "Choose your majors"
+                    : "Choose your major"}
+                </InputLabel>
                 <Select
                   labelId="category-label"
-                  multiple
+                  multiple={userType === "teacher"} // Allow multiple selection for teachers only
                   value={categoryIds}
                   onChange={handleCategoryChange}
                   renderValue={(selected) => {
@@ -181,9 +194,10 @@ export default function SignUp() {
                     <MenuItem
                       key={category.categoryId}
                       value={category.categoryId}
+                      // No need to disable items for students
                     >
                       <Checkbox
-                        checked={categoryIds.indexOf(category.categoryId) > -1}
+                        checked={categoryIds.includes(category.categoryId)}
                       />
                       <ListItemText primary={category.name} />
                     </MenuItem>
