@@ -117,7 +117,7 @@ const DetailClasses = ({ token }) => {
         <Box sx={style}>
           <div className="flex flex-col gap-4 items-center w-full">
             <h1 className="uppercase tracking-wide text-2xl font-semibold mx-auto">
-              Class List
+              Lesson List
             </h1>
 
             <YearWeekSelector
@@ -135,15 +135,25 @@ const DetailClasses = ({ token }) => {
                 <Table sx={{ minWidth: 750 }} aria-label="class table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Class ID</TableCell>
-                      <TableCell>Class Name</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        Class ID
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        Lesson Name
+                      </TableCell>
                       <TableCell>Code</TableCell>
                       <TableCell>Teacher</TableCell>
                       <TableCell>Period</TableCell>
-                      <TableCell>Day of the Week</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        Day of the Week
+                      </TableCell>
                       <TableCell>Price</TableCell>
-                      <TableCell>Max Students</TableCell>
-                      <TableCell>Number of Students</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        Max Students
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        Number of Students
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -222,7 +232,7 @@ export default function TotalClasses() {
   return (
     <div className=" h-full w-full bg-yellow-500 *:text-white shadow-lg py-2 rounded-lg px-4">
       <h1 className="font-semibold text-xl pb-4 tracking-wider ">
-        Total Classes
+        Total Lessons
       </h1>
       <div className="*:text-white text-3xl mt-2 font-semibold h-[40%] text-center ">
         <span>{totalClasses}</span>

@@ -29,7 +29,48 @@ const EditParams = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+    let isValid = true;
+    params.forEach((param) => {
+      switch (param.name) {
+        case "check_time_before_start":
+          if (param.value < 1 || param.value > 5) {
+            toast.error(
+              "Check time before start must be between 1 and 5 days."
+            );
+            isValid = false;
+          }
+          break;
+        case "minimum_required_percentage":
+          if (param.value < 0.8 || param.value > 1) {
+            toast.error(
+              "Minimum required percentage must be between 0.8 (80%) and 1 (100%)."
+            );
+            isValid = false;
+          }
+          break;
+        case "discount_percentage":
+          if (param.value < 0.15 || param.value > 0.3) {
+            toast.error(
+              "Discount percentage must be between 0.15 (15%) and 0.3 (30%)."
+            );
+            isValid = false;
+          }
+          break;
+        case "feedback_deadline":
+          if (param.value < 5 || param.value > 7) {
+            toast.error("Feedback deadline must be between 5 and 7 days.");
+            isValid = false;
+          }
+          break;
+        default:
+          break;
+      }
+    });
 
+    if (!isValid) {
+      setIsLoading(false);
+      return;
+    }
     const updatedParams = params.map((param) => ({
       ...param,
       value: param.value,
@@ -102,7 +143,7 @@ const EditParams = () => {
             <p className="mt-2 text-sm text-gray-500">
               Current value:{" "}
               {param.name.includes("check_time_before_start")
-                ? `${param.value} minutes`
+                ? `${param.value} day(s)`
                 : param.name.includes("minimum_required_percentage") ||
                   param.name.includes("discount_percentage")
                 ? `${(parseFloat(param.value) * 100).toFixed(0)}%`

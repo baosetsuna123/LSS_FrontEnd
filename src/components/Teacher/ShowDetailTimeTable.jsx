@@ -10,7 +10,7 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
     >
       <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pb-6 border-b">
-        Class Details
+        Lesson Details
       </h2>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-4">
@@ -60,7 +60,7 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
         </div>
 
         <div className="col-span-4 flex items-center gap-5">
-          <strong>Classroom:</strong>
+          <strong>Lesson room:</strong>
           {data?.location ? (
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-full"

@@ -119,7 +119,7 @@ const Classes = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Classes</h1>
+      <h1 className="text-2xl font-bold mb-4">Lessons</h1>
       <div className="flex justify-between items-center mb-4">
         <Input
           type="text"
@@ -149,7 +149,6 @@ const Classes = () => {
             <TableHead>Start Date</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Teacher Name</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -225,10 +224,10 @@ const Classes = () => {
             <div className="flex items-center mb-4">
               <AlertCircle className="h-6 w-6 text-yellow-500 mr-4" />
               <div>
-                <h3 className="text-lg font-semibold">Change Class Status</h3>
+                <h3 className="text-lg font-semibold">Change Lesson Status</h3>
                 <p className="text-sm text-gray-600">
-                  Are you sure you want to change the status of this class to{" "}
-                  <span className="font-bold">COMPLETED</span>?
+                  Are you sure you want to change the status of this lesson to{" "}
+                  <span className="font-bold text-green-500">COMPLETED</span>?
                 </p>
               </div>
             </div>

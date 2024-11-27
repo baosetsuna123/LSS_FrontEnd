@@ -9,6 +9,8 @@ function ClassList() {
   const result = localStorage.getItem("result");
   const [classesUpdated, setClassesUpdated] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
   let token;
   if (result) {
     try {
@@ -69,6 +71,7 @@ function ClassList() {
   const handleClosePopup = () => {
     setSelectedClass(null);
   };
+
   const dayOfWeekMap = {
     2: "Monday",
     3: "Tuesday",
@@ -78,13 +81,15 @@ function ClassList() {
     7: "Saturday",
     8: "Sunday",
   };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
   const slotTimeMap = {
     1: "7h00 - 9h15",
     2: "9h30 - 11h45",
@@ -92,6 +97,7 @@ function ClassList() {
     4: "15h00 - 17h15",
     5: "17h45 - 20h00",
   };
+
   const filteredClasses = classesUpdated.filter(
     (cls) =>
       (cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,15 +105,23 @@ function ClassList() {
       (filterStatus === "ALL" || cls.status === filterStatus)
   );
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredClasses.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Class List
+        Lesson List
       </h2>
       <div className="mb-6 flex justify-between items-center">
         <input
           type="text"
-          placeholder="Search class..."
+          placeholder="Search lesson..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-1/3 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -134,7 +148,7 @@ function ClassList() {
           <table className="min-w-full bg-white w-full">
             <thead>
               <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left w-1/6">Class Name</th>
+                <th className="py-3 px-6 text-left w-1/6">Lesson Name</th>
                 <th className="py-3 px-6 text-left w-1/6">Subject</th>
                 <th className="py-3 px-6 text-center w-1/6">Students</th>
                 <th className="py-3 px-6 text-center w-1/6">Schedule</th>
@@ -144,7 +158,7 @@ function ClassList() {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
-              {filteredClasses.map((cls) => (
+              {currentItems.map((cls) => (
                 <tr
                   key={cls.id}
                   className="border-b border-gray-200 hover:bg-gray-100"
@@ -188,7 +202,6 @@ function ClassList() {
                         : ""}
                     </span>
                   </td>
-
                   <td className="py-3 px-6 text-center whitespace-nowrap">
                     <span
                       className={`bg-blue-200 text-blue-800 rounded-full py-1 px-4 text-xs font-semibold`}
@@ -209,6 +222,21 @@ function ClassList() {
               ))}
             </tbody>
           </table>
+          <div className="mt-4 flex justify-center">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => paginate(i + 1)}
+                className={`mx-1 px-3 py-1 rounded ${
+                  currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -230,22 +258,49 @@ function ClassList() {
                   <strong>Students:</strong> {selectedClass.maxStudents}
                 </p>
                 <p className="text-sm text-gray-700 mb-2">
-                  <strong>Schedule:</strong> {selectedClass.schedule}
+                  <strong>Schedule:</strong>{" "}
+                  {`${formatDate(selectedClass.startDate)} (${
+                    dayOfWeekMap[selectedClass.dayOfWeek] || "Unknown"
+                  })`}
                 </p>
                 <p className="text-sm text-gray-700 mb-2">
                   <strong>Status:</strong>{" "}
-                  {selectedClass.status === "ACTIVE"
-                    ? "Ongoing"
-                    : selectedClass.status === "INACTIVE"
-                    ? "Upcoming"
-                    : "Completed"}
+                  <span
+                    className={`
+      ${selectedClass.status === "COMPLETED" ? "font-bold text-green-500" : ""}
+      ${selectedClass.status === "PENDING" ? "font-bold text-yellow-500" : ""}
+      ${selectedClass.status === "CANCELED" ? "font-bold text-red-500" : ""}
+      ${selectedClass.status === "ONGOING" ? "font-bold text-blue-500" : ""}
+      ${selectedClass.status === "ACTIVE" ? "font-bold text-orange-500" : ""}
+    `}
+                  >
+                    {selectedClass.status.charAt(0).toUpperCase() +
+                      selectedClass.status.slice(1).toLowerCase()}
+                  </span>
                 </p>
+
                 <p className="text-sm text-gray-700 mb-2">
-                  <strong>Time:</strong> {selectedClass.startDate.split("T")[0]}{" "}
-                  {/* {"->"} {selectedClass.endDate.split("T")[0]}{" "} */}
+                  <strong>Students Joined:</strong>{" "}
+                  {selectedClass.students.length}{" "}
+                  {selectedClass.students.length > 0 && (
+                    <span>
+                      (
+                      {selectedClass.students.map((student, index) => (
+                        <span key={student.userName}>
+                          {student.userName}
+                          {index < selectedClass.students.length - 1 && ", "}
+                        </span>
+                      ))}
+                      )
+                    </span>
+                  )}
                 </p>
                 <p className="text-sm text-gray-700 mb-2">
                   <strong>Teacher:</strong> {selectedClass.teacherName}
+                </p>
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>Time:</strong>{" "}
+                  {slotTimeMap[selectedClass.slotId] || "Unknown"}
                 </p>
                 <p className="text-sm text-gray-700 mb-4">
                   <strong>Location:</strong>

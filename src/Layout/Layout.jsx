@@ -236,7 +236,7 @@ export function Layout({ children }) {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search classes ..."
+                placeholder="Search lessons ..."
                 value={searchTerm}
                 onChange={handleSearchInputChange}
                 className="border rounded px-4 py-1 w-96 
@@ -305,7 +305,7 @@ export function Layout({ children }) {
                   className="text-sm font-semibold hover:underline underline-offset-4"
                   to="/class"
                 >
-                  Classes
+                  Lessons
                 </Link>
                 <Link
                   className="text-sm font-semibold hover:underline underline-offset-4"

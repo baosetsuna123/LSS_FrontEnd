@@ -4,6 +4,7 @@ import {
   fetchSlots,
   fetchCreateClass,
   fetchCourseByMajor,
+  fetchSystemParam,
 } from "@/data/api";
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
@@ -24,9 +25,7 @@ function TeacherHome() {
   const [timetable, setTimetable] = useState({});
   const [slots, setSlots] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const today = new Date();
-  today.setDate(today.getDate() + 4);
-  const minDateString = today.toISOString().split("T")[0];
+  const [minDateString, setMinDateString] = useState("");
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -37,11 +36,54 @@ function TeacherHome() {
   const [classesCreate, setClassCreate] = useState([]);
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [courseCodes, setCourseCodes] = useState([]);
+  const token = sessionStorage.getItem("token");
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
     range: "",
   });
   const [datesInTheWeek, setDatesInTheWeek] = useState([]);
+  useEffect(() => {
+    const fetchParam = async () => {
+      try {
+        const data = await fetchSystemParam(token);
+
+        const param = data.find((p) => p.name === "check_time_before_start");
+        console.log(param.value);
+        if (param) {
+          let baseDays = parseInt(param.value, 10); // Parse the value as an integer
+          if (isNaN(baseDays)) {
+            console.warn(
+              "The parameter 'check_time_before_start' value is not a valid number. Defaulting to 0."
+            );
+            baseDays = 0;
+          }
+          const today = new Date();
+          today.setDate(today.getDate() + baseDays + 2); // Add base days and 2 days buffer
+          const formattedMinDate = today.toISOString().split("T")[0];
+          setMinDateString(formattedMinDate); // Set the minimum date
+        } else {
+          console.warn(
+            "Parameter 'check_time_before_start' not found. Defaulting to 2 days from today."
+          );
+          const today = new Date();
+          today.setDate(today.getDate() + 2); // Default to 2 days buffer
+          const formattedMinDate = today.toISOString().split("T")[0];
+          setMinDateString(formattedMinDate); // Set the default minimum date
+        }
+      } catch (error) {
+        console.error("Error fetching parameters:", error);
+        toast.error(
+          "Failed to fetch system parameters. Defaulting to 2 days from today."
+        );
+        const today = new Date();
+        today.setDate(today.getDate() + 2); // Default to 2 days buffer
+        const formattedMinDate = today.toISOString().split("T")[0];
+        setMinDateString(formattedMinDate); // Set the default minimum date
+      }
+    };
+
+    fetchParam();
+  }, [token]);
 
   useEffect(() => {
     const fetchCousesMajor = async () => {
@@ -78,17 +120,6 @@ function TeacherHome() {
     "Saturday",
     "Sunday",
   ];
-
-  const result = localStorage.getItem("result");
-  let token;
-  if (result) {
-    try {
-      const parsedResult = JSON.parse(result);
-      token = parsedResult.token;
-    } catch (error) {
-      console.error("Error parsing result from localStorage:", error);
-    }
-  }
   const handleInput = (e) => {
     let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
@@ -256,7 +287,7 @@ function TeacherHome() {
       if (error.message && error.message.includes("duplicate")) {
         toast.error("Code is already in use");
       } else {
-        toast.error(error.message || "Failed to create class");
+        toast.error(error.message || "Failed to create lesson");
       }
       console.log(error.message);
     } finally {
@@ -268,18 +299,13 @@ function TeacherHome() {
     try {
       const selectedDate = e.target.value;
       const date = new Date(selectedDate);
+      console.log(date);
       setDate(date);
       const classList = classesCreate.filter(
         (c) => c.startDate === formatDate(date) && c.status !== "CANCELED"
       );
       setSelectedSlots(classList.map((item) => item.slotId));
-      // Ensure selected date is at least two days from today
-      const minDate = new Date(minDateString);
 
-      if (date < minDate) {
-        toast.error("Start date must be at least 3 days from today");
-        return;
-      }
       const jsDayOfWeek = date.getDay();
       const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
       const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
@@ -290,8 +316,8 @@ function TeacherHome() {
         startDate: formatDateToYMD(date),
         dayOfWeek,
       }));
-    } catch {
-      /* empty */
+    } catch (error) {
+      console.error("Error handling date change:", error);
     }
   };
 
@@ -350,7 +376,7 @@ function TeacherHome() {
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
         >
-          Create Class
+          Create a Lesson
         </button>
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
@@ -404,7 +430,7 @@ function TeacherHome() {
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
-          Create Class
+          Create Lesson
         </h2>
         <div className="grid grid-cols-2 gap-4 py-2">
           <input
@@ -546,7 +572,7 @@ function TeacherHome() {
                 <span>Creating...</span>
               </div>
             ) : (
-              "Create Class"
+              "Create"
             )}
           </button>
           <button

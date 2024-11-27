@@ -42,11 +42,16 @@ const RegisterApp = () => {
   );
   const handleClick = async () => {
     try {
-      await AssignApplication();
-      toast.success("Application assigned successfully!");
+      await AssignApplication(); // Assuming this updates on the backend
+      setApplications((prevApplications) =>
+        prevApplications.map((app) =>
+          app.status === "PENDING" ? { ...app, status: "ASSIGNED" } : app
+        )
+      );
+      toast.success("Pending applications assigned successfully!");
     } catch (error) {
-      console.error("Error assigning application", error);
-      toast.error("Already assigned for Staff!");
+      console.error("Error assigning applications", error);
+      toast.error("Failed to assign applications!");
     }
   };
   return (

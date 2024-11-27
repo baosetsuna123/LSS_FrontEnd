@@ -382,7 +382,7 @@ export function Dashboard() {
               }`}
             >
               <School size={20} className="mr-2" />
-              Class
+              Lesson
             </button>
             <button
               onClick={() => {

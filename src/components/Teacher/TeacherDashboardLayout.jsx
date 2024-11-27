@@ -66,12 +66,12 @@ function TeacherDashboardLayout() {
     },
     {
       path: "/teacher/cancel-request",
-      label: "Send Class Cancellation Request",
+      label: "Send Lesson Cancellation Request",
       icon: FaBan,
     },
     {
       path: "/teacher/class-list",
-      label: "View Class List",
+      label: "View Lesson List",
       icon: FaList,
     },
     {

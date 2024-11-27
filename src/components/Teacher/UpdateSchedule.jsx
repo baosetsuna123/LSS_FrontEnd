@@ -41,7 +41,6 @@ function UpdateSchedule() {
   const fetchClasses = async () => {
     try {
       const res = await fetchClassbyteacher(token);
-      console.log(res);
 
       const filteredClasses = res.filter(
         (classItem) =>
@@ -50,6 +49,7 @@ function UpdateSchedule() {
 
       // Set the filtered classes to state
       setClasses(filteredClasses);
+      console.log(filteredClasses);
     } catch (error) {
       console.log(error);
     }
@@ -200,13 +200,13 @@ function UpdateSchedule() {
   return (
     <div className="max-w-6xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl">
       <h2 className="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
-        Update Class Information
+        Update Lesson Information
       </h2>
       <div className="mb-6 relative">
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Search for a class..."
+          placeholder="Search for a lesson..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -229,6 +229,22 @@ function UpdateSchedule() {
                 <p className="text-gray-600 dark:text-gray-300">
                   Max students: {cls.maxStudents}
                 </p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Students Joined: {cls.students.length}{" "}
+                  {cls.students.length > 0 && (
+                    <span>
+                      (
+                      {cls.students.map((student, index) => (
+                        <span key={student.userName}>
+                          {student.userName}
+                          {index < cls.students.length - 1 && ", "}
+                        </span>
+                      ))}
+                      )
+                    </span>
+                  )}
+                </p>
+
                 <p className="text-gray-600 dark:text-gray-300">
                   Start date:{" "}
                   {new Date(cls.startDate).toLocaleDateString("en-GB")}
@@ -258,7 +274,7 @@ function UpdateSchedule() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
             <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-              Edit Class Information
+              Edit Lesson Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
@@ -267,7 +283,7 @@ function UpdateSchedule() {
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Class Name
+                    Lesson Name
                   </label>
                   <input
                     id="name"
@@ -347,7 +363,7 @@ function UpdateSchedule() {
                     htmlFor="location"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Classroom Link
+                    Lesson Room Link
                   </label>
                   <input
                     id="location"

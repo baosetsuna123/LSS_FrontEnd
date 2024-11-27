@@ -90,7 +90,7 @@ const ClassLayout = ({
           <Search size={16} className="mr-2" />
           <input
             type="text"
-            placeholder="Search Classes by Name"
+            placeholder="Search Lessons by Name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"

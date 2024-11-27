@@ -148,7 +148,7 @@ const TeacherProfile = () => {
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
-              { label: "Class", link: "/class" },
+              { label: "Lesson", link: "/class" },
               {
                 label: "Detail",
                 link: classId ? `/class/${classId}` : "/class",

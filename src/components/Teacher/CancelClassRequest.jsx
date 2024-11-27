@@ -68,7 +68,7 @@ function CancelClassRequest() {
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Submit Class Cancellation Request
+        Submit Lesson Cancellation Request
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -76,7 +76,7 @@ function CancelClassRequest() {
             htmlFor="class"
             className="block mb-2 font-medium text-gray-700"
           >
-            Select Class
+            Select Lesson
           </label>
           <select
             id="class"
@@ -85,7 +85,7 @@ function CancelClassRequest() {
             className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
             required
           >
-            <option value="">-- Select Class --</option>
+            <option value="">-- Select Lesson --</option>
             {classes.map((cls) => (
               <option key={cls.classId} value={cls.classId}>
                 {cls.name}

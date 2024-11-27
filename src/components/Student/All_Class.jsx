@@ -91,7 +91,7 @@ export function ViewAllClasses() {
   // Determine if no data matched the search query
   const breadcrumbItems = [
     { label: "Home", link: "/" },
-    { label: "Class", link: "/class" },
+    { label: "Lesson", link: "/class" },
   ];
   return (
     <>
@@ -105,14 +105,14 @@ export function ViewAllClasses() {
       </section>
 
       <div className="container mx-auto p-4 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-6">View All Classes</h1>
+        <h1 className="text-3xl font-bold mb-6">View All Lessons</h1>
 
         {/* Search Bar and Price Range Slider in One Row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
           <div className="flex-grow relative mb-4 md:mb-0 md:mr-4">
             <Input
               type="text"
-              placeholder="Search by class name or teacher"
+              placeholder="Search by lesson name or teacher"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -182,7 +182,7 @@ export function ViewAllClasses() {
               className="w-full mt-4 bg-cyan-600 text-white hover:bg-cyan-700 transition duration-200"
               disabled={isButtonDisabled} // Disable the button while refreshing
             >
-              {isButtonDisabled ? "Refreshed" : "Refresh Classes"}
+              {isButtonDisabled ? "Refreshed" : "Refresh Lessons"}
             </Button>
           </div>
 
@@ -208,7 +208,7 @@ export function ViewAllClasses() {
                               {classItem.name}
                             </h2>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Class Code: {classItem.code}
+                              Lesson Code: {classItem.code}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
                               Course Code: {classItem.courseCode}

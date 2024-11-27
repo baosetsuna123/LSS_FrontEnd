@@ -165,7 +165,7 @@ export function ClassDetail() {
     try {
       setIsProcessing(true);
       await fetchCreateOrder(id, token);
-      toast.success("Order Class Successfully!");
+      toast.success("Order Lesson Successfully!");
       setIsEnrolled(true);
     } catch (error) {
       if (error.response) {
@@ -204,7 +204,7 @@ export function ClassDetail() {
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
-              { label: "Class", link: "/class" },
+              { label: "Lesson", link: "/class" },
               { label: "Detail" },
             ]}
           />
@@ -227,7 +227,7 @@ export function ClassDetail() {
                   {classDetail?.name}
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300">
-                  Class Code:{" "}
+                  Lesson Code:{" "}
                   <span className="font-semibold">{classDetail?.code}</span>
                 </p>
                 <p className="text-lg text-gray-600 dark:text-gray-300">
@@ -267,7 +267,7 @@ export function ClassDetail() {
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg">Class Details</CardTitle>
+                  <CardTitle className="text-lg">Lesson Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
