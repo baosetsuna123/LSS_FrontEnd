@@ -77,12 +77,13 @@ const WithdrawApp = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Withdrawal Applications
       </h1>
-
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <select
           value={filterStatus}
@@ -109,7 +110,6 @@ const WithdrawApp = () => {
           />
         </div>
       </div>
-
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -202,7 +202,7 @@ const WithdrawApp = () => {
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative">
             <Button
               onClick={closeModal}
               variant="ghost"
@@ -245,11 +245,21 @@ const WithdrawApp = () => {
                       Approval Image
                     </p>
                   </div>
-                  <img
-                    src={approvalDetail.approvalImage}
-                    alt="Approval Image"
-                    className="w-full h-auto rounded-lg shadow-md"
-                  />
+                  <div className="w-full h-auto flex justify-center items-center">
+                    {!imageLoaded && (
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Loading image...
+                      </div>
+                    )}
+                    <img
+                      src={approvalDetail.approvalImage}
+                      alt="Approval Image"
+                      className={`rounded-lg shadow-md ${
+                        imageLoaded ? "block" : "hidden"
+                      }`}
+                      onLoad={() => setImageLoaded(true)}
+                    />
+                  </div>
                 </div>
               </div>
             ) : (

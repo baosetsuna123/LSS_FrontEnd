@@ -65,16 +65,25 @@ export function ClassDetail() {
           </div>
 
           {newBalance < 0 ? (
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-red-500 dark:text-red-400">
+            <div>
+              <p className="text-red-500 dark:text-red-400 mb-4">
                 Your current balance is not enough.
               </p>
-              <button
-                onClick={() => navigate("/wallet")}
-                className="text-blue-500 dark:text-blue-400 hover:underline"
-              >
-                Deposit now
-              </button>
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => navigate("/wallet")}
+                  className="text-blue-500 dark:text-blue-400 hover:underline"
+                >
+                  Deposit now
+                </button>
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  className="border-gray-400 text-gray-500 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-900 px-6 py-3"
+                >
+                  Got it
+                </Button>
+              </div>
             </div>
           ) : (
             <>
@@ -85,24 +94,23 @@ export function ClassDetail() {
               <p className="mb-6 text-gray-700 dark:text-gray-300">
                 New balance: {formatCurrency(newBalance)}
               </p>
+              <div className="flex justify-between space-x-4">
+                <Button
+                  onClick={onConfirm}
+                  className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500 px-10 py-3 text-lg"
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  className="border-red-500 text-red-500 hover:bg-red-100 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900 px-6 py-3 text-lg"
+                >
+                  No
+                </Button>
+              </div>
             </>
           )}
-
-          <div className="flex justify-between space-x-4">
-            <Button
-              onClick={onConfirm}
-              className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500 px-10 py-3 text-lg"
-            >
-              Yes
-            </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="border-red-500 text-red-500 hover:bg-red-100 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900 px-6 py-3 text-lg"
-            >
-              No
-            </Button>
-          </div>
         </div>
       </div>
     );
