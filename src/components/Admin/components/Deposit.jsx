@@ -24,9 +24,8 @@ export default function Deposit() {
   const [selectedYear, setSelectedYear] = useState(getCurrentYear());
   const [chartData, setChartData] = useState({
     totalBalance: [],
-    totalRefunded: [],
-    totalDeposit: [],
-    totalSpend: [],
+    totalExpenses: [],
+    totalIncome: [],
   });
 
   const result = localStorage.getItem("result");
@@ -46,11 +45,8 @@ export default function Deposit() {
       const completeData = Array.from({ length: 12 }, (_, i) => ({
         month: i + 1,
         totalBalance: 0,
-        averageBalance: 0,
-        totalRefunded: 0,
-        averageDeposit: 0,
-        totalDeposit: 0,
-        totalSpend: 0,
+        totalExpenses: 0,
+        totalIncome: 0,
       }));
 
       datas.forEach((item) => {
@@ -61,15 +57,13 @@ export default function Deposit() {
         };
       });
       const totalBalanceData = completeData.map((item) => item.totalBalance);
-      const totalRefundedData = completeData.map((item) => item.totalRefunded);
-      const totalDepositData = completeData.map((item) => item.totalDeposit);
-      const totalSpendData = completeData.map((item) => item.totalSpend);
+      const totalExpensesData = completeData.map((item) => item.totalExpenses);
+      const totalIncomeData = completeData.map((item) => item.totalIncome);
 
       setChartData({
         totalBalance: totalBalanceData,
-        totalRefunded: totalRefundedData,
-        totalDeposit: totalDepositData,
-        totalSpend: totalSpendData,
+        totalExpenses: totalExpensesData,
+        totalIncome: totalIncomeData,
       });
     } catch (error) {
       console.log(error);
@@ -123,19 +117,14 @@ export default function Deposit() {
               id: "totalBalanceId",
             },
             {
-              data: chartData.totalRefunded,
+              data: chartData.totalExpenses,
               label: "Total Refunded",
-              id: "totalRefundedId",
+              id: "totalExpensesId",
             },
             {
-              data: chartData.totalDeposit,
+              data: chartData.totalIncome,
               label: "Total Deposit",
-              id: "totalDepositId",
-            },
-            {
-              data: chartData.totalSpend,
-              label: "Total Spend",
-              id: "totalSpendId",
+              id: "totalIncomeId",
             },
           ]}
           xAxis={[{ data: xLabels, scaleType: "band" }]}
