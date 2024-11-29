@@ -1561,6 +1561,25 @@ export const getDepositsByMonth = async (year, token) => {
   }
 };
 
+export const getClassesByStatusAndMonth = async (year, token) => {
+  try {
+    const response = await api.get(`/admin/statistics`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { year },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching completed classes by month (detailed):",
+      error
+    );
+    throw error;
+  }
+};
+
+
 export const getTotalCourses = async (token) => {
   try {
     const response = await api.get(`/admin/total-courses`, {

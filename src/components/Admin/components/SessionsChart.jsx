@@ -1,8 +1,5 @@
 import {
-  getActiveClassesByMonth,
-  getCancelClassesByMonth,
-  getCompletedClassesByMonth,
-  getOngoingClassesByMonth,
+  getClassesByStatusAndMonth,
 } from "@/data/api";
 import {
   FormControl,
@@ -13,12 +10,12 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { LineChart } from "@mui/x-charts";
+import { PieChart } from '@mui/x-charts/PieChart';
 import { useEffect, useState, useMemo } from "react";
 
 const getCurrentYear = () => new Date().getFullYear();
 
-const optionsStatus = ["completed", "cancelled", "active", "ongoing"];
+// const optionsStatus = ["completed", "cancelled", "active", "ongoing"];
 
 const useStyles = {
   container: {
@@ -73,7 +70,6 @@ const useStyles = {
 
 export default function SessionsChart() {
   const [dataClasses, setDataClasses] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState(optionsStatus[0]);
   const [selectedYear, setSelectedYear] = useState(getCurrentYear());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -92,55 +88,32 @@ export default function SessionsChart() {
     return null;
   }, []);
 
-  const convertDataWithDefault = (input) => {
-    const result = [];
 
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
+  const convertResToPieChartData = (res) => {
+    const statusMapping = {
+      COMPLETED: "Completed",
+      ACTIVE: "Active",
+      CANCELED: "Cancelled",
+      ONGOING: "Ongoing",
+    };
 
-    for (let month = 1; month <= 12; month++) {
-      const monthKey = `${selectedYear}-${month.toString().padStart(2, "0")}`;
-      result.push({
-        month: monthNames[month - 1],
-        value: input[monthKey] || 0,
-      });
-    }
-
-    return result;
+    return Object.keys(res).map((status, index) => {
+      const totalValue = Object.values(res[status]).reduce((sum, value) => sum + value, 0);
+      return {
+        id: index,
+        value: totalValue,
+        label: statusMapping[status],
+      };
+    });
   };
 
   const getActiveClasses = async () => {
     setLoading(true);
     setError(null);
     try {
-      let res;
-      switch (selectedStatus) {
-        case "active":
-          res = await getActiveClassesByMonth(selectedYear, token);
-          break;
-        case "ongoing":
-          res = await getOngoingClassesByMonth(selectedYear, token);
-          break;
-        case "completed":
-          res = await getCompletedClassesByMonth(selectedYear, token);
-          break;
-        case "cancelled":
-          res = await getCancelClassesByMonth(selectedYear, token);
-          break;
-      }
-      setDataClasses(convertDataWithDefault(res));
+      const res = await getClassesByStatusAndMonth(selectedYear, token)
+      const pieChartData = convertResToPieChartData(res);
+      setDataClasses(pieChartData);
     } catch (error) {
       console.error(error);
       setError("Failed to fetch data. Please try again.");
@@ -153,11 +126,8 @@ export default function SessionsChart() {
     if (token) {
       getActiveClasses();
     }
-  }, [token, selectedStatus, selectedYear]);
+  }, [token, selectedYear]);
 
-  const handleChange = (e) => {
-    setSelectedStatus(e.target.value);
-  };
 
   const handleChangeYear = (e) => {
     setSelectedYear(e.target.value);
@@ -189,7 +159,7 @@ export default function SessionsChart() {
             })}
           </Select>
         </FormControl>
-        <FormControl size="small">
+        {/* <FormControl size="small">
           <InputLabel id="status-select-label">Status</InputLabel>
           <Select
             labelId="status-select-label"
@@ -205,7 +175,7 @@ export default function SessionsChart() {
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </FormControl> */}
       </Box>
       <Box sx={useStyles.chartContainer}>
         {loading ? (
@@ -213,40 +183,17 @@ export default function SessionsChart() {
         ) : error ? (
           <Typography color="error">{error}</Typography>
         ) : (
-          <LineChart
-            xAxis={[
-              {
-                scaleType: "point",
-                data: [...dataClasses.map((item) => item.month)],
-              },
-            ]}
+          <PieChart
             series={[
               {
-                data: [...dataClasses.map((item) => item.value)],
-                label: "Number of review sessions",
-                area: true,
-                curve: "natural",
+                data: [
+                  ...dataClasses
+                ],
               },
             ]}
-            width={750}
-            height={320}
-            sx={{
-              ".MuiLineElement-root": {
-                stroke: "#3f51b5",
-                strokeWidth: 3,
-              },
-              ".MuiAreaElement-root": {
-                fill: "url(#gradient)",
-              },
-            }}
-          >
-            <defs>
-              <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#3f51b5" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#3f51b5" stopOpacity={0.1} />
-              </linearGradient>
-            </defs>
-          </LineChart>
+            width={400}
+            height={200}
+          />
         )}
       </Box>
     </Box>
