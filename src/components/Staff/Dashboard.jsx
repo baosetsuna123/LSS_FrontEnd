@@ -22,7 +22,6 @@ import {
   fetchAllCourses,
   fetchApplicationStaff,
   fetchClassStaff,
-  fetchFeedbackByclassid,
   getAllNews,
   getApplicationsByType,
   // fetchClasses,
@@ -44,7 +43,7 @@ export function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const user = JSON.parse(localStorage.getItem("result"));
   const itemsPerPage = 4;
-  const [activeCategory, setActiveCategory] = useState("category");
+  const [activeCategory, setActiveCategory] = useState("categories");
   const [showLogoutText, setShowLogoutText] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -60,8 +59,48 @@ export function Dashboard() {
 
   const [searchQueryClass, setSearchQueryClass] = useState("");
   const [totalCategories, setTotalCategories] = useState(0); // Track total categories
-
   const navigate = useNavigate();
+  const fetchDataByCategory = async () => {
+    setLoading(true); // Start loading
+
+    const token = sessionStorage.getItem("token"); // Get token from sessionStorage
+    if (!token) {
+      console.error("No token found, unable to fetch data.");
+      setLoading(false);
+      return; // Exit if no token is found
+    }
+
+    try {
+      if (activeCategory === "categories") {
+        const data = await fetchAllCategories(token); // Pass token if required
+        setCategories(data || []);
+      } else if (activeCategory === "courses") {
+        const data = await fetchAllCourses(token); // Pass token if required
+        setCourses(data || []);
+      } else if (activeCategory === "applications") {
+        const data = await fetchApplicationStaff(token);
+        console.log(data.content);
+        setApplications(data.content || []);
+      } else if (activeCategory === "classes") {
+        const data = await fetchClassStaff(token);
+        setClasses(data || []);
+      } else if (activeCategory === "news") {
+        const data = await getAllNews(token);
+        setNews(data || []);
+      } else if (activeCategory === "withdraw") {
+        const appWithdrawData = await getApplicationsByType(1, token);
+        setAppWithdraw(appWithdrawData || []);
+      } else if (activeCategory === "others") {
+        const appOtherData = await getApplicationsByType(2, token);
+        setAppOther(appOtherData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("An error occurred while fetching data."); // Show toast on error
+    } finally {
+      setLoading(false); // End loading state
+    }
+  };
 
   // Load active category from localStorage on component mount
   useEffect(() => {
@@ -73,7 +112,13 @@ export function Dashboard() {
   // Save active category to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeCategory", activeCategory);
+    fetchDataByCategory();
   }, [activeCategory]);
+  const handleTabClick = (category) => {
+    setActiveCategory(category);
+    setCurrentPage(1); // Optionally reset to page 1 when switching categories
+    fetchDataByCategory(); // Trigger data fetch when switching tab
+  };
   const handleUpdatePagination = (totalCount) => {
     setTotalCategories(totalCount);
     setCurrentPage(1); // Reset to page 1 if total count changes
@@ -111,21 +156,6 @@ export function Dashboard() {
   }, []);
   const [appwithdraw, setAppWithdraw] = useState([]);
   const [isWithdrawMenuOpen, setIsWithdrawMenuOpen] = useState(false); // State for toggling Withdraw menu
-  const [feedback, setFeedback] = useState({});
-  const token = sessionStorage.getItem("token");
-  useEffect(() => {
-    const fetchFeedback = async () => {
-      try {
-        const fetchedFeedback = await fetchFeedbackByclassid(token, 5);
-        console.log("Fetched Feedback API response:", fetchedFeedback);
-        setFeedback(fetchedFeedback);
-      } catch (error) {
-        console.error("Error fetching feedback:", error);
-      }
-    };
-
-    fetchFeedback();
-  }, [token]);
   const [appother, setAppOther] = useState([]);
   useEffect(() => {
     const loadAppWithdraws = async () => {
@@ -302,8 +332,7 @@ export function Dashboard() {
           <nav className={`mt-6 ${isSidebarCollapsed ? "hidden" : ""}`}>
             <button
               onClick={() => {
-                setActiveCategory("category");
-                setCurrentPage(1); // Reset to page 1 when changing category
+                handleTabClick("categories"); // Reset to page 1 when changing category
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "category" ? "bg-gray-200" : ""
@@ -326,8 +355,7 @@ export function Dashboard() {
               <div className="pl-4">
                 <button
                   onClick={() => {
-                    setActiveCategory("withdraw");
-                    setCurrentPage(1); // Reset to page 1 when changing category
+                    handleTabClick("withdraw"); // Reset to page 1 when changing category
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                     activeCategory === "withdraw" ? "bg-gray-200" : ""
@@ -337,8 +365,7 @@ export function Dashboard() {
                 </button>
                 <button
                   onClick={() => {
-                    setActiveCategory("others");
-                    setCurrentPage(1); // Reset to page 1 when changing category
+                    handleTabClick("others"); // Reset to page 1 when changing category
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                     activeCategory === "others" ? "bg-gray-200" : ""
@@ -348,8 +375,7 @@ export function Dashboard() {
                 </button>
                 <button
                   onClick={() => {
-                    setActiveCategory("application");
-                    setCurrentPage(1); // Reset to page 1 when changing category
+                    handleTabClick("applications"); // Reset to page 1 when changing category
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                     activeCategory === "application" ? "bg-gray-200" : ""
@@ -362,8 +388,7 @@ export function Dashboard() {
 
             <button
               onClick={() => {
-                setActiveCategory("course");
-                setCurrentPage(1); // Reset to page 1 when changing category
+                handleTabClick("courses"); // Reset to page 1 when changing category
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "course" ? "bg-gray-200" : ""
@@ -374,8 +399,7 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => {
-                setActiveCategory("class");
-                setCurrentPage(1); // Reset to page 1 when changing category
+                handleTabClick("classes");
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "class" ? "bg-gray-200" : ""
@@ -386,8 +410,7 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => {
-                setActiveCategory("news");
-                setCurrentPage(1); // Reset to page 1 when changing category
+                handleTabClick("news");
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                 activeCategory === "news" ? "bg-gray-200" : ""
@@ -467,7 +490,7 @@ export function Dashboard() {
           )}
           <>
             {/* Render the active category layout */}
-            {activeCategory === "category" && (
+            {activeCategory === "categories" && (
               <CategoryLayout
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
@@ -478,9 +501,10 @@ export function Dashboard() {
                 setSearchQuery={setSearchQueryCategory}
               />
             )}
-            {activeCategory === "application" && (
+            {activeCategory === "applications" && (
               <ApplicationLayout
                 currentPage={currentPage}
+                setApplications={setApplications}
                 itemsPerPage={itemsPerPage}
                 applications={applications}
                 searchQuery={searchQueryApplication}
@@ -498,7 +522,7 @@ export function Dashboard() {
                 setSearchQuery={setSearchQueryNews}
               />
             )}
-            {activeCategory === "course" && (
+            {activeCategory === "courses" && (
               <CourseLayout
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
@@ -535,12 +559,11 @@ export function Dashboard() {
                 loading={loading}
               />
             )}
-            {activeCategory === "class" && (
+            {activeCategory === "classes" && (
               <ClassLayout
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
                 classes={classes}
-                feedback={feedback}
                 questions={questions}
                 setClasses={setClasses}
                 searchQuery={searchQueryClass}
@@ -552,7 +575,7 @@ export function Dashboard() {
           {/* Pagination Controls */}
           {!isSearchActive() && ( // Only show pagination if no search query is active
             <>
-              {activeCategory === "category" &&
+              {activeCategory === "categories" &&
                 categories.length > itemsPerPage && (
                   <div className="mt-4 flex justify-between items-center">
                     <button
@@ -580,7 +603,7 @@ export function Dashboard() {
                     </button>
                   </div>
                 )}
-              {activeCategory === "application" &&
+              {activeCategory === "applications" &&
                 applications.length > itemsPerPage && (
                   <div className="mt-4 flex justify-between items-center">
                     <button
@@ -608,33 +631,34 @@ export function Dashboard() {
                     </button>
                   </div>
                 )}
-              {activeCategory === "course" && courses.length > itemsPerPage && (
-                <div className="mt-4 flex justify-between items-center">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <span className="text-sm text-gray-700">
-                    Page {currentPage} of {pageCountCourse}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, pageCountCourse)
-                      )
-                    }
-                    disabled={currentPage === pageCountCourse}
-                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              )}
+              {activeCategory === "courses" &&
+                courses.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountCourse}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountCourse)
+                        )
+                      }
+                      disabled={currentPage === pageCountCourse}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
               {activeCategory === "news" && news.length > itemsPerPage && (
                 <div className="mt-4 flex justify-between items-center">
                   <button
@@ -662,33 +686,34 @@ export function Dashboard() {
                   </button>
                 </div>
               )}
-              {activeCategory === "class" && classes.length > itemsPerPage && (
-                <div className="mt-4 flex justify-between items-center">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <span className="text-sm text-gray-700">
-                    Page {currentPage} of {pageCountClass}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(prev + 1, pageCountClass)
-                      )
-                    }
-                    disabled={currentPage === pageCountClass}
-                    className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              )}
+              {activeCategory === "classes" &&
+                classes.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountClass}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountClass)
+                        )
+                      }
+                      disabled={currentPage === pageCountClass}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
               {activeCategory === "withdraw" &&
                 appwithdraw.length > itemsPerPage && (
                   <div className="mt-4 flex justify-between items-center">

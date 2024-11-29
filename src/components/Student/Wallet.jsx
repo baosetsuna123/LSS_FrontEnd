@@ -42,7 +42,7 @@ export function MyWallet() {
     };
 
     fetchTransactions();
-  }, [token, location.state]);
+  }, [token, location.state, balance]);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -82,21 +82,39 @@ export function MyWallet() {
     const vnpAmount = urlParams.get("vnp_Amount");
     const vnpResponseCode = urlParams.get("vnp_ResponseCode");
 
-    // Only proceed if vnp_Amount and vnp_ResponseCode are present
     if (vnpAmount && vnpResponseCode) {
       const fetchPaymentReturn = async () => {
         try {
           const params = Object.fromEntries(urlParams.entries());
-          const result = await fetchVNPayReturn(params, token);
+          await fetchVNPayReturn(params, token);
 
-          // Check for successful payment and navigate
           if (vnpResponseCode === "00") {
-            console.log("Payment result:", result);
+            const creditedAmount = parseFloat(vnpAmount) / 100; // Convert VNPay amount to actual
+
+            // Use functional updates to avoid stale state issues
+            setBalance((prevBalance) => {
+              const updatedBalance = prevBalance + creditedAmount;
+
+              // Add new transaction after updating balance
+              setTransactions((prevTransactions) => [
+                ...prevTransactions,
+                {
+                  id: Date.now(),
+                  amount: creditedAmount,
+                  transactionBalance: updatedBalance,
+                  transactionDate: new Date().toISOString(),
+                  note: "Recharge",
+                },
+              ]);
+
+              return updatedBalance;
+            });
 
             toast.success(
-              `Payment successful! Amount: ${formatCurrency(vnpAmount / 100)}`
+              `Payment successful! Amount: ${formatCurrency(creditedAmount)}`
             );
-            navigate("/wallet"); // Redirect to the wallet page after successful payment
+
+            navigate("/wallet"); // Redirect back to wallet
           } else {
             toast.error("Payment failed or canceled!");
           }
@@ -108,7 +126,8 @@ export function MyWallet() {
 
       fetchPaymentReturn();
     }
-  }, [location.search, token, navigate]);
+  }, [location.search, token, navigate]); // Removed balance from dependencies
+
   const formatTransactionDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -128,18 +147,11 @@ export function MyWallet() {
     try {
       const data = await fetchRecharge(amount, token);
       console.log("Recharge data:", data);
-      const newTransaction = {
-        id: Date.now(), // Use current timestamp as a temporary ID
-        amount: amount, // Amount credited (positive value)
-        transactionBalance: balance + amount, // New balance after credit
-        transactionDate: new Date().toISOString(), // Current date/time
-      };
 
-      // Update transactions state
-      setTransactions((prev) => [...prev, newTransaction]);
       window.open(data.paymentUrl, "_self");
     } catch (error) {
       console.error("Recharge failed:", error);
+      toast.error("Failed to initiate recharge. Please try again.");
     }
   };
 

@@ -436,7 +436,7 @@ function TeacherHome() {
           <input
             type="text"
             name="name"
-            placeholder="Class Name"
+            placeholder="Lesson Name"
             onChange={handleInputChange}
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"

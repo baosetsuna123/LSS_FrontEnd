@@ -24,7 +24,6 @@ import {
 import { submitOther, submitWithdrawal } from "@/data/api";
 import toast from "react-hot-toast";
 import { useWallet } from "@/context/WalletContext";
-import { useNavigate } from "react-router-dom";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 export function SendApplication() {
@@ -81,7 +80,6 @@ export function SendApplication() {
   const { balance, loadBalance } = useWallet();
   const token = sessionStorage.getItem("token");
   console.log(balance);
-  const navigate = useNavigate(); // For navigation to "/wallet"
   const [showModal, setShowModal] = useState(false);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -369,26 +367,10 @@ export function SendApplication() {
                       Your current balance is not enough to withdraw this
                       amount.
                     </p>
-                    <div
-                      className={`flex justify-between mt-4 ${
-                        role !== "TEACHER" ? "space-x-4" : ""
-                      }`}
-                    >
-                      {role !== "TEACHER" && (
-                        <button
-                          onClick={() => navigate("/wallet")}
-                          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                        >
-                          Deposit now
-                        </button>
-                      )}
-
-                      {/* Conditionally render the "Got it" button */}
+                    <div className="flex justify-center mt-4">
                       <button
                         onClick={handleCancel}
-                        className={`py-2 px-4 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400 ${
-                          role !== "TEACHER" ? "ml-auto" : "mx-auto"
-                        }`}
+                        className="py-2 px-4 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400"
                       >
                         Got it
                       </button>

@@ -4,11 +4,12 @@ import { toast } from "react-hot-toast";
 import { createApplication } from "@/data/api";
 import backgroundImage from "../../assets/background2.png";
 import { FaInfoCircle, FaSpinner } from "react-icons/fa";
+import { AlertTriangle, CircleX } from "lucide-react";
 
 export function Application() {
   const [description, setDescription] = useState("");
-  const [certificates, setCertificates] = useState([]);
-  const [certificateNames, setCertificateNames] = useState([]);
+  const [certificates, setCertificates] = useState([null, null]); // Initialize with two empty certificates
+  const [certificateNames, setCertificateNames] = useState(["", ""]); // Initialize with two empty certificate names
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -34,7 +35,14 @@ export function Application() {
     setCertificates((prev) => prev.filter((_, i) => i !== index));
     setCertificateNames((prev) => prev.filter((_, i) => i !== index));
   };
+  const [showConfirm, setShowConfirm] = useState(false);
+  const handleBackClick = () => {
+    setShowConfirm(true);
+  };
 
+  const handleConfirmExit = () => {
+    navigate("/login");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -55,8 +63,8 @@ export function Application() {
       navigate("/login");
       // Reset form fields after successful submission
       setDescription("");
-      setCertificates([]);
-      setCertificateNames([]);
+      setCertificates([null, null]); // Reset certificates to 2 empty values
+      setCertificateNames(["", ""]); // Reset certificate names to 2 empty values
     } catch (error) {
       toast.error(error.message || "Failed to create application");
     } finally {
@@ -66,18 +74,28 @@ export function Application() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-6 sm:px-8 lg:px-10"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
-        height: "100vh",
+        height: "130vh",
       }}
     >
-      <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
-        <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">
+      <div className="max-w-xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+        <h2 className="text-3xl font-semibold mb-1 text-center text-gray-800">
           Registration Form
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <p className="text-center text-sm text-gray-600">
+          Or{" "}
+          <a
+            onClick={handleBackClick}
+            className="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+          >
+            Sign in to your existing account
+          </a>
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-8 mt-6">
+          {/* Description Section */}
           <div className="flex flex-col space-y-2">
             <label
               htmlFor="title"
@@ -103,7 +121,10 @@ export function Application() {
               Upload Certificates
             </label>
             {certificates.map((_, index) => (
-              <div key={index} className="flex items-center space-x-4 mb-4">
+              <div
+                key={index}
+                className="flex flex-col md:flex-row items-center space-y-4 md:space-x-4 mb-4"
+              >
                 <input
                   type="file"
                   accept=".pdf, .jpg, .png"
@@ -118,11 +139,11 @@ export function Application() {
                   onClick={() =>
                     document.getElementById(`certificate-${index}`).click()
                   }
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600 transition duration-300"
+                  className="bg-blue-500 text-white whitespace-nowrap py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-blue-600 transition duration-300"
                 >
                   Choose File
                 </button>
-                <span className="text-gray-700 flex-1">
+                <span className="text-gray-700 flex-1 whitespace-nowrap">
                   {certificates[index]?.name || "No file chosen"}
                 </span>
                 <input
@@ -140,7 +161,7 @@ export function Application() {
                   onClick={() => handleRemoveCertificate(index)}
                   className="text-red-500 hover:text-red-700 transition duration-300"
                 >
-                  Remove
+                  <CircleX />
                 </button>
               </div>
             ))}
@@ -172,6 +193,40 @@ export function Application() {
               )}
             </button>
           </div>
+          {showConfirm && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="bg-red-100 rounded-full p-3">
+                    <AlertTriangle className="h-8 w-8 text-red-500" />
+                  </div>
+                </div>
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                    Confirm Exit
+                  </h2>
+                  <p className="text-gray-600">
+                    Are you sure you want to exit? Your signup progress will be
+                    lost and you will need to start over.
+                  </p>
+                </div>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
+                  <button
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all"
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    Stay Here
+                  </button>
+                  <button
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
+                    onClick={handleConfirmExit}
+                  >
+                    Yes, Exit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

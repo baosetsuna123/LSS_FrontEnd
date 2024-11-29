@@ -1,21 +1,18 @@
-import { useState, useEffect } from "react";
-import {
-  fetchApplicationStaff,
-  fetchApproveApplication,
-  rejectApplication,
-} from "@/data/api"; // Import the API function
+import { useState } from "react";
+import { fetchApproveApplication, rejectApplication } from "@/data/api"; // Import the API function
 import { toast } from "react-hot-toast";
 import { CheckCircle, Search } from "lucide-react";
 import RejectModal from "../Helper/RejectModal";
 import ModalApprove from "./ModalApprove";
 
 const ApplicationLayout = ({
+  applications,
+  setApplications,
   currentPage,
   itemsPerPage,
   searchQuery,
   setSearchQuery,
 }) => {
-  const [applications, setApplications] = useState([]); // State to hold application data
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
   const [selectedApplication, setSelectedApplication] = useState(null); // Currently selected application for rejection
   const [rejectionReason, setRejectionReason] = useState(""); // State for rejection reason
@@ -84,32 +81,18 @@ const ApplicationLayout = ({
       setSelectedApplication(null);
     }
   };
-  // Fetch application data on component mount
-  useEffect(() => {
-    const loadApplications = async () => {
-      try {
-        const data = await fetchApplicationStaff(token);
-        const application = data.content;
-        console.log("Applications:", application);
-        setApplications(application); // Set the fetched data to state
-      } catch (error) {
-        console.error("Failed to fetch applications:", error); // Log the error
-        toast.error("Failed to fetch applications."); // Show error message
-      }
-    };
-
-    loadApplications();
-  }, [token]);
 
   // Calculate the current data to display based on pagination and search query
   const filteredApplications = applications.filter((app) =>
     app.teacherName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  console.log(filteredApplications);
 
   const currentData = filteredApplications.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  console.log(currentData);
 
   return (
     <div>

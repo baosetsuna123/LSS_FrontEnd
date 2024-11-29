@@ -57,11 +57,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-otp-register" element={<VerifyOtpRegister />} />
-        <Route path="/verify-otp-forgot" element={<VerifyOtpForgot />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/create-application" element={<Application />} />
         {/* Staff Dashboard */}
         <Route
           path="/dashboard"
@@ -134,6 +129,11 @@ function App() {
             </Layout>
           }
         >
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp-register" element={<VerifyOtpRegister />} />
+          <Route path="/verify-otp-forgot" element={<VerifyOtpForgot />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/create-application" element={<Application />} />
           <Route path="/signup" element={<SignUp />} />
           <Route
             path="/profile"
