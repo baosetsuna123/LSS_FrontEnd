@@ -179,6 +179,7 @@ const MyClass = () => {
 
           {lessonStatus === "COMPLETED" &&
           !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+            // Case 1: Show Feedback button if status is COMPLETED and feedback not submitted
             <button
               key={lesson.orderId}
               onClick={() => {
@@ -189,22 +190,21 @@ const MyClass = () => {
               Feedback
             </button>
           ) : lesson.room &&
-            (lessonStatus === "PENDING" ||
-              lessonStatus === "ONGOING" ||
-              lessonStatus === "ACTIVE") ? (
-            // Case 2: Show Meet URL button for status PENDING, ONGOING, or ACTIVE
+            (lessonStatus === "ONGOING" || lessonStatus === "ACTIVE") ? (
+            // Case 2: Show Meet URL button for status ONGOING or ACTIVE
             <button
               onClick={() => window.open(lesson.room, "_blank")}
               className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
             >
               Meet URL
             </button>
-          ) : (
-            // Case 3: Show "Ended" if none of the above conditions are met
+          ) : lessonStatus === "COMPLETED" &&
+            submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+            // Case 3: Show "Ended" if feedback has been submitted
             <div className="mt-3 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-1.5 px-4">
               Ended
             </div>
-          )}
+          ) : null}
         </div>
       );
     }

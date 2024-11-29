@@ -83,6 +83,7 @@ export function Dashboard() {
         setApplications(data.content || []);
       } else if (activeCategory === "classes") {
         const data = await fetchClassStaff(token);
+        console.log(data);
         setClasses(data || []);
       } else if (activeCategory === "news") {
         const data = await getAllNews(token);

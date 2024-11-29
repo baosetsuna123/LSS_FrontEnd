@@ -1,16 +1,34 @@
 import { fetchClassbyteacher, fetchCoursesService } from "@/data/api";
 import { useState, useEffect } from "react";
+import { ScrollArea } from "../ui/scroll-area";
+import { Button } from "../ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 
 function ClassList() {
   const [classes, setClasses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("ALL");
-  const [selectedClass, setSelectedClass] = useState(null);
-  const result = localStorage.getItem("result");
-  const [classesUpdated, setClassesUpdated] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+
+  // Separate states for the two modals
+  const [detailsModal, setDetailsModal] = useState({
+    isOpen: false,
+    class: null,
+  });
+  const [studentsListModal, setStudentsListModal] = useState({
+    isOpen: false,
+    class: null,
+  });
+
+  const result = localStorage.getItem("result");
   let token;
   if (result) {
     try {
@@ -21,55 +39,47 @@ function ClassList() {
     }
   }
 
-  const fetchClasses = async () => {
-    try {
-      const res = await fetchClassbyteacher(token);
-      setClasses(res);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    fetchClasses();
-  }, [token]);
+    const fetchData = async () => {
+      try {
+        const [classesRes, coursesRes] = await Promise.all([
+          fetchClassbyteacher(token),
+          fetchCoursesService(token),
+        ]);
 
-  useEffect(() => {
-    if (classes.length > 0 && courses.length > 0) {
-      const newClasses = classes.map((classItem) => {
-        const course = courses.find(
-          (course) => course.courseCode === classItem.courseCode
-        );
-        return {
-          ...classItem,
-          courseName: course ? course.name : "Undefined course",
-        };
-      });
-      setClassesUpdated(newClasses);
-    }
-  }, [classes, courses]);
+        const newClasses = classesRes.map((classItem) => {
+          const course = coursesRes.find(
+            (course) => course.courseCode === classItem.courseCode
+          );
+          return {
+            ...classItem,
+            courseName: course ? course.name : "Undefined course",
+          };
+        });
 
-  const fetchCourses = async () => {
-    try {
-      const res = await fetchCoursesService(token);
-      setCourses(res);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+        setClasses(newClasses);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  useEffect(() => {
-    fetchCourses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchData();
   }, [token]);
 
   const handleShowDetails = (cls) => {
-    setSelectedClass(cls);
-    console.log("Selected class details:", cls);
+    setDetailsModal({ isOpen: true, class: cls });
   };
 
-  const handleClosePopup = () => {
-    setSelectedClass(null);
+  const handleShowStudentList = (cls) => {
+    setStudentsListModal({ isOpen: true, class: cls });
+  };
+
+  const handleCloseDetailsModal = () => {
+    setDetailsModal({ isOpen: false, class: null });
+  };
+
+  const handleCloseStudentListModal = () => {
+    setStudentsListModal({ isOpen: false, class: null });
   };
 
   const dayOfWeekMap = {
@@ -84,10 +94,7 @@ function ClassList() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return date.toLocaleDateString("en-GB");
   };
 
   const slotTimeMap = {
@@ -98,7 +105,7 @@ function ClassList() {
     5: "17h45 - 20h00",
   };
 
-  const filteredClasses = classesUpdated.filter(
+  const filteredClasses = classes.filter(
     (cls) =>
       (cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         cls.code.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -145,16 +152,16 @@ function ClassList() {
         </div>
       ) : (
         <div>
-          <table className="min-w-full bg-white w-full">
+          <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left w-1/6">Lesson Name</th>
-                <th className="py-3 px-6 text-left w-1/6">Subject</th>
-                <th className="py-3 px-6 text-center w-1/6">Students</th>
-                <th className="py-3 px-6 text-center w-1/6">Schedule</th>
-                <th className="py-3 px-6 text-center w-1/6">Status</th>
-                <th className="py-3 px-6 text-center w-1/6">Time</th>
-                <th className="py-3 px-6 text-center w-1/6">Action</th>
+                <th className="py-3 px-6 text-left">Lesson Name</th>
+                <th className="py-3 px-6 text-left">Subject</th>
+                <th className="py-3 px-6 text-center">Students</th>
+                <th className="py-3 px-6 text-center">Schedule</th>
+                <th className="py-3 px-6 text-center">Status</th>
+                <th className="py-3 px-6 text-center">Time</th>
+                <th className="py-3 px-6 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -189,34 +196,29 @@ function ClassList() {
                           : ""
                       }`}
                     >
-                      {cls.status === "PENDING"
-                        ? "Pending"
-                        : cls.status === "ACTIVE"
-                        ? "Active"
-                        : cls.status === "ONGOING"
-                        ? "Ongoing"
-                        : cls.status === "CANCELED"
-                        ? "Canceled"
-                        : cls.status === "COMPLETED"
-                        ? "Completed"
-                        : ""}
+                      {cls.status}
                     </span>
                   </td>
                   <td className="py-3 px-6 text-center whitespace-nowrap">
-                    <span
-                      className={`bg-blue-200 text-blue-800 rounded-full py-1 px-4 text-xs font-semibold`}
-                    >
+                    <span className="bg-blue-200 text-blue-800 rounded-full py-1 px-4 text-xs font-semibold">
                       {slotTimeMap[cls.slotId] || "Unknown"}
                     </span>
                   </td>
-                  <td className="py-3 px-6 text-center">
+                  <td className="py-3 px-6 text-center whitespace-nowrap">
                     <button
                       onClick={() => handleShowDetails(cls)}
-                      className="bg-gray-900 text-white active:bg-gray-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                      type="button"
+                      className="text-white font-bold bg-blue-600 hover:bg-blue-700 border border-blue-600 px-4 py-2 rounded-md mr-2"
                     >
                       Details
                     </button>
+                    {cls.students.length > 0 && (
+                      <button
+                        onClick={() => handleShowStudentList(cls)}
+                        className="text-white font-bold bg-green-600 hover:bg-green-700 border border-green-600 px-4 py-2 rounded-md"
+                      >
+                        List
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -239,93 +241,124 @@ function ClassList() {
           </div>
         </div>
       )}
+      {detailsModal.isOpen && (
+        <DetailsModal
+          cls={detailsModal.class}
+          onClose={handleCloseDetailsModal}
+          dayOfWeekMap={dayOfWeekMap}
+          formatDate={formatDate}
+          slotTimeMap={slotTimeMap}
+        />
+      )}
+      {studentsListModal.isOpen && (
+        <StudentsListModal
+          cls={studentsListModal.class}
+          onClose={handleCloseStudentListModal}
+        />
+      )}
+    </div>
+  );
+}
 
-      {selectedClass && (
-        <div
-          className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50"
-          id="my-modal"
-        >
-          <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <div className="text-center">
-              <h3 className="text-2xl font-semibold text-gray-900">
-                {selectedClass.name}
-              </h3>
-              <div className="mt-4 text-left">
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Subject:</strong> {selectedClass.courseName}
-                </p>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Students:</strong> {selectedClass.maxStudents}
-                </p>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Schedule:</strong>{" "}
-                  {`${formatDate(selectedClass.startDate)} (${
-                    dayOfWeekMap[selectedClass.dayOfWeek] || "Unknown"
-                  })`}
-                </p>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Status:</strong>{" "}
-                  <span
-                    className={`
-      ${selectedClass.status === "COMPLETED" ? "font-bold text-green-500" : ""}
-      ${selectedClass.status === "PENDING" ? "font-bold text-yellow-500" : ""}
-      ${selectedClass.status === "CANCELED" ? "font-bold text-red-500" : ""}
-      ${selectedClass.status === "ONGOING" ? "font-bold text-blue-500" : ""}
-      ${selectedClass.status === "ACTIVE" ? "font-bold text-orange-500" : ""}
-    `}
-                  >
-                    {selectedClass.status.charAt(0).toUpperCase() +
-                      selectedClass.status.slice(1).toLowerCase()}
-                  </span>
-                </p>
-
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Students Joined:</strong>{" "}
-                  {selectedClass.students.length}{" "}
-                  {selectedClass.students.length > 0 && (
-                    <span>
-                      (
-                      {selectedClass.students.map((student, index) => (
-                        <span key={student.userName}>
-                          {student.userName}
-                          {index < selectedClass.students.length - 1 && ", "}
-                        </span>
-                      ))}
-                      )
-                    </span>
-                  )}
-                </p>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Teacher:</strong> {selectedClass.teacherName}
-                </p>
-                <p className="text-sm text-gray-700 mb-2">
-                  <strong>Time:</strong>{" "}
-                  {slotTimeMap[selectedClass.slotId] || "Unknown"}
-                </p>
-                <p className="text-sm text-gray-700 mb-4">
-                  <strong>Location:</strong>
-                  <button
-                    onClick={() =>
-                      window.open(selectedClass.location, "_blank")
-                    }
-                    className="ml-2 text-gray-700 bg-gray-200 py-1 px-3 rounded-md text-xs font-medium hover:bg-gray-300 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                  >
-                    Meet URL
-                  </button>
-                </p>
-              </div>
-              <div className="mt-6">
-                <button
-                  onClick={handleClosePopup}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full font-medium shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
+  return (
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+      <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <div className="text-center">
+          <h3 className="text-2xl font-semibold text-gray-900">{cls.name}</h3>
+          <div className="mt-4 text-left">
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Subject:</strong> {cls.courseName}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Students:</strong> {cls.maxStudents}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Schedule:</strong>{" "}
+              {`${formatDate(cls.startDate)} (${
+                dayOfWeekMap[cls.dayOfWeek] || "Unknown"
+              })`}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Status:</strong>{" "}
+              <span
+                className={`
+                  ${
+                    cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
+                  }
+                  ${cls.status === "PENDING" ? "font-bold text-yellow-500" : ""}
+                  ${cls.status === "CANCELED" ? "font-bold text-red-500" : ""}
+                  ${cls.status === "ONGOING" ? "font-bold text-blue-500" : ""}
+                  ${cls.status === "ACTIVE" ? "font-bold text-orange-500" : ""}
+                `}
+              >
+                {cls.status}
+              </span>
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Students Joined:</strong> {cls.students.length}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Teacher:</strong> {cls.teacherName}
+            </p>
+            <p className="text-sm text-gray-700 mb-2">
+              <strong>Time:</strong> {slotTimeMap[cls.slotId] || "Unknown"}
+            </p>
+            <p className="text-sm text-gray-700 mb-4">
+              <strong>Location:</strong>
+              <button
+                onClick={() => window.open(cls.location, "_blank")}
+                className="ml-2 text-gray-700 bg-gray-200 py-1 px-3 rounded-md text-xs font-medium hover:bg-gray-300 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Meet URL
+              </button>
+            </p>
+          </div>
+          <div className="mt-6">
+            <button
+              onClick={onClose}
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full font-medium shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
+            >
+              Close
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  );
+}
+
+function StudentsListModal({ cls, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+        <h3 className="text-xl font-semibold mb-4">Student List</h3>
+        <ScrollArea>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {cls.students.map((student, index) => (
+                <TableRow key={student.email}>
+                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell>{student.userName}</TableCell>
+                  <TableCell>{student.email}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+        <div className="mt-4 flex justify-end">
+          <Button onClick={onClose} variant="destructive">
+            Close
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
