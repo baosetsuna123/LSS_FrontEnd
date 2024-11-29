@@ -233,9 +233,9 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student Username</TableHead>
-                <TableHead>Question ID</TableHead>
-                <TableHead>Rating</TableHead>
+                <TableHead className="text-center">Student Username</TableHead>
+                <TableHead className="text-center">Question ID</TableHead>
+                <TableHead className="text-center">Rating</TableHead>
                 <TableHead className="text-center">Comment</TableHead>
               </TableRow>
             </TableHeader>
@@ -243,19 +243,25 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
               {detailedFeedback
                 .slice(0, displayedCount)
                 .map((detail, index) => {
-                  // Check if it's the first item in the group of 6
                   const showComment = index % 6 === 0;
                   return (
-                    <TableRow key={index}>
-                      <TableCell>{detail.studentUsername}</TableCell>
-                      <TableCell>{detail.questionId}</TableCell>
-                      <TableCell>{detail.rating}</TableCell>
-                      <TableCell
-                        rowSpan={showComment ? 6 : 1} // Make the comment cell span 6 rows
-                        style={{ textAlign: "center" }}
-                      >
-                        {showComment ? detail.comment || "N/A" : ""}
+                    <TableRow key={index} className="text-center">
+                      {index % 6 === 0 && (
+                        <TableCell rowSpan={6} className="text-center">
+                          {detail.studentUsername}
+                        </TableCell>
+                      )}
+                      <TableCell className="text-center">
+                        {detail.questionId}
                       </TableCell>
+                      <TableCell className="text-center">
+                        {detail.rating}
+                      </TableCell>
+                      {index % 6 === 0 && (
+                        <TableCell rowSpan={6} className="text-center">
+                          {showComment ? detail.comment || "N/A" : ""}
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })}

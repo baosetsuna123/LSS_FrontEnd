@@ -108,7 +108,7 @@ export default function TransactionHistory() {
                       {row.balanceAfterTransaction.toLocaleString()} VND
                     </TableCell>
                     <TableCell>{row.username}</TableCell>
-                    <TableCell>{row.note}</TableCell>
+                    <TableCell>{row.note || "N/A"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
