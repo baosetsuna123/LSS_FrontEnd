@@ -87,7 +87,7 @@ export function ClassDetail() {
             </div>
           ) : (
             <>
-              <p className="mb-6 text-gray-700 dark:text-gray-300">
+              <p className="mb-6 text-gray-700 whitespace-nowrap dark:text-gray-300">
                 You agree to participate in this class with price{" "}
                 {formatCurrency(classDetail?.price)}?
               </p>
@@ -182,7 +182,7 @@ export function ClassDetail() {
         console.log(errorMessage);
 
         if (errorMessage === "User has already registered for this schedule.") {
-          toast.error(errorMessage);
+          toast.error("You have already registered for this schedule.");
         } else {
           toast.error(errorMessage);
           navigate("/wallet");

@@ -63,9 +63,11 @@ const ClassLayout = ({
     setIsModalOpen(false);
     setSelectedClassId(null);
   };
-
+  const sortedData = classes.sort(
+    (a, b) => new Date(b.startDate) - new Date(a.startDate)
+  );
   // Calculate the current data to display based on pagination and search query
-  const filteredClass = classes.filter((cls) =>
+  const filteredClass = sortedData.filter((cls) =>
     cls.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -119,9 +121,6 @@ const ClassLayout = ({
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
                 Price
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
-                Action
               </th>
             </tr>
           </thead>

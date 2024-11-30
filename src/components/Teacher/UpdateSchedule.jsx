@@ -46,9 +46,10 @@ function UpdateSchedule() {
         (classItem) =>
           classItem.status === "PENDING" || classItem.status === "ACTIVE"
       );
-
-      // Set the filtered classes to state
-      setClasses(filteredClasses);
+      const sortedData = filteredClasses.sort(
+        (a, b) => new Date(b.startDate) - new Date(a.startDate)
+      );
+      setClasses(sortedData);
       console.log(filteredClasses);
     } catch (error) {
       console.log(error);

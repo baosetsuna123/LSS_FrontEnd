@@ -22,11 +22,26 @@ const News = ({
 
   const token = sessionStorage.getItem("token");
 
+  const sortedData = news.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateB - dateA; // Sort by most recent date
+    }
+
+    // If dates are the same, compare by time
+    const timeA = new Date(`1970-01-01T${a.time}`);
+    const timeB = new Date(`1970-01-01T${b.time}`);
+    return timeB - timeA; // Sort by most recent time
+  });
+
   // Calculate the filtered news based on the search query
-  const filteredNews = news.filter((item) =>
+  const filteredNews = sortedData.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  console.log(filteredNews);
   // Paginate the filtered news based on currentPage and itemsPerPage
   const currentData = filteredNews.slice(
     (currentPage - 1) * itemsPerPage,

@@ -56,8 +56,10 @@ function ClassList() {
             courseName: course ? course.name : "Undefined course",
           };
         });
-
-        setClasses(newClasses);
+        const sortedData = newClasses.sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+        setClasses(sortedData);
       } catch (error) {
         console.log(error);
       }

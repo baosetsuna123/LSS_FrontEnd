@@ -17,6 +17,7 @@ const RegisterApp = () => {
       try {
         const data = await fetchAppAdmin(token);
         setApplications(data.content || []);
+        console.log(data.content);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");

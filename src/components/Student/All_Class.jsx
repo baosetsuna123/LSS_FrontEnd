@@ -31,7 +31,11 @@ export function ViewAllClasses() {
         (selectedCourseCodes.length === 0 ||
           selectedCourseCodes.includes(c.courseCode))
     );
-    setFilteredClasses(filtered);
+    const sortedData = filtered.sort(
+      (a, b) => new Date(b.startDate) - new Date(a.startDate)
+    );
+    setFilteredClasses(sortedData);
+    console.log(filtered);
     setCurrentPage(1);
   }, [searchTerm, maxPrice, selectedCourseCodes, contextClasses]);
 
@@ -93,6 +97,12 @@ export function ViewAllClasses() {
     { label: "Home", link: "/" },
     { label: "Lesson", link: "/class" },
   ];
+  console.log("contextClasses.length:", contextClasses.length);
+  console.log("itemsPerPage:", itemsPerPage);
+  console.log("totalPages:", totalPages);
+  console.log("currentPage:", currentPage);
+  console.log("fitlercalss:", filteredClasses);
+
   return (
     <>
       <section className="w-full py-4 bg-gray-100 dark:bg-gray-800">
@@ -208,9 +218,6 @@ export function ViewAllClasses() {
                               {classItem.name}
                             </h2>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Lesson Code: {classItem.code}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
                               Course Code: {classItem.courseCode}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -238,7 +245,7 @@ export function ViewAllClasses() {
                 )}
               </div>
             </div>
-            {contextClasses.length > itemsPerPage && maxPrice != 100000 && (
+            {filteredClasses.length > itemsPerPage && maxPrice != 100000 && (
               <div className="flex justify-between mt-4">
                 <Button
                   disabled={currentPage === 1}

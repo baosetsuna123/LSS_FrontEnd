@@ -58,7 +58,11 @@ export function MyOrders() {
     const fetchOrders = async () => {
       try {
         const response = await fetchOrderClasses(token);
-        setOrders(response.data.content);
+        const sortedData = response.data.content.sort(
+          (a, b) =>
+            new Date(b.classDTO.startDate) - new Date(a.classDTO.startDate)
+        );
+        setOrders(sortedData);
         console.log(response.data.content);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -132,7 +136,7 @@ export function MyOrders() {
           <div className="flex items-center border rounded p-2 dark:bg-gray-700">
             <input
               type="text"
-              placeholder="Search by Class Name"
+              placeholder="Search by Lesson Name"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm dark:text-white dark:bg-gray-700"
@@ -158,7 +162,7 @@ export function MyOrders() {
                   Start Date
                 </TableHead>
                 <TableHead className="pl-12 text-gray-900 dark:text-white">
-                  Class Name
+                  Lesson Name
                 </TableHead>
                 <TableHead className="text-right text-gray-900 dark:text-white">
                   Total Price

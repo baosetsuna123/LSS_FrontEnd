@@ -26,6 +26,7 @@ export default function Deposit() {
     totalBalance: [],
     totalExpenses: [],
     totalIncome: [],
+    totalOrders: [], // New bar data for Total Orders
   });
 
   const result = localStorage.getItem("result");
@@ -48,6 +49,7 @@ export default function Deposit() {
         totalBalance: 0,
         totalExpenses: 0,
         totalIncome: 0,
+        totalOrders: 0, // Default value for Total Orders
       }));
 
       datas.forEach((item) => {
@@ -60,11 +62,13 @@ export default function Deposit() {
       const totalBalanceData = completeData.map((item) => item.totalBalance);
       const totalExpensesData = completeData.map((item) => item.totalExpenses);
       const totalIncomeData = completeData.map((item) => item.totalIncome);
+      const totalOrdersData = completeData.map((item) => item.totalOrders); // Extract Total Orders
 
       setChartData({
         totalBalance: totalBalanceData,
         totalExpenses: totalExpensesData,
         totalIncome: totalIncomeData,
+        totalOrders: totalOrdersData, // Set Total Orders data
       });
     } catch (error) {
       console.log(error);
@@ -126,6 +130,11 @@ export default function Deposit() {
               data: chartData.totalIncome,
               label: "Total Deposit",
               id: "totalIncomeId",
+            },
+            {
+              data: chartData.totalOrders,
+              label: "Total Orders",
+              id: "totalOrdersId",
             },
           ]}
           xAxis={[{ data: xLabels, scaleType: "band" }]}

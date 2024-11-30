@@ -1,6 +1,4 @@
-import {
-  getClassesByStatusAndMonth,
-} from "@/data/api";
+import { getClassesByStatusAndMonth } from "@/data/api";
 import {
   FormControl,
   InputLabel,
@@ -10,7 +8,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import { PieChart } from '@mui/x-charts/PieChart';
+import { PieChart } from "@mui/x-charts/PieChart";
 import { useEffect, useState, useMemo } from "react";
 
 const getCurrentYear = () => new Date().getFullYear();
@@ -88,7 +86,6 @@ export default function SessionsChart() {
     return null;
   }, []);
 
-
   const convertResToPieChartData = (res) => {
     const statusMapping = {
       COMPLETED: "Completed",
@@ -98,7 +95,10 @@ export default function SessionsChart() {
     };
 
     return Object.keys(res).map((status, index) => {
-      const totalValue = Object.values(res[status]).reduce((sum, value) => sum + value, 0);
+      const totalValue = Object.values(res[status]).reduce(
+        (sum, value) => sum + value,
+        0
+      );
       return {
         id: index,
         value: totalValue,
@@ -111,7 +111,8 @@ export default function SessionsChart() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getClassesByStatusAndMonth(selectedYear, token)
+      const res = await getClassesByStatusAndMonth(selectedYear, token);
+      console.log(res);
       const pieChartData = convertResToPieChartData(res);
       setDataClasses(pieChartData);
     } catch (error) {
@@ -127,7 +128,6 @@ export default function SessionsChart() {
       getActiveClasses();
     }
   }, [token, selectedYear]);
-
 
   const handleChangeYear = (e) => {
     setSelectedYear(e.target.value);
@@ -186,9 +186,7 @@ export default function SessionsChart() {
           <PieChart
             series={[
               {
-                data: [
-                  ...dataClasses
-                ],
+                data: [...dataClasses],
               },
             ]}
             width={400}

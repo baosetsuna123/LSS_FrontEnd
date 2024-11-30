@@ -30,7 +30,10 @@ export default function TransactionHistory() {
   const getSystemWalletTransactionHistorys = async () => {
     try {
       const res = await getSystemWalletTransactionHistory(token);
-      setData(res);
+      const sortedData = res.sort(
+        (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
+      );
+      setData(sortedData);
     } catch (error) {
       console.log(error);
     }

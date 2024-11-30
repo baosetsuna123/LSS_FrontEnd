@@ -304,6 +304,7 @@ function TeacherHome() {
       const classList = classesCreate.filter(
         (c) => c.startDate === formatDate(date) && c.status !== "CANCELED"
       );
+      console.log(classList);
       setSelectedSlots(classList.map((item) => item.slotId));
 
       const jsDayOfWeek = date.getDay();

@@ -56,8 +56,11 @@ const Classes = () => {
     const fetchClassData = async () => {
       try {
         const response = await fetchClasses(token);
-        setClasses(response);
-        setFilteredClasses(response);
+        const sortedData = response.sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+        setClasses(sortedData);
+        setFilteredClasses(sortedData);
         setTotalPages(Math.ceil(response.length / itemsPerPage));
       } catch (error) {
         console.error("Error fetching classes:", error);

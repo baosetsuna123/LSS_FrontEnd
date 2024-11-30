@@ -1342,10 +1342,9 @@ export const cancelClass = async (classId, token) => {
         },
       }
     );
-    return response.data; // Success message or response
+    return response.data;
   } catch (error) {
     if (error.response) {
-      // Check if it's a 400 or 403 error and handle them separately
       if (error.response.status === 400) {
         throw new Error(error.response.data); // Return the error message from backend
       } else if (error.response.status === 403) {
@@ -1578,7 +1577,6 @@ export const getClassesByStatusAndMonth = async (year, token) => {
     throw error;
   }
 };
-
 
 export const getTotalCourses = async (token) => {
   try {

@@ -24,7 +24,6 @@ const WithdrawApp = () => {
       const token = sessionStorage.getItem("token");
       try {
         const data = await getApplicationsByType(1, token);
-        console.log(data);
         setAppWithdraw(data || []);
       } catch (error) {
         console.error("Failed to fetch applications:", error);

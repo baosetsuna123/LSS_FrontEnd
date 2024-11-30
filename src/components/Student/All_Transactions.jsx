@@ -28,8 +28,12 @@ export function WalletHistory() {
       try {
         const data = await fetchWalletHistory(token);
         console.log("Transactions:", data);
-        setTransactions(data);
-        setFilteredTransactions(data); // Set initial filtered transactions
+        const sortedData = data.sort(
+          (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
+        );
+
+        setTransactions(sortedData);
+        setFilteredTransactions(sortedData); // Set initial filtered transactions
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
       }

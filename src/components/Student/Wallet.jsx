@@ -34,8 +34,10 @@ export function MyWallet() {
     const fetchTransactions = async () => {
       try {
         const data = await fetchWalletHistory(token);
-        console.log("Transactions:", data);
-        setTransactions(data);
+        const sortedData = data.sort(
+          (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
+        );
+        setTransactions(sortedData);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
       }

@@ -54,6 +54,7 @@ function CancelClassRequest() {
       await cancelClass(selectedClassId, token);
       setSelectedClassId(""); // Reset class selection
       toast.success("Cancellation request submitted successfully!");
+      fetchClasses(); // Refetch classes after successful cancellation
     } catch (error) {
       console.error(
         "An error occurred while submitting the cancellation:",

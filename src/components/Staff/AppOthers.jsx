@@ -22,7 +22,7 @@ const AppOthers = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState(""); // "approve" or "reject"
   const [selectedId, setSelectedId] = useState(null);
-
+  console.log(appother);
   const filteredApplications = appother.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
