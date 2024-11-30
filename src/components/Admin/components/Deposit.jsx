@@ -42,6 +42,7 @@ export default function Deposit() {
   const getTotal = async () => {
     try {
       const datas = await getDepositsByMonth(selectedYear, token);
+      console.log(datas);
       const completeData = Array.from({ length: 12 }, (_, i) => ({
         month: i + 1,
         totalBalance: 0,

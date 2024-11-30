@@ -200,7 +200,6 @@ const MyClass = () => {
             </button>
           ) : lessonStatus === "COMPLETED" &&
             submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-            // Case 3: Show "Ended" if feedback has been submitted
             <div className="mt-3 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-1.5 px-4">
               Ended
             </div>

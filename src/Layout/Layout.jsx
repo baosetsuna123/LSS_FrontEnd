@@ -14,10 +14,12 @@ import {
   Search,
   ShoppingBag,
   User,
+  RefreshCcw,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
 import { ModeToggle } from "@/components/ui/Mode-Toggle";
+
 import {
   deleteNoti,
   putAllNoti,
@@ -209,7 +211,10 @@ export function Layout({ children }) {
   const handleTabChange = (tab) => {
     setActiveTab(tab); // Change active tab when clicked
   };
-
+  const handleRefreshClick = () => {
+    fetchNotifications(); // Fetch notifications when the button is clicked
+    toast.success("Notifications refreshed successfully");
+  };
   const filteredNotifications =
     activeTab === "All"
       ? notifications
@@ -359,39 +364,52 @@ export function Layout({ children }) {
                         Notifications
                       </h3>
                       {/* Ellipsis icon to show the "Mark all as read" menu */}
-                      <div
-                        className="relative"
-                        onClick={() => setShowMarkAllMenu((prev) => !prev)} // Toggle the menu on icon click
-                      >
-                        <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold">
-                          <Ellipsis />
-                        </button>
+                      <div className="flex items-center">
+                        {/* Refresh Button in Separate Div */}
+                        <div>
+                          <button
+                            onClick={handleRefreshClick}
+                            className="text-gray-500 mr-5 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold"
+                          >
+                            <RefreshCcw />
+                          </button>
+                        </div>
 
-                        {/* Dropdown for "Mark all as read" */}
-                        {showMarkAllMenu && (
-                          <div className="absolute right-0 top-full w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20">
-                            <button
-                              onClick={handleMarkAllAsRead}
-                              className="flex whitespace-nowrap items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 w-full"
-                            >
-                              <svg
-                                className="h-5 w-5 mr-2 text-green-500"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                        {/* Ellipsis Button and Mark All Menu */}
+                        <div className="relative">
+                          <button
+                            onClick={() => setShowMarkAllMenu((prev) => !prev)} // Toggle the menu
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl font-bold"
+                          >
+                            <Ellipsis />
+                          </button>
+
+                          {/* Dropdown for "Mark all as read" */}
+                          {showMarkAllMenu && (
+                            <div className="absolute right-0 top-full w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20">
+                              <button
+                                onClick={handleMarkAllAsRead}
+                                className="flex whitespace-nowrap items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 w-full"
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                              Mark all as read
-                            </button>
-                          </div>
-                        )}
+                                <svg
+                                  className="h-5 w-5 mr-2 text-green-500"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                Mark all as read
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex border-b border-gray-200 dark:border-gray-700">
