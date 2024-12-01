@@ -1221,13 +1221,22 @@ export const getApprovalDetail = async (applicationUserId, token) => {
   }
 };
 //approve other application
-export const approveOtherApp = async (id, token) => {
+export const approveOtherApp = async (applicationId, token, approvalImage) => {
   try {
-    const response = await api.put(`applicationUser/approve/${id}`, null, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const formData = new FormData();
+    if (approvalImage) {
+      formData.append("approvalImage", approvalImage);
+    }
+    const response = await api.put(
+      `applicationUser/approve/${applicationId}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error completing withdrawal request:", error);

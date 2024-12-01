@@ -184,7 +184,7 @@ const Classes = () => {
               </TableCell>
               <TableCell>{cls.teacherName}</TableCell>
               <TableCell className="text-right">
-                {cls.status !== "COMPLETED" && (
+                {cls.status !== "COMPLETED" && cls.status !== "CANCELED" && (
                   <Button onClick={() => handleEdit(cls.classId)}>Edit</Button>
                 )}
               </TableCell>

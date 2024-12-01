@@ -111,7 +111,7 @@ const TotalOrdersAmountDetails = () => {
         onClick={() => setOpen(true)}
         className="w-full flex items-center justify-between"
       >
-        view details
+        View details
         <ChevronRight />
       </button>
       <Modal

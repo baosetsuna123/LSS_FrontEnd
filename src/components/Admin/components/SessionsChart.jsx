@@ -88,10 +88,11 @@ export default function SessionsChart() {
 
   const convertResToPieChartData = (res) => {
     const statusMapping = {
-      COMPLETED: "Completed",
-      ACTIVE: "Active",
-      CANCELED: "Cancelled",
-      ONGOING: "Ongoing",
+      COMPLETED: { label: "Completed", color: "#4caf50" }, // Green
+      ACTIVE: { label: "Active", color: "#2196f3" }, // Blue
+      CANCELED: { label: "Cancelled", color: "#f44336" }, // Red
+      ONGOING: { label: "Ongoing", color: "#9c27b0" }, // Purple
+      PENDING: { label: "Pending", color: "#ffc107" }, // Yellow
     };
 
     return Object.keys(res).map((status, index) => {
@@ -99,10 +100,16 @@ export default function SessionsChart() {
         (sum, value) => sum + value,
         0
       );
+      const { label, color } = statusMapping[status] || {
+        label: "Unknown",
+        color: "#757575", // Grey for unexpected statuses
+      };
+
       return {
         id: index,
         value: totalValue,
-        label: statusMapping[status],
+        label: label,
+        color: color,
       };
     });
   };
@@ -191,6 +198,11 @@ export default function SessionsChart() {
             ]}
             width={400}
             height={200}
+            sx={{
+              "& .MuiPieChart-sector": {
+                color: (datum) => datum.color, // Use the color from the data
+              },
+            }}
           />
         )}
       </Box>

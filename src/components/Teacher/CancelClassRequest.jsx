@@ -1,12 +1,25 @@
-import { cancelClass } from "@/data/api"; // Import the cancelClass function from api.js
-import { fetchClassbyteacher } from "@/data/api"; // Keep fetchClassbyteacher to fetch classes
+import { cancelClass, fetchClassbyteacher } from "@/data/api";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import EnhancedSelectInput from "./EnhancedSelectInput";
 
 function CancelClassRequest() {
   const [classes, setClasses] = useState([]);
-  const [selectedClassId, setSelectedClassId] = useState(""); // Store only classId
+  const [selectedClassId, setSelectedClassId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const result = localStorage.getItem("result");
 
   let token;
@@ -20,11 +33,9 @@ function CancelClassRequest() {
     }
   }
 
-  // Fetch classes that the teacher is associated with
   const fetchClasses = async () => {
     try {
       const res = await fetchClassbyteacher(token);
-      // Filter only classes with status ACTIVE or PENDING
       const filteredClasses = res.filter(
         (cls) => cls.status === "ACTIVE" || cls.status === "PENDING"
       );
@@ -38,23 +49,28 @@ function CancelClassRequest() {
     fetchClasses();
   }, [token]);
 
-  // Handle cancellation form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
     if (!selectedClassId) {
       toast.error("Please select a class to cancel.");
-      setIsSubmitting(false);
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const handleConfirmCancellation = async () => {
+    if (!agreeToTerms) {
+      toast.error("Please agree to the terms before proceeding.");
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      console.log(selectedClassId);
       await cancelClass(selectedClassId, token);
-      setSelectedClassId(""); // Reset class selection
+      setSelectedClassId("");
       toast.success("Cancellation request submitted successfully!");
-      fetchClasses(); // Refetch classes after successful cancellation
+      fetchClasses();
+      setShowModal(false);
     } catch (error) {
       console.error(
         "An error occurred while submitting the cancellation:",
@@ -67,42 +83,83 @@ function CancelClassRequest() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-xl">
+      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
         Submit Lesson Cancellation Request
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label
-            htmlFor="class"
-            className="block mb-2 font-medium text-gray-700"
-          >
-            Select Lesson
-          </label>
-          <select
-            id="class"
-            value={selectedClassId} // Use classId here
-            onChange={(e) => setSelectedClassId(e.target.value)} // Update the selected classId
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            required
-          >
-            <option value="">-- Select Lesson --</option>
-            {classes.map((cls) => (
-              <option key={cls.classId} value={cls.classId}>
-                {cls.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <EnhancedSelectInput
+          classes={classes}
+          selectedClassId={selectedClassId}
+          setSelectedClassId={setSelectedClassId}
+        />
 
-        <button
+        <Button
           type="submit"
-          className="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+          className="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-all duration-200"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Submitting..." : "Submit Cancellation Request"}
-        </button>
+        </Button>
       </form>
+
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-500">
+              <AlertTriangle className="h-6 w-6" />
+              Cancellation Policy
+            </DialogTitle>
+            <DialogDescription>
+              Please read our cancellation policy carefully before proceeding.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-500 mb-4">
+              By cancelling this class, you agree to the following terms:
+            </p>
+            <ul className="list-disc pl-5 text-sm text-gray-500 space-y-2">
+              <li>
+                Your salary will be reduced by 10% for this cancelled class.
+              </li>
+              <li>
+                This reduction will also apply to your next completed lessons.
+              </li>
+            </ul>
+            <div className="flex items-center space-x-2 mt-4">
+              <Checkbox
+                id="terms"
+                checked={agreeToTerms}
+                onCheckedChange={setAgreeToTerms}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I agree to the cancellation policy
+              </label>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmCancellation}
+              disabled={!agreeToTerms || isSubmitting}
+            >
+              {isSubmitting ? "Processing..." : "Agree & Cancel"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="ml-2"
+              onClick={() => setShowModal(false)}
+            >
+              Decline
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -16,7 +16,6 @@ import {
   CreditCard,
   DollarSign,
   User,
-  FileText,
   Send,
   Landmark,
   File,
@@ -157,14 +156,6 @@ export function SendApplication() {
     const { name, value } = e.target;
     setOtherRequestData((prev) => ({ ...prev, [name]: value }));
   };
-  const [role, setRole] = useState(null);
-  useEffect(() => {
-    const storedData = localStorage.getItem("result");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setRole(parsedData.role);
-    }
-  }, []);
 
   const handleConfirmWithdrawal = async () => {
     setShowModal(false); // Close the modal
@@ -438,25 +429,6 @@ export function SendApplication() {
                     className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                {role !== "TEACHER" && (
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="studentRollNo"
-                      className="text-gray-900 dark:text-white"
-                    >
-                      <FileText className="w-4 h-4 inline-block mr-2" />
-                      Student Roll Number
-                    </Label>
-                    <Input
-                      id="studentRollNo"
-                      name="studentRollNo"
-                      value={otherRequestData.studentRollNo}
-                      onChange={handleOtherRequestChange}
-                      required
-                      className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                )}
                 <div className="space-y-2">
                   <Label
                     htmlFor="reason"

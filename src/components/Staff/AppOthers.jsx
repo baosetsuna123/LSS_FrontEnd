@@ -2,14 +2,8 @@ import { useState } from "react";
 import { rejectAppOther, approveOtherApp } from "@/data/api";
 import { Search } from "lucide-react";
 import toast from "react-hot-toast";
-
-const parseDescription = (description) => {
-  const studentRollNoMatch = description.match(/Student Roll No: (\w+)/);
-
-  return {
-    studentRollNo: studentRollNoMatch ? studentRollNoMatch[1] : "N/A",
-  };
-};
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 
 const AppOthers = ({
   currentPage,
@@ -22,6 +16,8 @@ const AppOthers = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [actionType, setActionType] = useState(""); // "approve" or "reject"
   const [selectedId, setSelectedId] = useState(null);
+  const [approvalImage, setApprovalImage] = useState(null);
+
   console.log(appother);
   const filteredApplications = appother.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -31,12 +27,27 @@ const AppOthers = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  const [fileName, setFileName] = useState(null); // State to store the file name
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the selected file
+    if (file) {
+      setApprovalImage(file); // Set the file name state
+      setFileName(file.name); // Set the file name state
+    } else {
+      setApprovalImage(null); // If no file is selected, reset the file name state
+    } // Store the selected file
+  };
+  const [loading, setLoading] = useState(false);
   const handleAction = async () => {
     const token = sessionStorage.getItem("token");
     try {
       if (actionType === "approve") {
-        await approveOtherApp(selectedId, token);
+        if (!approvalImage) {
+          toast.error("Please choose an approval image before submitting.");
+          return;
+        }
+        setLoading(true);
+        await approveOtherApp(selectedId, token, approvalImage);
         toast.success("Application approved successfully!");
         setAppOther((prevApplications) =>
           prevApplications.map((app) =>
@@ -45,6 +56,7 @@ const AppOthers = ({
               : app
           )
         );
+        setModalVisible(false);
       } else if (actionType === "reject") {
         await rejectAppOther(selectedId, token);
         toast.success("Application rejected successfully!");
@@ -55,12 +67,13 @@ const AppOthers = ({
               : app
           )
         );
+        setModalVisible(false);
       }
     } catch (error) {
       console.error("Error performing action:", error);
       toast.error("Something went wrong!");
     } finally {
-      setModalVisible(false);
+      setLoading(false);
     }
   };
 
@@ -75,10 +88,15 @@ const AppOthers = ({
     setActionType("");
     setSelectedId(null);
   };
-
+  // Utility function to extract the value for a given key from a string
+  const extractValueFromDescription = (description, key) => {
+    const part = description
+      .split(", ")
+      .find((item) => item.startsWith(`${key}:`));
+    return part ? part.split(": ")[1] : "N/A";
+  };
   return (
     <div>
-      {/* Modal */}
       {modalVisible && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
@@ -89,6 +107,33 @@ const AppOthers = ({
                   <p className="font-semibold text-lg mt-2">
                     Are you sure you want to approve this application?
                   </p>
+                  <div className="mt-4 space-y-2">
+                    <Label
+                      htmlFor="file-upload"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Choose a file
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          document.getElementById("file-upload")?.click()
+                        }
+                      >
+                        Select File
+                      </Button>
+                      <span className="text-sm text-gray-500">
+                        {fileName ? fileName : "No file chosen"}
+                      </span>
+                    </div>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      onChange={handleFileChange}
+                      className="sr-only"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="text-red-500">
@@ -99,23 +144,36 @@ const AppOthers = ({
                 </div>
               )}
             </div>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleAction}
-                className={`px-4 py-2 rounded text-white ${
-                  actionType === "approve"
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                Yes
-              </button>
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-              >
-                No
-              </button>
+            <div className="flex justify-between items-center w-full">
+              {!loading ? (
+                <>
+                  <button
+                    onClick={handleAction}
+                    className={`px-4 py-2 rounded text-white ${
+                      actionType === "approve"
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-red-600 hover:bg-red-700"
+                    }`}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                  >
+                    No
+                  </button>
+                </>
+              ) : (
+                <div className="w-full flex justify-center">
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md w-24"
+                  >
+                    Loading...
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -151,16 +209,10 @@ const AppOthers = ({
                 Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Reason
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Roll Number
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Action
@@ -170,7 +222,6 @@ const AppOthers = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.length > 0 ? (
               currentData.map((app, index) => {
-                const { studentRollNo } = parseDescription(app.description);
                 return (
                   <tr
                     key={app.applicationUserId}
@@ -183,15 +234,25 @@ const AppOthers = ({
                     <td className="px-6 py-4 whitespace-nowrap">
                       {app.name || "N/A"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {app.title || "N/A"}
+                    <td className="px-6 py-4 whitespace-nowrap relative group">
+                      <span
+                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-sm font-medium px-3 py-2 rounded-md shadow-lg"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        {extractValueFromDescription(app.description, "Reason")}
+                      </span>
+                      {extractValueFromDescription(app.description, "Reason")
+                        .length > 10
+                        ? `${extractValueFromDescription(
+                            app.description,
+                            "Reason"
+                          ).slice(0, 10)}...`
+                        : extractValueFromDescription(
+                            app.description,
+                            "Reason"
+                          )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {app.description
-                        .split(", ")
-                        .find((part) => part.startsWith("Reason:"))
-                        .split(": ")[1] || "N/A"}
-                    </td>
+
                     <td
                       className={`px-6 py-4 whitespace-nowrap font-semibold text-sm rounded-lg ${
                         app.status === "rejected"
@@ -204,9 +265,6 @@ const AppOthers = ({
                       }`}
                     >
                       {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {studentRollNo}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {app.status === "pending" ? (

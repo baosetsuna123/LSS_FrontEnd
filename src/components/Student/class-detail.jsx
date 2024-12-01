@@ -185,7 +185,6 @@ export function ClassDetail() {
           toast.error("You have already registered for this schedule.");
         } else {
           toast.error(errorMessage);
-          navigate("/wallet");
         }
       } else if (error.request) {
         toast.error("No response received from the server.");

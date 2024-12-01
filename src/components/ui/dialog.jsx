@@ -142,5 +142,13 @@ const EditClassModal = () => {
     </div>
   );
 };
-
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+};
 export default EditClassModal;

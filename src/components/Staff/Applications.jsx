@@ -92,7 +92,6 @@ const ApplicationLayout = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  console.log(currentData);
 
   return (
     <div>
