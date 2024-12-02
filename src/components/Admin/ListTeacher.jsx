@@ -148,7 +148,8 @@ export default function Teacher() {
                             : "text-red-500"
                         }`}
                       >
-                        {teacher.status}
+                        {teacher.status.charAt(0).toUpperCase() +
+                          teacher.status.slice(1).toLowerCase()}
                       </span>
                     </TableCell>
                     <TableCell>{teacher.role}</TableCell>

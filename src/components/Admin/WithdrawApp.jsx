@@ -24,7 +24,10 @@ const WithdrawApp = () => {
       const token = sessionStorage.getItem("token");
       try {
         const data = await getApplicationsByType(1, token);
-        setAppWithdraw(data || []);
+        const sortedData = data.sort(
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+        );
+        setAppWithdraw(sortedData || []);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");

@@ -18,8 +18,10 @@ const AppOthers = ({
   const [selectedId, setSelectedId] = useState(null);
   const [approvalImage, setApprovalImage] = useState(null);
 
-  console.log(appother);
-  const filteredApplications = appother.filter((app) =>
+  const sortedData = appother.sort(
+    (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+  );
+  const filteredApplications = sortedData.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -242,11 +244,11 @@ const AppOthers = ({
                         {extractValueFromDescription(app.description, "Reason")}
                       </span>
                       {extractValueFromDescription(app.description, "Reason")
-                        .length > 10
+                        .length > 30
                         ? `${extractValueFromDescription(
                             app.description,
                             "Reason"
-                          ).slice(0, 10)}...`
+                          ).slice(0, 30)}...`
                         : extractValueFromDescription(
                             app.description,
                             "Reason"

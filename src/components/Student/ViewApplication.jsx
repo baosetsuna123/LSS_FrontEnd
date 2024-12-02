@@ -55,7 +55,10 @@ export function ApplicationManagement() {
     const fetchApplications = async () => {
       try {
         const data = await viewAllApplications(token);
-        setApplications(data);
+        const sortedData = data.sort(
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+        );
+        setApplications(sortedData);
         console.log(data);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
@@ -128,18 +131,8 @@ export function ApplicationManagement() {
     indexOfFirstOtherApp,
     indexOfLastOtherApp
   );
-
   const paginateWithdraw = (pageNumber) => setWithdrawPage(pageNumber);
   const paginateOther = (pageNumber) => setOtherPage(pageNumber);
-  const [role, setRole] = useState("");
-  useEffect(() => {
-    const storedData = localStorage.getItem("result");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setRole(parsedData.role);
-    }
-  }, []);
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">View Your Applications</h1>
@@ -348,9 +341,6 @@ export function ApplicationManagement() {
                   <TableHead>ID</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Name</TableHead>
-                  {role !== "TEACHER" && (
-                    <TableHead>Roll Number</TableHead>
-                  )}{" "}
                   {/* Conditionally render the Roll Number column */}
                   <TableHead>Reason</TableHead>
                   <TableHead>Status</TableHead>
@@ -358,9 +348,7 @@ export function ApplicationManagement() {
               </TableHeader>
               <TableBody>
                 {currentOtherApplications.map((app, index) => {
-                  const { studentRollNo, reason } = parseDescription(
-                    app.description
-                  );
+                  const { reason } = parseDescription(app.description);
                   return (
                     <TableRow key={app.applicationUserId}>
                       <TableCell>
@@ -368,9 +356,6 @@ export function ApplicationManagement() {
                       </TableCell>
                       <TableCell>{app.applicationType.name}</TableCell>
                       <TableCell>{app.name}</TableCell>
-                      {role !== "TEACHER" && (
-                        <TableCell>{studentRollNo}</TableCell>
-                      )}{" "}
                       {/* Conditionally render Roll Number data */}
                       <TableCell>{reason}</TableCell>
                       <TableCell>

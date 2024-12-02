@@ -17,9 +17,6 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
           <strong>Name:</strong> {data?.name}
         </div>
         <div className="col-span-4">
-          <strong>Code:</strong> {data?.code}
-        </div>
-        <div className="col-span-4">
           <strong>Max Students:</strong> {data?.maxStudents}
         </div>
         <div className="col-span-4">

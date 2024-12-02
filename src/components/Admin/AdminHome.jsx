@@ -22,8 +22,8 @@ const AdminHome = () => {
         <div className="flex flex-col gap-2 overflow-hidden">
           {" "}
           {/* Hides overflow inside this container */}
-          <SessionsChart />
           <TransactionHistory />
+          <SessionsChart />
         </div>
         <div className="mx-auto py-8">
           <Deposit />

@@ -568,6 +568,19 @@ export const completeClassImmediately = async (classId, token) => {
     }
   }
 };
+// force ongoing class
+export const activateClassImmediately = async (classId, token) => {
+  try {
+    const response = await api.put(`/admin/${classId}/start`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message || "An error occurred";
+  }
+};
 //update-user
 export const updateCurrentUser = async (token, userData) => {
   try {

@@ -135,7 +135,6 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
         const data = await fetchFeedbackDetail(token, classId); // Assuming this function takes token and classId
         setDetailedFeedback(data); // Set the detailed feedback
         setIsDetailedFetched(true); // Mark that detailed feedback has been fetched
-        toast.success("Detailed feedback fetched successfully."); // Optionally toast a success message
       } catch (error) {
         console.error("Error fetching detailed feedback:", error);
         toast.error("Failed to fetch detailed feedback.");

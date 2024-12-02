@@ -12,7 +12,6 @@ import {
 import {
   Select,
   MenuItem,
-  InputLabel,
   FormControl,
   Checkbox,
   ListItemText,
@@ -169,32 +168,33 @@ export default function SignUp() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div className="relative">
-              <InputLabel id="category-label"></InputLabel>
               <FormControl fullWidth variant="outlined">
-                <InputLabel id="category-label">
-                  {userType === "teacher"
-                    ? "Choose your majors"
-                    : "Choose your major"}
-                </InputLabel>
                 <Select
                   labelId="category-label"
                   multiple={userType === "teacher"} // Allow multiple selection for teachers only
                   value={categoryIds}
                   onChange={handleCategoryChange}
+                  displayEmpty // Ensures the placeholder is shown when no selection is made
                   renderValue={(selected) => {
                     const selectedNames = allCategories
                       .filter((category) =>
                         selected.includes(category.categoryId)
                       )
                       .map((category) => category.name);
-                    return selectedNames.join(", ");
+                    const placeholderText =
+                      userType === "teacher"
+                        ? "Choose your majors"
+                        : "Choose your major";
+
+                    return selectedNames.length === 0
+                      ? placeholderText // Placeholder when no selection is made
+                      : selectedNames.join(", ");
                   }}
                 >
                   {allCategories.map((category) => (
                     <MenuItem
                       key={category.categoryId}
                       value={category.categoryId}
-                      // No need to disable items for students
                     >
                       <Checkbox
                         checked={categoryIds.includes(category.categoryId)}
@@ -205,6 +205,7 @@ export default function SignUp() {
                 </Select>
               </FormControl>
             </div>
+
             <div>
               <label htmlFor="username" className="sr-only">
                 Username

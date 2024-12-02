@@ -26,7 +26,10 @@ const OtherApp = () => {
       const token = sessionStorage.getItem("token");
       try {
         const data = await getApplicationsByType(2, token);
-        setAppOther(data);
+        const sortedData = data.sort(
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+        );
+        setAppOther(sortedData);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");

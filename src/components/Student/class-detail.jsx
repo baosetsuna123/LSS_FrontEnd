@@ -71,7 +71,10 @@ export function ClassDetail() {
               </p>
               <div className="flex justify-between items-center">
                 <button
-                  onClick={() => navigate("/wallet")}
+                  onClick={() => {
+                    localStorage.setItem("classId", classDetail.classId);
+                    navigate("/wallet");
+                  }}
                   className="text-blue-500 dark:text-blue-400 hover:underline"
                 >
                   Deposit now
@@ -233,10 +236,6 @@ export function ClassDetail() {
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                   {classDetail?.name}
                 </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-300">
-                  Lesson Code:{" "}
-                  <span className="font-semibold">{classDetail?.code}</span>
-                </p>
                 <p className="text-lg text-gray-600 dark:text-gray-300">
                   Course Code:{" "}
                   <span className="font-semibold">

@@ -118,7 +118,7 @@ export function Application() {
           {/* Certificates Section */}
           <div>
             <label className="text-gray-700 font-semibold mb-2 block">
-              Upload Certificates
+              Upload CV or any certificates
             </label>
             {certificates.map((_, index) => (
               <div
@@ -152,7 +152,7 @@ export function Application() {
                   onChange={(e) =>
                     handleCertificateNameChange(index, e.target.value)
                   }
-                  placeholder="Certificate name"
+                  placeholder="Name"
                   className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
                   required
                 />

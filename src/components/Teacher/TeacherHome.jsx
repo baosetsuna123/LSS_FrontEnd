@@ -196,7 +196,7 @@ function TeacherHome() {
         return (
           classStartDate >= startRange &&
           classStartDate <= endRange &&
-          ["ACTIVE", "ONGOING", "PENDING"].includes(item.status)
+          ["ACTIVE", "ONGOING", "PENDING", "COMPLETED"].includes(item.status)
         );
       });
 

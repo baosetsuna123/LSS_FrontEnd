@@ -155,22 +155,22 @@ export function MyOrders() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-gray-900 dark:text-white">
+                <TableHead className="text-gray-900 dark:text-white pl-7">
                   Order ID
                 </TableHead>
-                <TableHead className="pl-12 text-gray-900 dark:text-white">
+                <TableHead className="text-gray-900 dark:text-white pl-10">
                   Start Date
                 </TableHead>
-                <TableHead className="pl-12 text-gray-900 dark:text-white">
+                <TableHead className="text-gray-900 dark:text-white pl-10">
                   Lesson Name
                 </TableHead>
                 <TableHead className="text-right text-gray-900 dark:text-white">
                   Total Price
                 </TableHead>
-                <TableHead className="text-right text-gray-900 dark:text-white">
+                <TableHead className="text-gray-900 dark:text-white pl-20">
                   Teacher Name
                 </TableHead>
-                <TableHead className="pl-5 text-gray-900 dark:text-white">
+                <TableHead className="text-center text-gray-900 dark:text-white">
                   Status
                 </TableHead>
               </TableRow>
@@ -178,19 +178,19 @@ export function MyOrders() {
             <TableBody>
               {currentData.map((order, index) => (
                 <TableRow key={order.orderDetailId}>
-                  <TableCell className="font-medium pl-7 text-gray-900 dark:text-white">
+                  <TableCell className="font-medium text-gray-900 dark:text-white pl-7">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </TableCell>
-                  <TableCell className="pl-10 text-gray-900 dark:text-white">
+                  <TableCell className="text-gray-900 dark:text-white pl-10">
                     {new Date(order.classDTO.startDate).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="pl-10 text-gray-900 dark:text-white">
+                  <TableCell className="text-gray-900 dark:text-white pl-10">
                     {order.classDTO.name}
                   </TableCell>
                   <TableCell className="text-right text-gray-900 dark:text-white">
                     {formatCurrency(order.price)}
                   </TableCell>
-                  <TableCell className="pl-20 text-gray-900 dark:text-white">
+                  <TableCell className="text-gray-900 dark:text-white pl-20">
                     {order.classDTO.teacherName}
                   </TableCell>
                   <TableCell className="text-center">
@@ -206,8 +206,8 @@ export function MyOrders() {
                     {order.orderDTO.status === "PENDING" && (
                       <button
                         onClick={() => {
-                          setSelectedOrder(order); // Set the selected order
-                          setShowModal(true); // Show the modal
+                          setSelectedOrder(order);
+                          setShowModal(true);
                         }}
                         className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 w-24"
                       >

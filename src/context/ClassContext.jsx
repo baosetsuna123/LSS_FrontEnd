@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { fetchClasses } from "../data/api"; // Import the fetchClasses function
 import { isEqual } from "lodash";
 
@@ -20,23 +26,26 @@ export const ClassProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Function to fetch classes
-  const getClasses = async (token, role) => {
-    if (role !== "STUDENT") return;
-    setLoading(true);
-    try {
-      const response = await fetchClasses(token);
-      console.log("Fetched classes:", response); // Log the response to verify it's correct
+  const getClasses = useCallback(
+    async (token, role) => {
+      if (role !== "STUDENT") return;
+      setLoading(true);
+      try {
+        const response = await fetchClasses(token);
+        console.log("Fetched classes:", response); // Log the response to verify it's correct
 
-      if (response && !isEqual(response, classes)) {
-        setClasses(response);
-        sessionStorage.setItem("classes", JSON.stringify(response));
+        if (response && !isEqual(response, classes)) {
+          setClasses(response);
+          sessionStorage.setItem("classes", JSON.stringify(response));
+        }
+      } catch (error) {
+        console.error("Error fetching classes:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching classes:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [classes]
+  );
 
   const clearClasses = () => {
     setClasses([]); // Clear classes

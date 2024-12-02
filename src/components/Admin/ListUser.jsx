@@ -143,7 +143,8 @@ export default function User() {
                             : "text-red-500"
                         }`}
                       >
-                        {user.status}
+                        {user.status.charAt(0).toUpperCase() +
+                          user.status.slice(1).toLowerCase()}
                       </span>
                     </TableCell>
                     <TableCell>{user.role}</TableCell>

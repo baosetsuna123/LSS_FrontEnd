@@ -140,6 +140,16 @@ const TeacherProfile = () => {
   const handleClassClick = (classId) => {
     navigate(`/class/${classId}`);
   };
+  const maxNameLength =
+    info.certificate && info.certificate.length > 0
+      ? Math.max(
+          ...info.certificate.map((certificate) => certificate.name.length)
+        )
+      : 0;
+  console.log(maxNameLength);
+
+  const nameWidth = `${maxNameLength * 0.6 + 2}rem`; // Adjust factor (e.g., 0.6) as needed
+  console.log(nameWidth);
 
   return (
     <>
@@ -196,12 +206,12 @@ const TeacherProfile = () => {
             {info.certificate && info.certificate.length > 0 ? (
               <div className="mt-4 space-y-4">
                 {info.certificate.map((certificate) => (
-                  <div
-                    key={certificate.id}
-                    className="flex justify-between items-center"
-                  >
-                    <div className="flex-1 flex items-center gap-4">
-                      <p className="text-lg text-gray-700 dark:text-gray-300 font-semibold">
+                  <div key={certificate.id} className="flex items-center gap-4">
+                    <div className="flex items-center gap-4">
+                      <p
+                        className="text-lg text-gray-700 dark:text-gray-300 font-semibold"
+                        style={{ minWidth: nameWidth }}
+                      >
                         {certificate.name}
                       </p>
                       <a
@@ -210,7 +220,7 @@ const TeacherProfile = () => {
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
                       >
-                        View
+                        Click to view
                       </a>
                     </div>
                   </div>
@@ -265,9 +275,6 @@ const TeacherProfile = () => {
                       <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 dark:text-gray-100 dark:hover:text-blue-500">
                         {classItem.name}
                       </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Class Code: {classItem.code}
-                      </p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Course Code: {classItem.courseCode}
                       </p>

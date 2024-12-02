@@ -189,8 +189,7 @@ const MyClass = () => {
             >
               Feedback
             </button>
-          ) : lesson.room &&
-            (lessonStatus === "ONGOING" || lessonStatus === "ACTIVE") ? (
+          ) : lesson.room && lessonStatus === "ONGOING" ? (
             // Case 2: Show Meet URL button for status ONGOING or ACTIVE
             <button
               onClick={() => window.open(lesson.room, "_blank")}

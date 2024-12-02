@@ -102,8 +102,9 @@ export default function TransactionHistory() {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {row.transactionAmount.toLocaleString()} VND
+                      {Math.abs(row.transactionAmount).toLocaleString()} VND
                     </TableCell>
+
                     <TableCell>
                       {new Date(row.transactionDate).toLocaleString()}
                     </TableCell>

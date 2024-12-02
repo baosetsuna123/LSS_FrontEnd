@@ -115,8 +115,14 @@ export function MyWallet() {
             toast.success(
               `Payment successful! Amount: ${formatCurrency(creditedAmount)}`
             );
+            const classId = localStorage.getItem("classId");
 
-            navigate("/wallet"); // Redirect back to wallet
+            if (classId) {
+              navigate(`/class/${classId}`);
+              localStorage.removeItem("classId");
+            } else {
+              navigate("/wallet");
+            }
           } else {
             toast.error("Payment failed or canceled!");
           }
@@ -128,7 +134,7 @@ export function MyWallet() {
 
       fetchPaymentReturn();
     }
-  }, [location.search, token, navigate]); // Removed balance from dependencies
+  }, [location.search, token, navigate]);
 
   const formatTransactionDate = (dateString) => {
     const date = new Date(dateString);

@@ -81,9 +81,11 @@ const ApplicationLayout = ({
       setSelectedApplication(null);
     }
   };
-
+  const sortedData = applications.sort(
+    (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+  );
   // Calculate the current data to display based on pagination and search query
-  const filteredApplications = applications.filter((app) =>
+  const filteredApplications = sortedData.filter((app) =>
     app.teacherName.toLowerCase().includes(searchQuery.toLowerCase())
   );
   console.log(filteredApplications);
@@ -123,7 +125,7 @@ const ApplicationLayout = ({
                 Description
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ">
-                Certificate
+                Portfolio
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                 Status
@@ -173,7 +175,7 @@ const ApplicationLayout = ({
                           }
                           className="text-blue-600 hover:underline"
                         >
-                          View Certificate
+                          View Portfolio
                         </button>
 
                         {/* Modal to display certificate details */}
@@ -181,7 +183,7 @@ const ApplicationLayout = ({
                           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
                             <div className="bg-white p-6 rounded-lg w-3/4 relative overflow-x-auto">
                               <h3 className="text-xl font-semibold mb-4">
-                                Certificate Details
+                                Portfolio Details
                               </h3>
                               <button
                                 onClick={handleCloseModalApp}

@@ -141,7 +141,6 @@ const DetailClasses = ({ token }) => {
                       <TableCell className="whitespace-nowrap">
                         Lesson Name
                       </TableCell>
-                      <TableCell>Code</TableCell>
                       <TableCell>Teacher</TableCell>
                       <TableCell>Period</TableCell>
                       <TableCell className="whitespace-nowrap">
@@ -166,7 +165,6 @@ const DetailClasses = ({ token }) => {
                         <TableRow key={index}>
                           <TableCell>{classItem.classId}</TableCell>
                           <TableCell>{classItem.name}</TableCell>
-                          <TableCell>{classItem.code}</TableCell>
                           <TableCell>{classItem.teacherName}</TableCell>
                           <TableCell>{classItem.slotInfo?.period}</TableCell>
                           <TableCell>

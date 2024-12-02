@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { fetchClasses, completeClassImmediately } from "@/data/api";
+import {
+  fetchClasses,
+  completeClassImmediately,
+  activateClassImmediately,
+} from "@/data/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,9 +51,9 @@ const Classes = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [classToComplete, setClassToComplete] = useState(null);
+  const [classToEdit, setClassToEdit] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
   const token = sessionStorage.getItem("token");
-  console.log(token);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -77,33 +81,37 @@ const Classes = () => {
     );
     setFilteredClasses(filtered);
     setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   }, [classes, statusFilter, searchTerm]);
 
-  const handleEdit = (classId) => {
+  const handleEdit = (classId, status) => {
     const selectedClass = classes.find((cls) => cls.classId === classId);
-    if (selectedClass.status !== "COMPLETED") {
-      setClassToComplete(selectedClass);
-      setIsModalOpen(true);
-    }
+    setClassToEdit(selectedClass);
+    setNewStatus(status);
+    setIsModalOpen(true);
   };
 
-  const handleCompleteClass = async () => {
-    if (!classToComplete) return;
+  const handleStatusUpdate = async () => {
+    if (!classToEdit) return;
     try {
-      await completeClassImmediately(classToComplete.classId, token);
-      setIsModalOpen(false);
+      if (newStatus === "ONGOING") {
+        await activateClassImmediately(classToEdit.classId, token);
+      } else if (newStatus === "COMPLETED") {
+        await completeClassImmediately(classToEdit.classId, token);
+      }
+
       const updatedClasses = classes.map((cls) =>
-        cls.classId === classToComplete.classId
-          ? { ...cls, status: "COMPLETED" }
+        cls.classId === classToEdit.classId
+          ? { ...cls, status: newStatus }
           : cls
       );
       setClasses(updatedClasses);
       setFilteredClasses(updatedClasses);
-      toast.success("Class completed successfully.");
+      setIsModalOpen(false);
+      toast.success(`Class status changed to ${newStatus}.`);
     } catch (error) {
-      console.error("Error completing class:", error);
-      toast.error("Failed to complete class. Please try again.");
+      console.error(`Error changing class status to ${newStatus}:`, error);
+      toast.error("Failed to update class status. Please try again.");
     }
   };
 
@@ -164,17 +172,17 @@ const Classes = () => {
               <TableCell>{formatDate(cls.startDate)}</TableCell>
               <TableCell>
                 <span
-                  className={`px-2 py-1 rounded-full ${
-                    cls.status === "COMPLETED"
-                      ? "bg-green-300 text-green-700 font-bold"
-                      : cls.status === "PENDING"
-                      ? "bg-yellow-300 text-yellow-700 font-bold"
-                      : cls.status === "CANCELED"
-                      ? "bg-red-300 text-red-700 font-bold"
-                      : cls.status === "ONGOING"
-                      ? "bg-blue-300 text-blue-700 font-bold"
+                  className={`px-2 py-1 rounded-full font-semibold text-sm ${
+                    cls.status === "PENDING"
+                      ? "bg-yellow-300 text-yellow-700"
                       : cls.status === "ACTIVE"
-                      ? "bg-orange-300 text-orange-700 font-bold"
+                      ? "bg-blue-300 text-blue-700"
+                      : cls.status === "ONGOING"
+                      ? "bg-purple-300 text-purple-700"
+                      : cls.status === "COMPLETED"
+                      ? "bg-green-300 text-green-700"
+                      : cls.status === "CANCELED"
+                      ? "bg-red-300 text-red-700"
                       : "bg-gray-300 text-gray-700"
                   }`}
                 >
@@ -182,10 +190,18 @@ const Classes = () => {
                     cls.status.slice(1).toLowerCase()}
                 </span>
               </TableCell>
+
               <TableCell>{cls.teacherName}</TableCell>
               <TableCell className="text-right">
-                {cls.status !== "COMPLETED" && cls.status !== "CANCELED" && (
-                  <Button onClick={() => handleEdit(cls.classId)}>Edit</Button>
+                {(cls.status === "PENDING" || cls.status === "ACTIVE") && (
+                  <Button onClick={() => handleEdit(cls.classId, "ONGOING")}>
+                    Edit
+                  </Button>
+                )}
+                {cls.status === "ONGOING" && (
+                  <Button onClick={() => handleEdit(cls.classId, "COMPLETED")}>
+                    Edit
+                  </Button>
                 )}
               </TableCell>
             </TableRow>
@@ -220,7 +236,7 @@ const Classes = () => {
         </div>
       </div>
 
-      {/* Modal for completing the class */}
+      {/* Modal for updating the class status */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -230,7 +246,7 @@ const Classes = () => {
                 <h3 className="text-lg font-semibold">Change Lesson Status</h3>
                 <p className="text-sm text-gray-600">
                   Are you sure you want to change the status of this lesson to{" "}
-                  <span className="font-bold text-green-500">COMPLETED</span>?
+                  <span className="font-bold text-green-500">{newStatus}</span>?
                 </p>
               </div>
             </div>
@@ -239,10 +255,10 @@ const Classes = () => {
                 Cancel
               </Button>
               <Button
-                onClick={handleCompleteClass}
+                onClick={handleStatusUpdate}
                 className="bg-green-500 text-white"
               >
-                Yes, Complete
+                Yes, Change
               </Button>
             </div>
           </div>

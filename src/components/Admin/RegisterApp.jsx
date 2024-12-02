@@ -11,20 +11,22 @@ const RegisterApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const loadApplications = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const data = await fetchAppAdmin(token);
+      console.log(data.content);
+      const sortedData = data.content.sort(
+        (a, b) => new Date(b.applicationId) - new Date(a.applicationId)
+      );
+      setApplications(sortedData || []);
+    } catch (error) {
+      console.error("Failed to fetch applications:", error);
+      toast.error("Failed to fetch applications.");
+      setApplications([]);
+    }
+  };
   useEffect(() => {
-    const loadApplications = async () => {
-      const token = sessionStorage.getItem("token");
-      try {
-        const data = await fetchAppAdmin(token);
-        setApplications(data.content || []);
-        console.log(data.content);
-      } catch (error) {
-        console.error("Failed to fetch applications:", error);
-        toast.error("Failed to fetch applications.");
-        setApplications([]);
-      }
-    };
-
     loadApplications();
   }, []);
 
@@ -41,14 +43,19 @@ const RegisterApp = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const [isModalApp, setIsModalApp] = useState(false);
+  const [selectedCertificates, setSelectedCertificates] = useState([]);
+  const handleViewCertificateClick = (certificates) => {
+    setSelectedCertificates(certificates); // Set the full array of certificates
+    setIsModalApp(true); // Open the modal
+  };
+  const handleCloseModalApp = () => {
+    setIsModalApp(false);
+  };
   const handleClick = async () => {
     try {
-      await AssignApplication(); // Assuming this updates on the backend
-      setApplications((prevApplications) =>
-        prevApplications.map((app) =>
-          app.status === "PENDING" ? { ...app, status: "ASSIGNED" } : app
-        )
-      );
+      await AssignApplication();
+      await loadApplications();
       toast.success("Pending applications assigned successfully!");
     } catch (error) {
       console.error("Error assigning applications", error);
@@ -93,26 +100,29 @@ const RegisterApp = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Teacher Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Certificate
+                Portfolio
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 whitespace-nowrap  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Staff Assigned
+              </th>
+              <th className="px-6 py-3 whitespace-nowrap  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Rejection Reason
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedApplications.length > 0 ? (
-              paginatedApplications.map((app) => (
+              paginatedApplications.map((app, index) => (
                 <tr key={app.applicationId} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {app.applicationId}
+                    {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {app.description}
@@ -136,20 +146,76 @@ const RegisterApp = () => {
                         app.status.slice(1).toLowerCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {app.certificate ? (
-                      <a
-                        href={app.certificate}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View
-                      </a>
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                    {app.certificate && app.certificate.length > 0 ? (
+                      <div>
+                        <button
+                          onClick={() =>
+                            handleViewCertificateClick(app.certificate)
+                          } // Pass the full certificate array to the modal
+                          className="text-blue-600 hover:underline"
+                        >
+                          View Portfolio
+                        </button>
+
+                        {/* Modal to display certificate details */}
+                        {isModalApp && selectedCertificates && (
+                          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+                            <div className="bg-white p-6 rounded-lg w-3/4 relative overflow-x-auto">
+                              <h3 className="text-xl font-semibold mb-4">
+                                Portfolio Details
+                              </h3>
+                              <button
+                                onClick={handleCloseModalApp}
+                                className="absolute top-2 right-2 px-5 py-5 text-lg font-bold"
+                              >
+                                X
+                              </button>
+
+                              {/* Table to display all certificates */}
+                              <table className="min-w-full table-auto">
+                                <thead>
+                                  <tr className="bg-gray-100">
+                                    <th className="px-4 py-2 text-left">ID</th>
+                                    <th className="px-4 py-2 text-left">
+                                      Name
+                                    </th>
+                                    <th className="px-4 py-2 text-left">
+                                      File
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {selectedCertificates.map((cert, index) => (
+                                    <tr key={cert.id} className="border-t">
+                                      <td className="px-4 py-2">{index + 1}</td>
+                                      <td className="px-4 py-2">{cert.name}</td>
+                                      <td className="px-4 py-2">
+                                        <a
+                                          href={cert.fileUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-blue-500"
+                                        >
+                                          View File
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       "N/A"
                     )}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {app.assignedStaff || "N/A"}
+                  </td>
+
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {app.rejectionReason || "N/A"}
                   </td>

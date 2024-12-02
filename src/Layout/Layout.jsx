@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
 import { ModeToggle } from "@/components/ui/Mode-Toggle";
+import defaults from "../assets/default.jfif";
 
 import {
   deleteNoti,
@@ -86,11 +87,19 @@ export function Layout({ children }) {
 
   useEffect(() => {
     if (searchTerm.trim() !== "") {
-      const filtered = classes.filter(
-        (c) =>
-          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.teacherName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const filtered = classes.filter((c) => {
+        const matchesSearchTerm = searchTerm.toLowerCase();
+        const matchesName = c.name.toLowerCase().includes(matchesSearchTerm);
+        const matchesTeacherName = c.teacherName
+          .toLowerCase()
+          .includes(matchesSearchTerm);
+
+        return (
+          (c.status === "PENDING" || c.status === "ACTIVE") &&
+          (matchesName || matchesTeacherName)
+        );
+      });
+
       setFilteredClasses(filtered);
       setIsSearchPopupVisible(filtered.length > 0); // Show popup if there are results
     } else {
@@ -98,6 +107,7 @@ export function Layout({ children }) {
       setIsSearchPopupVisible(false); // Hide the popup when search term is empty
     }
   }, [searchTerm, classes]);
+
   // Handle class navigation when a row is clicked
   const handleClassClick = (classId) => {
     setIsSearchPopupVisible(false);
@@ -286,7 +296,7 @@ export function Layout({ children }) {
                       className="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
                     >
                       <img
-                        src={course.imageUrl}
+                        src={course.imageUrl || defaults}
                         alt={course.name}
                         className="w-10 h-10 object-cover rounded mr-4"
                       />

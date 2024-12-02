@@ -8,7 +8,6 @@ import { Search, X } from "lucide-react";
 import { useClassContext } from "@/context/ClassContext";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../Home/Breadcrumb";
-import toast from "react-hot-toast";
 import defaults from "../../assets/default.jfif";
 
 export function ViewAllClasses() {
@@ -21,6 +20,19 @@ export function ViewAllClasses() {
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
+  useEffect(() => {
+    const fetchClassesOnMount = async () => {
+      const token = sessionStorage.getItem("token");
+      const result = JSON.parse(localStorage.getItem("result") || "{}");
+      const role = result.role;
+
+      if (token && role === "STUDENT") {
+        await getClasses(token, role);
+      }
+    };
+
+    fetchClassesOnMount();
+  }, [getClasses]);
   useEffect(() => {
     const filtered = contextClasses.filter(
       (c) =>
@@ -54,21 +66,7 @@ export function ViewAllClasses() {
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
   };
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  const handleRefresh = async () => {
-    const token = sessionStorage.getItem("token");
-    const result = JSON.parse(localStorage.getItem("result") || "{}");
-    const role = result.role;
-    setIsButtonDisabled(true);
-    if (token && role === "STUDENT") {
-      getClasses(token, role);
-      toast.success("Classes refreshed successfully!");
-    }
-    setTimeout(() => {
-      setIsButtonDisabled(false);
-    }, 10000);
-  };
   const handleCourseCodeChange = (courseCode) => {
     setSelectedCourseCodes((prev) =>
       prev.includes(courseCode)
@@ -185,14 +183,6 @@ export function ViewAllClasses() {
               className="w-full"
             >
               <X className="mr-2 h-4 w-4" /> Clear All Filters
-            </Button>
-            <Button
-              onClick={handleRefresh} // Trigger the refresh
-              variant="outline"
-              className="w-full mt-4 bg-cyan-600 text-white hover:bg-cyan-700 transition duration-200"
-              disabled={isButtonDisabled} // Disable the button while refreshing
-            >
-              {isButtonDisabled ? "Refreshed" : "Refresh Lessons"}
             </Button>
           </div>
 

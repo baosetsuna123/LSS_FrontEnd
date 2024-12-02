@@ -68,8 +68,11 @@ const AppWithDraw = ({
       currency: "VND",
     }).format(amount);
   };
+  const sortedData = appwithdraw.sort(
+    (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+  );
 
-  const filteredApplications = appwithdraw.filter((app) =>
+  const filteredApplications = sortedData.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
