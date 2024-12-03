@@ -273,9 +273,12 @@ export function ClassDetail() {
               <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
                 Description
               </h3>
-              <p className="text-gray-600 leading-relaxed dark:text-gray-300">
-                {classDetail?.description}
-              </p>
+              <p
+                className="text-gray-600 leading-relaxed dark:text-gray-300"
+                dangerouslySetInnerHTML={{
+                  __html: classDetail?.description?.replace(/\n/g, "<br />"),
+                }}
+              />
             </div>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
