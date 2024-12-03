@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import { fetchCreateCategory, fetchUpdateCategory } from "@/data/api";
 import { toast } from "react-hot-toast";
-import { Search } from "lucide-react";
+import { Search, Plus, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const CategoryLayout = ({
   currentPage,
@@ -9,15 +20,15 @@ const CategoryLayout = ({
   initialCategories = [],
   searchQuery,
   onUpdatePagination,
-  setSearchQuery, // Receive the search query state
+  setSearchQuery,
 }) => {
   const [newCategory, setNewCategory] = useState({ name: "" });
   const [categories, setCategories] = useState(initialCategories);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editCategoryId, setEditCategoryId] = useState(null);
   const token = sessionStorage.getItem("token");
-  // Effect to update categories when initialCategories changes
+
   useEffect(() => {
     setCategories(initialCategories);
   }, [initialCategories]);
@@ -31,36 +42,36 @@ const CategoryLayout = ({
       const createdCategory = await fetchCreateCategory(newCategory, token);
       setCategories((prevCategories) => {
         const updatedCategories = [...prevCategories, createdCategory];
-
-        // Check for pagination after creating the category
         onUpdatePagination(updatedCategories.length);
-
         return updatedCategories;
       });
       toast.success("Category created successfully!");
       setNewCategory({ name: "" });
-      setShowCreateForm(false);
+      setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Failed to create category:", error);
       toast.error("Failed to create category.");
     }
   };
 
-  const handleEditCategory = async (id) => {
+  const handleEditCategory = async () => {
     if (!newCategory.name) {
       toast.error("Category name cannot be empty.");
       return;
     }
     try {
-      const updatedCategory = await fetchUpdateCategory(id, newCategory, token);
+      const updatedCategory = await fetchUpdateCategory(
+        editCategoryId,
+        newCategory,
+        token
+      );
       setCategories((prevCategories) =>
         prevCategories.map((cat) =>
-          cat.categoryId === id ? updatedCategory : cat
+          cat.categoryId === editCategoryId ? updatedCategory : cat
         )
       );
-
       toast.success("Category updated successfully!");
-      setIsEditing(false);
+      setIsEditDialogOpen(false);
       setNewCategory({ name: "" });
       setEditCategoryId(null);
     } catch (error) {
@@ -69,12 +80,10 @@ const CategoryLayout = ({
     }
   };
 
-  // Calculate the filtered categories based on search query
   const filteredCategories = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate the current data to display based on pagination and search query
   const currentData = filteredCategories.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -83,56 +92,41 @@ const CategoryLayout = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md"
-        >
-          Create New Category
-        </button>
-        {/* Search Box with Icon */}
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="mr-2 h-4 w-4" /> Create New Category
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create New Category</DialogTitle>
+              <DialogDescription>
+                Enter the name for the new category.
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              placeholder="Category Name"
+              value={newCategory.name}
+              onChange={(e) => setNewCategory({ name: e.target.value })}
+            />
+            <DialogFooter>
+              <Button onClick={handleCreateCategory}>Create</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <div
           className="flex items-center border rounded p-2 ml-4"
           style={{ width: "300px" }}
         >
           <Search size={16} className="mr-2" />
-          <input
-            type="text"
+          <Input
             placeholder="Search Categories By Name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} // Update the search query
-            className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
-
-      {/* Show Create Category Form */}
-      {showCreateForm && (
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold">Create New Category</h3>
-          <input
-            type="text"
-            placeholder="Category Name"
-            value={newCategory.name}
-            onChange={(e) => {
-              const value = e.target.value;
-              setNewCategory({ name: value });
-            }}
-            className="border rounded p-2 mr-2"
-          />
-          <button
-            onClick={handleCreateCategory}
-            className="px-4 py-2 bg-green-600 text-white rounded-md"
-          >
-            Submit
-          </button>
-          <button
-            onClick={() => setShowCreateForm(false)}
-            className="px-4 py-2 bg-gray-300 rounded-md ml-2"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -158,19 +152,44 @@ const CategoryLayout = ({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>{" "}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{cat.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => {
-                        setIsEditing(true);
-                        setEditCategoryId(cat.categoryId);
-                        setNewCategory({ name: cat.name });
-                      }}
-                      className="text-blue-600 hover:text-blue-800"
+                    <Dialog
+                      open={isEditDialogOpen}
+                      onOpenChange={setIsEditDialogOpen}
                     >
-                      Edit
-                    </button>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditCategoryId(cat.categoryId);
+                            setNewCategory({ name: cat.name });
+                          }}
+                        >
+                          <Edit className="mr-2 h-4 w-4" /> Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Edit Category</DialogTitle>
+                          <DialogDescription>
+                            Update the name of the category.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Input
+                          placeholder="Category Name"
+                          value={newCategory.name}
+                          onChange={(e) =>
+                            setNewCategory({ name: e.target.value })
+                          }
+                        />
+                        <DialogFooter>
+                          <Button onClick={handleEditCategory}>Update</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </td>
                 </tr>
               ))
@@ -187,34 +206,6 @@ const CategoryLayout = ({
           </tbody>
         </table>
       </div>
-
-      {isEditing && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Edit Category</h3>
-          <input
-            type="text"
-            placeholder="Name"
-            value={newCategory.name}
-            onChange={(e) => {
-              const value = e.target.value;
-              setNewCategory({ ...newCategory, name: value });
-            }}
-            className="border rounded p-2 mr-2"
-          />
-          <button
-            onClick={() => handleEditCategory(editCategoryId)}
-            className="px-4 py-2 bg-green-600 text-white rounded-md"
-          >
-            Update Category
-          </button>
-          <button
-            onClick={() => setIsEditing(false)}
-            className="px-4 py-2 bg-gray-300 rounded-md ml-2"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
     </div>
   );
 };

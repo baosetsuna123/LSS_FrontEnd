@@ -25,7 +25,9 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
-
+  .DialogOverlay {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -68,7 +70,6 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
 }
-
 
 .css-1jhfw0t-MuiResponsiveChart-container {
   width: 1100px !important;

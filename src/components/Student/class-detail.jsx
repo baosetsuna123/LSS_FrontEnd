@@ -140,11 +140,12 @@ export function ClassDetail() {
     };
     return slots[slotId] || "Unknown Slot";
   };
-  useEffect(() => {
-    const fetchClassDetail = async () => {
+  const fetchClassDetail = async (id, token) => {
+    try {
       const response = await fetchClassbyID(id, token); // Replace with your API
       console.log(response);
       setClassDetail(response);
+
       const storedResult = localStorage.getItem("result");
       const currentUserName = storedResult
         ? JSON.parse(storedResult).username
@@ -153,9 +154,15 @@ export function ClassDetail() {
         (student) => student.userName === currentUserName
       );
       setIsEnrolled(isUserEnrolled); // Set enrollment status
-    };
+    } catch (error) {
+      console.error("Error fetching class detail:", error);
+    }
+  };
 
-    fetchClassDetail();
+  useEffect(() => {
+    if (id && token) {
+      fetchClassDetail(id, token);
+    }
   }, [id, token]);
 
   const formatCurrency = (amount) => {
@@ -177,6 +184,7 @@ export function ClassDetail() {
       setIsProcessing(true);
       await fetchCreateOrder(id, token);
       toast.success("Order Lesson Successfully!");
+      fetchClassDetail(id, token);
       setIsEnrolled(true);
     } catch (error) {
       if (error.response) {

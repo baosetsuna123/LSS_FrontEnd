@@ -6,10 +6,16 @@ import {
   ChevronRight,
   LayoutDashboard,
   Users,
-  FileText,
   Settings,
   LogOut,
   School,
+  User,
+  UserPlus,
+  BookUser,
+  FileX,
+  FileQuestionIcon,
+  File,
+  FileTextIcon,
 } from "lucide-react";
 import Modal from "@/components/Helper/Modal"; // Adjust the import path
 import { useAuth } from "@/context/AuthContext";
@@ -49,7 +55,7 @@ export function AdminLayout({ children }) {
       onClick: () => setIsUsersMenuExpanded(!isUsersMenuExpanded), // Toggle child menu
     },
     {
-      icon: FileText,
+      icon: File,
       label: "Applications",
       path: "#",
       onClick: () => setIsAppMenuExpanded(!isAppMenuExpanded), // Toggle child menu
@@ -63,22 +69,41 @@ export function AdminLayout({ children }) {
   ];
 
   const usersSubMenuItems = [
-    { label: "List User", path: "/admin/User/ListUser" },
-    { label: "List Teacher", path: "/admin/User/ListTeacher" },
-    { label: "Create Staff", path: "/admin/User/create-staff" },
+    { icon: User, label: "List User", path: "/admin/User/ListUser" },
+    { icon: BookUser, label: "List Teacher", path: "/admin/User/ListTeacher" },
+    {
+      icon: UserPlus,
+      label: "Create Staff",
+      path: "/admin/User/create-staff",
+    },
   ];
   const appsSubMenuItems = [
-    { label: "Register", path: "/admin/Application/Register" },
-    { label: "Withdraw", path: "/admin/Application/Withdraw" },
-    { label: "Other", path: "/admin/Application/Other" },
+    {
+      icon: FileTextIcon,
+      label: "Register",
+      path: "/admin/Application/Register",
+    },
+    {
+      icon: FileX,
+      label: "Withdraw",
+      path: "/admin/Application/Withdraw",
+    },
+    {
+      icon: FileQuestionIcon,
+      label: "Other",
+      path: "/admin/Application/Other",
+    },
   ];
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <div
-        className={`bg-gray-800 text-white transition-all duration-300 ${
-          isExpanded ? "w-64" : "w-32" // Adjust w-32 if 20 is too narrow
-        } h-screen`}
+        className="bg-gray-800 text-white transition-all duration-300 h-screen"
+        style={{
+          width: isExpanded ? "16rem" : "8rem",
+          minWidth: isExpanded ? "16rem" : "8rem",
+          maxWidth: isExpanded ? "16rem" : "8rem",
+        }}
       >
         <div className="flex items-center justify-between p-4">
           {isExpanded && <h1 className="text-xl font-bold">Admin Panel</h1>}
@@ -104,7 +129,9 @@ export function AdminLayout({ children }) {
                   }`}
                   onClick={item.onClick} // If it's the "Users" item, toggle the submenu
                 >
-                  <item.icon className="h-6 w-6" />
+                  {item.icon && (
+                    <item.icon className="h-5 w-5 mr-3 text-gray-300" />
+                  )}
                   {isExpanded && <span className="ml-3">{item.label}</span>}
                 </Link>
 
@@ -119,6 +146,9 @@ export function AdminLayout({ children }) {
                         isExpanded ? "justify-start" : "justify-center"
                       }`}
                     >
+                      {subItem.icon && (
+                        <subItem.icon className="h-5 w-5 mr-3 text-gray-300" />
+                      )}
                       {isExpanded && (
                         <span className="ml-3">{subItem.label}</span>
                       )}
@@ -134,6 +164,9 @@ export function AdminLayout({ children }) {
                         isExpanded ? "justify-start" : "justify-center"
                       }`}
                     >
+                      {subItem.icon && (
+                        <subItem.icon className="h-5 w-5 mr-3 text-gray-300" />
+                      )}
                       {isExpanded && (
                         <span className="ml-3">{subItem.label}</span>
                       )}
@@ -157,7 +190,7 @@ export function AdminLayout({ children }) {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className={`text-gray-600 hover:text-gray-800 mr-3 hover:bg-gray-100 ${
+              className={`text-gray-600 hover:text-gray-800 mr-5 hover:bg-gray-100 ${
                 isLogoutHovered ? "text-red-500" : ""
               }`}
               onMouseEnter={() => setIsLogoutHovered(true)}
@@ -165,9 +198,7 @@ export function AdminLayout({ children }) {
               onClick={handleLogoutClick}
             >
               <LogOut
-                className={`h-5 w-5 mr-2 ${
-                  isLogoutHovered ? "text-red-500" : ""
-                }`}
+                className={`h-5 w-5  ${isLogoutHovered ? "text-red-500" : ""}`}
               />
               Logout
             </Button>

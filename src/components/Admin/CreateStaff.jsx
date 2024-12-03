@@ -122,7 +122,7 @@ const CreateStaff = () => {
   };
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card className="max-w-md mx-auto bg-gradient-to-br from-blue-100 via-white to-purple-100">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Register Staff</CardTitle>
       </CardHeader>

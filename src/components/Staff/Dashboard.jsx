@@ -10,6 +10,9 @@ import {
   LogOut,
   School,
   Newspaper,
+  FileX,
+  FileQuestion,
+  FileText,
 } from "lucide-react";
 import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
@@ -356,37 +359,39 @@ export function Dashboard() {
               <div className="pl-4">
                 <button
                   onClick={() => {
-                    handleTabClick("withdraw"); // Reset to page 1 when changing category
+                    handleTabClick("withdraw");
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                     activeCategory === "withdraw" ? "bg-gray-200" : ""
                   }`}
                 >
+                  <FileX className="mr-2 h-4 w-4" />
                   Withdraw
                 </button>
                 <button
                   onClick={() => {
-                    handleTabClick("others"); // Reset to page 1 when changing category
+                    handleTabClick("others");
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
                     activeCategory === "others" ? "bg-gray-200" : ""
                   }`}
                 >
+                  <FileQuestion className="mr-2 h-4 w-4" />
                   Others
                 </button>
                 <button
                   onClick={() => {
-                    handleTabClick("applications"); // Reset to page 1 when changing category
+                    handleTabClick("applications");
                   }}
                   className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                    activeCategory === "application" ? "bg-gray-200" : ""
+                    activeCategory === "applications" ? "bg-gray-200" : ""
                   }`}
                 >
+                  <FileText className="mr-2 h-4 w-4" />
                   Register
                 </button>
               </div>
             )}
-
             <button
               onClick={() => {
                 handleTabClick("courses"); // Reset to page 1 when changing category

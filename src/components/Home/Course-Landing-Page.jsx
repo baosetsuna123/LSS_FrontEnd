@@ -22,8 +22,13 @@ export function CourseLandingPage() {
         const token = sessionStorage.getItem("token");
         if (token) {
           const classes = await fetchMajorClassByStudent(token);
-          setMajorClasses(classes);
-          console.log(classes);
+
+          const sortedClasses = classes.sort(
+            (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
+          );
+
+          setMajorClasses(sortedClasses);
+          console.log(sortedClasses);
         }
       } catch (error) {
         console.error("Error fetching major classes:", error);
@@ -32,6 +37,7 @@ export function CourseLandingPage() {
 
     fetchMajorClasses();
   }, []);
+
   const [comments, setComments] = useState([]);
   useEffect(() => {
     const fetchComments = async () => {
@@ -66,6 +72,17 @@ export function CourseLandingPage() {
   };
   const navigate = useNavigate();
   const { classes, loading } = useClassContext();
+  const [sortedClasses, setSortedClasses] = useState([]);
+
+  useEffect(() => {
+    if (classes && classes.length > 0) {
+      // Sort the classes by the number of students in descending order
+      const sorted = [...classes].sort(
+        (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
+      );
+      setSortedClasses(sorted);
+    }
+  }, [classes]);
   const { isLoggedIn } = useAuth();
   const storedResult = localStorage.getItem("result");
   const currentUserName = storedResult
@@ -324,8 +341,8 @@ export function CourseLandingPage() {
           )}
 
         {isLoggedIn &&
-          classes.length > 0 &&
-          classes.some(
+          sortedClasses.length > 0 &&
+          sortedClasses.some(
             (classItem) =>
               classItem.status === "PENDING" || classItem.status === "ACTIVE"
           ) && (
@@ -353,7 +370,7 @@ export function CourseLandingPage() {
                         : ""
                     }
                   >
-                    {classes
+                    {sortedClasses
                       .filter(
                         (course) =>
                           course.status === "PENDING" ||
