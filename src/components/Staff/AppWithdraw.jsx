@@ -26,7 +26,7 @@ const AppWithDraw = ({
 
   const handleApprove = async () => {
     if (!approvalImage) {
-      toast.error("Please choose an approval image before submitting.");
+      toast.error("Please choose a receipt image before submitting.");
       return;
     }
     setLoading(true);
@@ -232,7 +232,7 @@ const AppWithDraw = ({
               {/* Icon for confirmation */}
             </div>
             <h2 className="text-xl font-semibold text-center text-gray-800 mb-4">
-              Are you sure you want to approve this withdrawal?
+              Are you sure you want to approve this withdrawal application?
             </h2>
             <p className="text-center text-lg">
               <strong>{selectedApp.name}</strong>
@@ -245,7 +245,7 @@ const AppWithDraw = ({
                 htmlFor="file-upload"
                 className="block text-sm font-medium text-gray-700"
               >
-                Choose a file
+                Upload Receipt
               </Label>
               <div className="flex items-center gap-2">
                 <Button

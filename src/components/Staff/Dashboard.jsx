@@ -307,7 +307,7 @@ export function Dashboard() {
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
         <div
-          className="bg-gray-100 text-gray-800 transition-all duration-300 ease-in-out flex flex-col"
+          className="bg-gray-800 text-white transition-all duration-300 ease-in-out flex flex-col border-r-2 border-gray-300" // Set background to black and text to white
           style={{
             width: `${sidebarWidth}px`, // Fixed template literal
             minWidth: isSidebarCollapsed ? "60px" : "60px",
@@ -316,7 +316,6 @@ export function Dashboard() {
           <div className="p-4 flex justify-between items-center">
             <h2
               className={`text-xl font-bold ${
-                // Fixed template literal
                 isSidebarCollapsed ? "hidden" : ""
               }`}
             >
@@ -338,8 +337,8 @@ export function Dashboard() {
               onClick={() => {
                 handleTabClick("categories"); // Reset to page 1 when changing category
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "category" ? "bg-gray-200" : ""
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "category" ? "bg-gray-700" : ""
               }`}
             >
               <LayoutGrid size={20} className="mr-2" />
@@ -349,7 +348,7 @@ export function Dashboard() {
               onClick={() => {
                 setIsWithdrawMenuOpen(!isWithdrawMenuOpen); // Toggle Withdraw menu
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200`}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700`}
             >
               <AppWindowMac size={20} className="mr-2" />
               Applications
@@ -361,8 +360,8 @@ export function Dashboard() {
                   onClick={() => {
                     handleTabClick("withdraw");
                   }}
-                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                    activeCategory === "withdraw" ? "bg-gray-200" : ""
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                    activeCategory === "withdraw" ? "bg-gray-700" : ""
                   }`}
                 >
                   <FileX className="mr-2 h-4 w-4" />
@@ -372,8 +371,8 @@ export function Dashboard() {
                   onClick={() => {
                     handleTabClick("others");
                   }}
-                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                    activeCategory === "others" ? "bg-gray-200" : ""
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                    activeCategory === "others" ? "bg-gray-700" : ""
                   }`}
                 >
                   <FileQuestion className="mr-2 h-4 w-4" />
@@ -383,8 +382,8 @@ export function Dashboard() {
                   onClick={() => {
                     handleTabClick("applications");
                   }}
-                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                    activeCategory === "applications" ? "bg-gray-200" : ""
+                  className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                    activeCategory === "applications" ? "bg-gray-700" : ""
                   }`}
                 >
                   <FileText className="mr-2 h-4 w-4" />
@@ -396,8 +395,8 @@ export function Dashboard() {
               onClick={() => {
                 handleTabClick("courses"); // Reset to page 1 when changing category
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "course" ? "bg-gray-200" : ""
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "course" ? "bg-gray-700" : ""
               }`}
             >
               <BookOpen size={20} className="mr-2" />
@@ -407,8 +406,8 @@ export function Dashboard() {
               onClick={() => {
                 handleTabClick("classes");
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "class" ? "bg-gray-200" : ""
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "class" ? "bg-gray-700" : ""
               }`}
             >
               <School size={20} className="mr-2" />
@@ -418,8 +417,8 @@ export function Dashboard() {
               onClick={() => {
                 handleTabClick("news");
               }}
-              className={`w-full flex items-center py-2 px-4 hover:bg-gray-200 ${
-                activeCategory === "news" ? "bg-gray-200" : ""
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "news" ? "bg-gray-700" : ""
               }`}
             >
               <Newspaper size={20} className="mr-2" />
@@ -427,6 +426,7 @@ export function Dashboard() {
             </button>
           </nav>
         </div>
+
         {/* Main Content */}
         <div className="flex-1 overflow-hidden bg-gray-100">
           <div className="p-6 flex justify-between items-center">

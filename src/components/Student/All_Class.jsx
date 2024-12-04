@@ -120,7 +120,7 @@ export function ViewAllClasses() {
           <div className="flex-grow relative mb-4 md:mb-0 md:mr-4">
             <Input
               type="text"
-              placeholder="Search by lesson name or teacher"
+              placeholder="Search by lesson or tutor name"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -211,7 +211,7 @@ export function ViewAllClasses() {
                               Course Code: {classItem.courseCode}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Instructor: {classItem.teacherName}
+                              Tutor: {classItem.teacherName}
                             </p>
                           </div>
                           <div className="flex justify-between items-center">

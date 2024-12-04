@@ -1,5 +1,4 @@
 import { Box, Button, Typography, Modal, Grid, Paper } from "@mui/material";
-import { Video } from "lucide-react";
 
 const ClassDetail = ({ data, open, setOpen }) => {
   return (
@@ -47,16 +46,6 @@ const ClassDetail = ({ data, open, setOpen }) => {
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Course Code: {data?.courseCode}
               </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                startIcon={<Video />}
-                onClick={() => window.open(data?.location, "_blank")}
-                className="mt-4"
-              >
-                Join Meet
-              </Button>
             </Paper>
           </Grid>
           <Grid item xs={12} md={8}>
@@ -64,7 +53,7 @@ const ClassDetail = ({ data, open, setOpen }) => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="body1">
-                    <strong>Teacher:</strong> {data?.teacherName}
+                    <strong>Tutor:</strong> {data?.teacherName}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>

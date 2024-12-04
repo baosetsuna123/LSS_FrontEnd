@@ -506,6 +506,8 @@ function TeacherHome() {
             required
             className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
+
+          {/* Make price and meeting URL inputs in a row */}
           <input
             type="text"
             name="price"
@@ -515,7 +517,7 @@ function TeacherHome() {
             value={formatWithCommas(classData.price)}
             onChange={handleInput}
             required
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="border p-2 rounded-lg flex-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
 
           <input
@@ -524,7 +526,7 @@ function TeacherHome() {
             placeholder="Meeting Url"
             onChange={handleInputChange}
             required
-            className="border col-span-2 p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            className="border p-2 rounded-lg flex-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
           />
           <textarea
             name="description"
@@ -537,7 +539,6 @@ function TeacherHome() {
               Upload File
             </label>
             <div className="w-3/4 flex items-center">
-              {/* Custom button to trigger file input */}
               <button
                 type="button"
                 onClick={() => document.getElementById("fileInput").click()}
@@ -554,13 +555,13 @@ function TeacherHome() {
                 className="hidden whitespace-nowrap"
               />
 
-              {/* Display selected file name or default message */}
               <span className="ml-2 text-gray-900 whitespace-nowrap">
                 {image ? `Selected File: ${image.name}` : "No file selected"}
               </span>
             </div>
           </div>
         </div>
+
         <div className="flex items-center gap-6 justify-center">
           <button
             onClick={handleCreateClass}

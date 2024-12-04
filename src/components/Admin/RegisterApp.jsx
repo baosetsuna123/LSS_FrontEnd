@@ -83,7 +83,7 @@ const RegisterApp = () => {
 
         <input
           type="text"
-          placeholder="Search by teacher name"
+          placeholder="Search by tutor name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border border-gray-300 rounded-md shadow-sm py-2 px-3 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -101,7 +101,7 @@ const RegisterApp = () => {
                 Description
               </th>
               <th className="px-6 py-3 text-left whitespace-nowrap text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Teacher Name
+                Tutor Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
@@ -124,9 +124,15 @@ const RegisterApp = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {app.description}
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-sm font-medium cursor-pointer text-gray-500"
+                    title={app.description}
+                  >
+                    {app.description.length > 10
+                      ? `${app.description.slice(0, 10)}...`
+                      : app.description}
                   </td>
+
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {app.teacherName}
                   </td>
@@ -216,8 +222,15 @@ const RegisterApp = () => {
                     {app.assignedStaff || "N/A"}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {app.rejectionReason || "N/A"}
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-sm cursor-pointer text-gray-500"
+                    title={app.rejectionReason}
+                  >
+                    {app.rejectionReason
+                      ? app.rejectionReason.length > 10
+                        ? `${app.rejectionReason.slice(0, 10)}...`
+                        : app.rejectionReason
+                      : "N/A"}
                   </td>
                 </tr>
               ))
@@ -233,16 +246,18 @@ const RegisterApp = () => {
             )}
           </tbody>
         </table>
-        <footer className="bg-white shadow-sm p-4 flex justify-end">
-          <Button
-            variant="default"
-            onClick={() => handleClick()}
-            className="bg-blue-500 text-white hover:bg-blue-600"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Assign Application
-          </Button>
-        </footer>
+        {applications.some((app) => app.status === "PENDING") && (
+          <footer className="bg-white shadow-sm p-4 flex justify-end">
+            <Button
+              variant="default"
+              onClick={() => handleClick()}
+              className="bg-blue-500 text-white hover:bg-blue-600"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Assign Application
+            </Button>
+          </footer>
+        )}
       </div>
 
       {pageCount > 1 && (

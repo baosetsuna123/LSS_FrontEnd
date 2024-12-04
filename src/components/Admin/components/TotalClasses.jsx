@@ -141,7 +141,7 @@ const DetailClasses = ({ token }) => {
                       <TableCell className="whitespace-nowrap">
                         Lesson Name
                       </TableCell>
-                      <TableCell>Teacher</TableCell>
+                      <TableCell>Tutor</TableCell>
                       <TableCell>Period</TableCell>
                       <TableCell className="whitespace-nowrap">
                         Day of the Week

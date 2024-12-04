@@ -45,7 +45,7 @@ const AppOthers = ({
     try {
       if (actionType === "approve") {
         if (!approvalImage) {
-          toast.error("Please choose an approval image before submitting.");
+          toast.error("Please choose a receipt image before submitting.");
           return;
         }
         setLoading(true);
@@ -107,14 +107,14 @@ const AppOthers = ({
                 <div className="text-green-500">
                   <Search size={48} className="mx-auto" />
                   <p className="font-semibold text-lg mt-2">
-                    Are you sure you want to approve this application?
+                    Are you sure you want to approve this other application?
                   </p>
                   <div className="mt-4 space-y-2">
                     <Label
                       htmlFor="file-upload"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Choose a file
+                      Upload Receipt
                     </Label>
                     <div className="flex items-center gap-2">
                       <Button
@@ -141,7 +141,7 @@ const AppOthers = ({
                 <div className="text-red-500">
                   <Search size={48} className="mx-auto" />
                   <p className="font-semibold text-lg mt-2">
-                    Are you sure you want to reject this application?
+                    Are you sure you want to reject this other application?
                   </p>
                 </div>
               )}

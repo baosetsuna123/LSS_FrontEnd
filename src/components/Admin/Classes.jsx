@@ -134,7 +134,7 @@ const Classes = () => {
       <div className="flex justify-between items-center mb-4">
         <Input
           type="text"
-          placeholder="Search by name"
+          placeholder="Search by lesson name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
@@ -156,10 +156,10 @@ const Classes = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Name</TableHead>
+            <TableHead>Lesson Name</TableHead>
             <TableHead>Start Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Teacher Name</TableHead>
+            <TableHead>Tutor Name</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

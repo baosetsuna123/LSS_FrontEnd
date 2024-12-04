@@ -14,7 +14,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 import { Dock, LogOut, Wallet } from "lucide-react";
-import misasa from "../../assets/misasa.jfif";
+import avatars from "../../assets/avatar.png";
 
 function TeacherDashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -107,7 +107,7 @@ function TeacherDashboardLayout() {
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           {isSidebarOpen && (
             <h2 className="text-2xl font-semibold">
-              <Link to="/teacher">Teacher Dashboard</Link>
+              <Link to="/teacher">Tutor Dashboard</Link>
             </h2>
           )}
           <button
@@ -195,7 +195,7 @@ function TeacherDashboardLayout() {
                 />
               ) : (
                 <img
-                  src={misasa}
+                  src={avatars}
                   alt="Avatar"
                   className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300"
                   onClick={() => setShowLogoutText(!showLogoutText)}

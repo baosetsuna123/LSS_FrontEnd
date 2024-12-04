@@ -9,6 +9,8 @@ import Breadcrumb from "../Home/Breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import defaults from "@/assets/default.jfif";
+import avatar from "../../assets/avatar.png";
+
 const TeacherProfile = () => {
   const { teacherName } = useParams();
   const [classes, setClasses] = useState([]);
@@ -163,7 +165,7 @@ const TeacherProfile = () => {
                 label: "Detail",
                 link: classId ? `/class/${classId}` : "/class",
               },
-              { label: "TeacherProfile" },
+              { label: "TutorProfile" },
             ]}
           />
         </div>
@@ -172,7 +174,7 @@ const TeacherProfile = () => {
       <div className="teacher-profile-container px-6 mt-6 flex justify-between items-center">
         <div className="flex-1">
           <Button className="mb-2 mr-4 text-white bg-gray-900 hover:bg-gray-800 transition-all duration-300 rounded-full px-4 py-1 text-sm dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600">
-            Teacher
+            Tutor
           </Button>
 
           <h1 className="text-4xl font-semibold text-gray-800 dark:text-gray-100">
@@ -205,25 +207,17 @@ const TeacherProfile = () => {
             </h3>
             {info.certificate && info.certificate.length > 0 ? (
               <div className="mt-4 space-y-4">
-                {info.certificate.map((certificate) => (
-                  <div key={certificate.id} className="flex items-center gap-4">
-                    <div className="flex items-center gap-4">
-                      <p
-                        className="text-lg text-gray-700 dark:text-gray-300 font-semibold"
-                        style={{ minWidth: nameWidth }}
-                      >
-                        {certificate.name}
-                      </p>
-                      <a
-                        href={certificate.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
-                      >
-                        Click to view
-                      </a>
-                    </div>
-                  </div>
+                {info.certificate.map((certificate, index) => (
+                  <li key={index}>
+                    <a
+                      href={certificate.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {certificate.name}
+                    </a>
+                  </li>
                 ))}
               </div>
             ) : (
@@ -234,13 +228,11 @@ const TeacherProfile = () => {
           </div>
         </div>
         <div className="ml-6">
-          {info.avatarImage && (
-            <img
-              src={info.avatarImage}
-              alt={`${teacherName}'s Avatar`}
-              className="w-50 h-50 mr-10 rounded-full object-cover border-2 border-blue-500"
-            />
-          )}
+          <img
+            src={info.avatarImage || avatar}
+            alt={`${teacherName}'s Avatar`}
+            className="w-50 h-50 mr-10 rounded-full object-cover border-2 border-blue-500"
+          />
         </div>
       </div>
 

@@ -163,46 +163,54 @@ const MyClass = () => {
       const lessonStatus = lesson.orderStatus; // Use status from orderDTO
       console.log(lessonStatus);
       return (
-        <div className="p-4 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-          <p
-            className="font-bold text-lg text-gray-800 cursor-pointer"
-            onClick={() => {
-              handleClick(lesson.id);
-            }}
-          >
-            {lesson.subject}
-          </p>
-          <p className="text-sm text-gray-600">CourseCode: {lesson.code}</p>
-          <p className="text-sm text-gray-600">
-            Instructor: {lesson.teacherName}
-          </p>
-
-          {lessonStatus === "COMPLETED" &&
-          !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-            // Case 1: Show Feedback button if status is COMPLETED and feedback not submitted
-            <button
-              key={lesson.orderId}
-              onClick={() => {
-                navigate(`/feedback/${lesson.orderId}`);
-              }}
-              className="mt-3 text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-1.5 px-4"
-            >
-              Feedback
-            </button>
-          ) : lesson.room && lessonStatus === "ONGOING" ? (
-            // Case 2: Show Meet URL button for status ONGOING or ACTIVE
-            <button
-              onClick={() => window.open(lesson.room, "_blank")}
-              className="mt-3 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-1.5 px-4"
-            >
-              Meet URL
-            </button>
-          ) : lessonStatus === "COMPLETED" &&
-            submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-            <div className="mt-3 text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-1.5 px-4">
-              Ended
+        <div className="p-6 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+          <div className="flex flex-col h-full">
+            <div className="flex-grow">
+              <h3
+                className="font-bold text-xl whitespace-nowrap text-gray-800 cursor-pointer hover:text-blue-600 transition-colors duration-200 mb-2"
+                onClick={() => handleClick(lesson.id)}
+              >
+                {lesson.subject}
+              </h3>
+              <p className="text-sm text-gray-600 mb-1 whitespace-nowrap">
+                <span className="font-semibold">Course Code:</span>{" "}
+                {lesson.code}
+              </p>
+              <p className="text-sm text-gray-600 mb-4 whitespace-nowrap">
+                <span className="font-semibold">Tutor:</span>{" "}
+                {lesson.teacherName}
+              </p>
             </div>
-          ) : null}
+
+            <div className="mt-auto">
+              {lessonStatus === "COMPLETED" &&
+              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                <button
+                  key={lesson.orderId}
+                  onClick={() => navigate(`/feedback/${lesson.orderId}`)}
+                  className="w-full text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-2 px-4"
+                >
+                  Feedback
+                </button>
+              ) : lesson.room && lessonStatus === "ONGOING" ? (
+                <button
+                  onClick={() => window.open(lesson.room, "_blank")}
+                  className="w-full text-sm font-semibold whitespace-nowrap text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-2 px-4"
+                >
+                  Join Meeting
+                </button>
+              ) : lessonStatus === "COMPLETED" &&
+                submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                <div className="w-full text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-2 px-4 text-center">
+                  Ended
+                </div>
+              ) : (
+                <div className="w-full text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full py-2 px-4 text-center">
+                  {lessonStatus || "Upcoming"}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       );
     }

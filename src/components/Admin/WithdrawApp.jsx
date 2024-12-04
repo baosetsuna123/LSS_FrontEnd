@@ -244,7 +244,7 @@ const WithdrawApp = () => {
                   <div className="flex items-center gap-4">
                     <ImageIcon className="h-5 w-5 text-red-500" />
                     <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
-                      Approval Image
+                      Receipt Image
                     </p>
                   </div>
                   <div className="w-full h-auto flex justify-center items-center">

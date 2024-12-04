@@ -11,7 +11,6 @@ import {
   Clock,
   Code,
   Coins,
-  GraduationCap,
   User,
   AlertCircle,
   Users,
@@ -25,7 +24,7 @@ import Breadcrumb from "../Home/Breadcrumb";
 import toast from "react-hot-toast";
 import { useWallet } from "@/context/WalletContext";
 import defaults from "../../assets/default.jfif";
-import misasa from "../../assets/misasa.jfif";
+import avatar from "../../assets/avatar.png";
 
 // Modal Component for Confirmation
 
@@ -91,7 +90,7 @@ export function ClassDetail() {
           ) : (
             <>
               <p className="mb-6 text-gray-700 whitespace-nowrap dark:text-gray-300">
-                You agree to participate in this class with price{" "}
+                You agree to participate in this lesson with price{" "}
                 {formatCurrency(classDetail?.price)}?
               </p>
               <p className="mb-6 text-gray-700 dark:text-gray-300">
@@ -193,7 +192,7 @@ export function ClassDetail() {
         console.log(errorMessage);
 
         if (errorMessage === "User has already registered for this schedule.") {
-          toast.error("You have already registered for this schedule.");
+          toast.error("You have already registered a lesson with this time.");
         } else {
           toast.error(errorMessage);
         }
@@ -328,26 +327,17 @@ export function ClassDetail() {
 
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg">Instructor</CardTitle>
+                  <CardTitle className="text-lg">Tutor Details</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
                     <User className="mr-2 h-5 w-5 text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">
-                      Instructor Name: {classDetail?.fullName}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <GraduationCap className="mr-2 h-5 w-5 text-blue-600" />
-                    <span
-                      className="text-gray-700 dark:text-gray-300"
-                      onClick={handleTeacherClick}
-                    >
-                      Teacher Username: {classDetail?.teacherName}
+                      Tutor Name: {classDetail?.fullName}
                     </span>
                   </div>
                   {classDetail?.imageTeacher ? (
-                    <div className="mt-4 flex justify-center items-center relative">
+                    <div className="mt-7 flex justify-center items-center relative">
                       <img
                         src={classDetail?.imageTeacher}
                         alt={`Instructor: ${classDetail?.fullName}`}
@@ -358,7 +348,7 @@ export function ClassDetail() {
                   ) : (
                     <div className="mt-4 flex justify-center items-center relative">
                       <img
-                        src={misasa}
+                        src={avatar}
                         alt={`Instructor: ${classDetail?.fullName}`}
                         className="w-24 h-24 rounded-full object-cover border-2 border-blue-500 cursor-pointer"
                         onClick={handleTeacherClick}

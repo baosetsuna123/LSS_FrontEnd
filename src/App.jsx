@@ -81,7 +81,7 @@ function App() {
           <Route index element={<AdminHome />} />
           <Route path="User/ListUser" element={<User />} />
           <Route path="Classes" element={<Classes />} />
-          <Route path="User/ListTeacher" element={<Teacher />} />
+          <Route path="User/ListTutor" element={<Teacher />} />
           <Route path="User/Create-staff" element={<CreateStaff />} />
           <Route path="Application/Register" element={<RegisterApp />} />
           <Route path="Application/Withdraw" element={<WithdrawApp />} />

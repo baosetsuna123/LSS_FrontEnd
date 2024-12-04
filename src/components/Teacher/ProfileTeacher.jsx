@@ -11,7 +11,7 @@ import profile from "../../assets/profilebg.jfif";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { updateTeacherProfile } from "@/data/api";
-import misasa from "../../assets/misasa.jfif";
+import avatars from "../../assets/avatar.png";
 import { useAvatar } from "@/context/AvatarContext";
 const ProfileTeacher = () => {
   const result = JSON.parse(localStorage.getItem("result"));
@@ -160,7 +160,7 @@ const ProfileTeacher = () => {
     >
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">Teacher Profile</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Tutor Profile</h1>
           {avatarImage ? (
             <img
               src={avatarImages}
@@ -169,7 +169,7 @@ const ProfileTeacher = () => {
             />
           ) : (
             <img
-              src={misasa}
+              src={avatars}
               alt="Avatar"
               className="w-16 h-16 rounded-full border-2 border-gray-300"
             />

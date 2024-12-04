@@ -191,7 +191,7 @@ export function AboutMe() {
             navigate("/signup", { state: { userType: "teacher" } })
           }
         >
-          Sign Up as Teacher
+          Sign Up as Tutor
         </Button>
         <Button
           className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"

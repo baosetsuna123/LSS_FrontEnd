@@ -168,7 +168,7 @@ export function MyOrders() {
                   Total Price
                 </TableHead>
                 <TableHead className="text-gray-900 dark:text-white pl-20">
-                  Teacher Name
+                  Tutor Name
                 </TableHead>
                 <TableHead className="text-center text-gray-900 dark:text-white">
                   Status

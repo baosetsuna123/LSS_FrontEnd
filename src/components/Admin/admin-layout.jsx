@@ -70,7 +70,7 @@ export function AdminLayout({ children }) {
 
   const usersSubMenuItems = [
     { icon: User, label: "List User", path: "/admin/User/ListUser" },
-    { icon: BookUser, label: "List Teacher", path: "/admin/User/ListTeacher" },
+    { icon: BookUser, label: "List Tutor", path: "/admin/User/ListTutor" },
     {
       icon: UserPlus,
       label: "Create Staff",

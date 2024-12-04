@@ -144,7 +144,9 @@ export function Application() {
                   Choose File
                 </button>
                 <span className="text-gray-700 flex-1 whitespace-nowrap">
-                  {certificates[index]?.name || "No file chosen"}
+                  {certificates[index]?.name.length > 12
+                    ? certificates[index]?.name.slice(0, 12) + "..."
+                    : certificates[index]?.name || "No file chosen"}
                 </span>
                 <input
                   type="text"

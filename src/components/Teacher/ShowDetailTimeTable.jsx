@@ -1,4 +1,5 @@
 import Modal from "react-modal";
+import defaults from "../../assets/default.jfif";
 
 const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
   return (
@@ -33,7 +34,7 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
           <strong>Course Code:</strong> {data?.courseCode}
         </div>
         <div className="col-span-4">
-          <strong>Day of Week: </strong>
+          <strong>Day of Week:</strong>{" "}
           {(() => {
             switch (Number(data?.dayOfWeek)) {
               case 2:
@@ -70,18 +71,24 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
           )}
         </div>
         <div className="col-span-4">
-          <strong>Description:</strong> {data?.description || "No description"}
+          <strong>Description:</strong>{" "}
+          {data?.description
+            ? data.description.length > 8
+              ? `${data.description.slice(0, 8)}...`
+              : data.description
+            : "No description"}
         </div>
-        {data?.imageUrl && (
-          <div className="col-span-4">
-            <strong>Image:</strong>
-            <img
-              src={data?.imageUrl}
-              alt={data?.name}
-              className="mt-2 max-w-[200px] h-auto rounded"
-            />
-          </div>
-        )}
+      </div>
+      {/* Image as the last centered item */}
+      <div className="flex justify-center mt-6">
+        <div className="text-center">
+          <strong>Image:</strong>
+          <img
+            src={data?.imageUrl || defaults} // Use default if imageUrl is not provided
+            alt={data?.name || "Default Image"} // Provide a fallback alt text
+            className="mt-2 max-w-[200px] h-auto rounded"
+          />
+        </div>
       </div>
       <div className="flex items-center justify-center mt-4">
         <button
