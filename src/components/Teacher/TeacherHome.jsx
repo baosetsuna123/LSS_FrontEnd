@@ -12,6 +12,16 @@ import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
 import { FaSpinner } from "react-icons/fa";
 import YearSelector from "./YearSelector";
+import {
+  Book,
+  Calendar,
+  DollarSign,
+  FileText,
+  Info,
+  Link,
+  UploadCloud,
+  Users,
+} from "lucide-react";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -422,146 +432,163 @@ function TeacherHome() {
           </tbody>
         </table>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         contentLabel="Create Class"
-        className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto"
+        className="bg-white p-4 rounded-lg shadow-lg max-w-5xl min-w-[40rem] mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
       >
         <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
           Create Lesson
         </h2>
         <div className="grid grid-cols-2 gap-4 py-2">
-          <input
-            type="text"
-            name="name"
-            placeholder="Lesson Name"
-            onChange={handleInputChange}
-            required
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-          <input
-            type="date"
-            min={minDateString}
-            onChange={handleDateChange}
-            required
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-          <input
-            type="text"
-            name="dayOfWeek"
-            disabled
-            value={
-              [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-              ][dayOfWeek]
-            }
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-
-          <select
-            name="slotId"
-            onChange={handleInputChange}
-            disabled={date ? false : true}
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          >
-            <option value="">Select Slot</option>
-            {slots.map((slot) => (
-              <option
-                key={slot.slotId}
-                value={slot.slotId}
-                disabled={selectedSlots.some((item) => item === slot.slotId)}
-              >
-                {`${slot.period} (${slot.start} - ${slot.end})`}
-              </option>
-            ))}
-          </select>
-          <select
-            name="courseCode"
-            onChange={handleInputChange}
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          >
-            <option value="">Select Course</option>
-            {courseCodes.map((courseCode) => (
-              <option key={courseCode} value={courseCode}>
-                {courseCode}{" "}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            name="maxStudents"
-            placeholder="Max Students (15-30)"
-            min={15}
-            max={30}
-            onChange={handleInputChange}
-            required
-            className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-
-          {/* Make price and meeting URL inputs in a row */}
-          <input
-            type="text"
-            name="price"
-            placeholder="Price (100,000 - 500,000)"
-            min={100000}
-            max={500000}
-            value={formatWithCommas(classData.price)}
-            onChange={handleInput}
-            required
-            className="border p-2 rounded-lg flex-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-
-          <input
-            type="text"
-            name="location"
-            placeholder="Meeting Url"
-            onChange={handleInputChange}
-            required
-            className="border p-2 rounded-lg flex-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            onChange={handleInputChange}
-            className="border p-2 rounded-lg col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-          />
-          <div className="mb-4 flex items-center">
-            <label className="text-gray-700 font-semibold w-1/4 whitespace-nowrap">
-              Upload File
-            </label>
-            <div className="w-3/4 flex items-center">
+          <div className="relative flex items-center">
+            <Book name="book" className="mr-2 text-gray-600" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Lesson Name"
+              onChange={handleInputChange}
+              required
+              className="border p-2  rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center">
+            <Calendar name="calendar" className="mr-2 text-gray-600" />
+            <input
+              type="date"
+              min={minDateString}
+              onChange={handleDateChange}
+              required
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center">
+            <FileText name="clock" className="mr-2 text-gray-600" />
+            <input
+              type="text"
+              name="dayOfWeek"
+              disabled
+              value={
+                [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ][dayOfWeek]
+              }
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center">
+            <Users name="clock" className="mr-2 text-gray-600" />
+            <select
+              name="slotId"
+              onChange={handleInputChange}
+              disabled={!date}
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              <option value="">Select Slot</option>
+              {slots.map((slot) => (
+                <option
+                  key={slot.slotId}
+                  value={slot.slotId}
+                  disabled={selectedSlots.some((item) => item === slot.slotId)}
+                >
+                  {`${slot.period} (${slot.start} - ${slot.end})`}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="relative flex items-center">
+            <Book name="code" className="mr-2 text-gray-600" />
+            <select
+              name="courseCode"
+              onChange={handleInputChange}
+              className="border p-2  rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            >
+              <option value="">Select Course</option>
+              {courseCodes.map((courseCode) => (
+                <option key={courseCode} value={courseCode}>
+                  {courseCode}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="relative flex items-center">
+            <Users name="users" className="mr-2 text-gray-600" />
+            <input
+              type="number"
+              name="maxStudents"
+              placeholder="Max Students (15-30)"
+              min={15}
+              max={30}
+              onChange={handleInputChange}
+              required
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center">
+            <DollarSign name="dollar-sign" className="mr-2 text-gray-600" />
+            <input
+              type="text"
+              name="price"
+              placeholder="Price (100,000 - 500,000)"
+              min={100000}
+              max={500000}
+              value={formatWithCommas(classData.price)}
+              onChange={handleInput}
+              required
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center w-full">
+            <Link name="link" className="mr-2 text-gray-600" />
+            <input
+              type="text"
+              name="location"
+              placeholder="Meeting URL"
+              onChange={handleInputChange}
+              required
+              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative flex items-center col-span-2 ">
+            <Info name="link" className="mr-2 text-gray-600" />
+            <textarea
+              name="description"
+              placeholder="Description"
+              onChange={handleInputChange}
+              className="border p-2 rounded-lg  col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+            />
+          </div>
+          <div className="relative col-span-2">
+            <div className="flex items-center gap-4">
+              <UploadCloud name="upload" className="text-gray-600" />
               <button
                 type="button"
                 onClick={() => document.getElementById("fileInput").click()}
-                className="p-2 border ml-4 border-gray-300 rounded-lg whitespace-nowrap bg-gray-200 hover:bg-gray-300"
+                className="p-2 border border-gray-300 rounded-lg bg-gray-200 hover:bg-gray-300"
               >
-                Choose File
+                Choose Image
               </button>
-
               <input
                 id="fileInput"
                 onChange={handleFileChange}
                 accept="image/*"
                 type="file"
-                className="hidden whitespace-nowrap"
+                className="hidden"
               />
-
-              <span className="ml-2 text-gray-900 whitespace-nowrap">
-                {image ? `Selected File: ${image.name}` : "No file selected"}
+              <span className="text-gray-900 truncate overflow-hidden w-1/2">
+                {image ? `Selected Image: ${image.name}` : "No image selected"}
               </span>
             </div>
           </div>
         </div>
-
         <div className="flex items-center gap-6 justify-center">
           <button
             onClick={handleCreateClass}
