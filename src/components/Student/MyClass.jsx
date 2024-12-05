@@ -166,12 +166,14 @@ const MyClass = () => {
         <div className="p-6 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex flex-col h-full">
             <div className="flex-grow">
-              <h3
-                className="font-bold text-xl whitespace-nowrap text-gray-800 cursor-pointer hover:text-blue-600 transition-colors duration-200 mb-2"
-                onClick={() => handleClick(lesson.id)}
-              >
-                {lesson.subject}
-              </h3>
+              <div className="flex justify-center">
+                <h3
+                  className="font-bold text-xl text-center whitespace-nowrap text-gray-800 cursor-pointer hover:text-blue-600 transition-colors duration-200 mb-2"
+                  onClick={() => handleClick(lesson.id)}
+                >
+                  {lesson.subject}
+                </h3>
+              </div>
               <p className="text-sm text-gray-600 mb-1 whitespace-nowrap">
                 <span className="font-semibold">Course Code:</span>{" "}
                 {lesson.code}

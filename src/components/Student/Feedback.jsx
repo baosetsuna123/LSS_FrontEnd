@@ -155,7 +155,7 @@ export default function FeedbackForm() {
 
       <div className="container mx-auto p-4 max-w-6xl">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-          Course Feedback
+          Lesson Feedback
         </h1>
         <form onSubmit={handleSubmit}>
           <Card className="mb-6 dark:bg-gray-700">

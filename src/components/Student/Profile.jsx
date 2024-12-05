@@ -41,6 +41,7 @@ export default function Profile() {
     fetchCategories();
 
     if (result.major && result.major.length > 0) {
+      console.log(result.major);
       const savedCategoryIds = result.major.map((major) => major.categoryId);
       setCategoryIds(savedCategoryIds);
     }
@@ -84,16 +85,16 @@ export default function Profile() {
     try {
       await updateCurrentUser(token, updatedProfileData);
       toast.success("Profile updated successfully!");
-
+      const updatedMajor = allCategories.filter((category) =>
+        categoryIds.includes(category.categoryId)
+      );
       // Update localStorage to persist updated data
       const updatedResult = {
         ...result,
         fullName: profileData.fullName, // Update fullName
         address: profileData.address, // Update address
         phoneNumber: profileData.phoneNumber, // Update phoneNumber
-        major: allCategories.filter((category) =>
-          categoryIds.includes(category.categoryId)
-        ),
+        major: updatedMajor,
       };
       localStorage.setItem("result", JSON.stringify(updatedResult));
 
