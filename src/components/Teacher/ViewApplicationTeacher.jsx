@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,13 +9,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  fetchBalanceTeacher,
-  fetchCancelApplication,
-  viewAllApplications,
-} from "@/data/api";
-import toast from "react-hot-toast";
-import { FaChevronLeft, FaChevronRight, FaInfoCircle } from "react-icons/fa";
+import { viewAllApplications } from "@/data/api";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const parseDescription = (description) => {
   const accountMatch = description.match(/Account number: (\d+)/);
@@ -33,42 +28,15 @@ const parseDescription = (description) => {
 
 export function ApplicationManagementTeacher() {
   const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(false);
   const token = sessionStorage.getItem("token");
-  const [showModal, setShowModal] = useState(false);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount);
   };
-  const [balance, setBalance] = useState(0);
-  useEffect(() => {
-    const loadBalance = async (token) => {
-      try {
-        const data = await fetchBalanceTeacher(token);
-        setBalance(data.balance);
-      } catch (error) {
-        console.error("Failed to fetch balance:", error);
-      }
-    };
 
-    if (token) {
-      loadBalance(token);
-    }
-  }, []);
-  const loadBalance = useCallback(async (token) => {
-    try {
-      const data = await fetchBalanceTeacher(token);
-      setBalance(data.balance);
-    } catch (err) {
-      console.log(err.message || "Error fetching balance");
-    }
-  }, []);
-  useEffect(() => {
-    if (token) {
-      loadBalance(token);
-    }
-  }, [token, loadBalance]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [selectedTab, setSelectedTab] = useState("Withdraw Applications");
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,21 +46,20 @@ export function ApplicationManagementTeacher() {
 
   useEffect(() => {
     const fetchApplications = async () => {
+      setLoading(true);
       try {
         const data = await viewAllApplications(token);
         setApplications(data);
         console.log(data);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchApplications();
   }, [token]);
-  const [selectedApp, setSelectedApp] = useState(null);
-  const handleShowModal = (app) => {
-    setSelectedApp(app);
-    setShowModal(true);
-  };
+
   // Filter applications based on search query
   useEffect(() => {
     const filtered = applications.filter((app) =>
@@ -100,35 +67,6 @@ export function ApplicationManagementTeacher() {
     );
     setFilteredApplications(filtered);
   }, [searchQuery, applications]);
-  const handleCloseModal = () => setShowModal(false);
-
-  const handleCancelApplication = async () => {
-    if (!selectedApp) return;
-
-    const amountToRefund = selectedApp.amountFromDescription;
-    const newBalance = balance + amountToRefund;
-
-    try {
-      await fetchCancelApplication(selectedApp.applicationUserId, token);
-      setApplications((prevApplications) =>
-        prevApplications.map((app) =>
-          app.applicationUserId === selectedApp.applicationUserId
-            ? { ...app, status: "Canceled" }
-            : app
-        )
-      );
-      loadBalance(token); // Update balance after cancel
-      toast.success(
-        `Application canceled successfully!\nNew balance: ${formatCurrency(
-          newBalance
-        )}`
-      );
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error canceling application:", error);
-      toast.error("Failed to cancel the application.");
-    }
-  };
 
   // Filter applications based on selected tab
   const withdrawApplications = filteredApplications.filter(
@@ -208,7 +146,11 @@ export function ApplicationManagementTeacher() {
       {/* Tab Content */}
       {selectedTab === "Withdraw Applications" && (
         <>
-          {withdrawApplications.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="loader border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+            </div>
+          ) : withdrawApplications.length === 0 ? (
             <p className="flex items-center text-red-500 justify-center text-center w-full h-full">
               No Data
             </p>
@@ -241,10 +183,7 @@ export function ApplicationManagementTeacher() {
                       <TableCell>{bank}</TableCell>
                       <TableCell>
                         {app.amountFromDescription
-                          ? new Intl.NumberFormat("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }).format(app.amountFromDescription)
+                          ? formatCurrency(app.amountFromDescription)
                           : "N/A"}
                       </TableCell>
                       <TableCell>
@@ -263,65 +202,9 @@ export function ApplicationManagementTeacher() {
                             app.status.slice(1)}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {app.status === "pending" && (
-                          <Button
-                            className="px-4 py-2 text-white dark:bg-red-400 dark:hover:bg-red-500 bg-red-500 rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-400"
-                            onClick={() => handleShowModal(app)}
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                      </TableCell>
                     </TableRow>
                   );
                 })}
-                {showModal && selectedApp && (
-                  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white rounded-lg w-full sm:w-96 p-6 shadow-xl transform transition-all scale-95 hover:scale-100">
-                      <div className="flex items-center mb-4 border-b border-gray-200 pb-3">
-                        <FaInfoCircle className="text-blue-500 mr-3 text-2xl" />
-                        <h3 className="text-2xl font-semibold text-gray-800">
-                          Cancel Application
-                        </h3>
-                      </div>
-
-                      <div className="text-gray-700 mb-4">
-                        <p className="text-lg">
-                          Are you sure you want to cancel the application for{" "}
-                          <strong className="font-semibold">
-                            {selectedApp.name}
-                          </strong>
-                          ?
-                        </p>
-                      </div>
-
-                      <div className="mt-4">
-                        <p className="text-xl font-semibold text-green-600">
-                          New Balance:{" "}
-                          {formatCurrency(
-                            balance + selectedApp.amountFromDescription
-                          )}
-                        </p>
-                      </div>
-
-                      <div className="flex justify-between mt-6">
-                        <button
-                          className="w-full sm:w-auto mt-3 sm:mt-0 text-lg px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors duration-200"
-                          onClick={handleCancelApplication}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          className="w-full sm:w-auto px-6 py-2 text-lg bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors duration-200"
-                          onClick={handleCloseModal}
-                        >
-                          No
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </TableBody>
             </Table>
           )}

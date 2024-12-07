@@ -88,7 +88,7 @@ export default function SignUp() {
         );
         toast.success("Please verify your email with OTP");
         navigate("/verify-otp-register");
-      } else if (userType === "teacher") {
+      } else if (userType === "tutor") {
         await fetchSignUpTeacher(
           username,
           password,
@@ -151,7 +151,7 @@ export default function SignUp() {
           </p>
         </div>
         <div className="flex justify-center space-x-1">
-          {["student", "teacher"].map((type) => (
+          {["student", "tutor"].map((type) => (
             <button
               key={type}
               onClick={() => setUserType(type)}
@@ -171,7 +171,7 @@ export default function SignUp() {
               <FormControl fullWidth variant="outlined">
                 <Select
                   labelId="category-label"
-                  multiple={userType === "teacher"} // Allow multiple selection for teachers only
+                  multiple={userType === "tutor"} // Allow multiple selection for teachers only
                   value={categoryIds}
                   onChange={handleCategoryChange}
                   displayEmpty // Ensures the placeholder is shown when no selection is made
@@ -182,7 +182,7 @@ export default function SignUp() {
                       )
                       .map((category) => category.name);
                     const placeholderText =
-                      userType === "teacher"
+                      userType === "tutor"
                         ? "Choose your majors"
                         : "Choose your major";
 

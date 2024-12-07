@@ -29,13 +29,16 @@ import avatar from "../../assets/avatar.png";
 // Modal Component for Confirmation
 
 export function ClassDetail() {
-  const { id } = useParams(); // Get the class id from the URL
+  const { id } = useParams();
   const [classDetail, setClassDetail] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false); // State for controlling modal visibility
+  const [isModalOpen, setModalOpen] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false); // State for enrollment status
   const token = sessionStorage.getItem("token");
   const [, setIsProcessing] = useState(false);
   const { balance, loadBalance } = useWallet();
+  const [loading, setLoading] = useState(false);
+  const [loadingAll, setLoadingAll] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     if (token) {
       loadBalance(token);
@@ -100,13 +103,16 @@ export function ClassDetail() {
                 <Button
                   onClick={onConfirm}
                   className="bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500 px-10 py-3 text-lg"
+                  disabled={loading} // Disable button when loading is true
                 >
-                  Yes
+                  {loading ? "Processing..." : "Yes"}{" "}
+                  {/* Change text when loading */}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={onClose}
                   className="border-red-500 text-red-500 hover:bg-red-100 dark:border-red-400 dark:text-red-400 dark:hover:bg-red-900 px-6 py-3 text-lg"
+                  disabled={loading} // Disable button when loading is true
                 >
                   No
                 </Button>
@@ -141,8 +147,8 @@ export function ClassDetail() {
   };
   const fetchClassDetail = async (id, token) => {
     try {
-      const response = await fetchClassbyID(id, token); // Replace with your API
-      console.log(response);
+      setLoadingAll(true);
+      const response = await fetchClassbyID(id, token);
       setClassDetail(response);
 
       const storedResult = localStorage.getItem("result");
@@ -153,16 +159,28 @@ export function ClassDetail() {
         (student) => student.userName === currentUserName
       );
       setIsEnrolled(isUserEnrolled); // Set enrollment status
+      setTimeout(() => {
+        setLoadingAll(false); // Hide spinner after 1 second (or when data is fetched)
+      }, 1000);
     } catch (error) {
       console.error("Error fetching class detail:", error);
     }
   };
-
   useEffect(() => {
     if (id && token) {
       fetchClassDetail(id, token);
     }
   }, [id, token]);
+  const SpinnerOverlay = () => {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-16 w-16 mt-36 border-t-4 border-blue-500 border-opacity-75"></div>
+      </div>
+    );
+  };
+  if (loadingAll) {
+    return <SpinnerOverlay />;
+  }
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -175,15 +193,14 @@ export function ClassDetail() {
     // Open the modal when "Enroll Now" is clicked
     setModalOpen(true);
   };
-  const navigate = useNavigate();
 
   const handleConfirmEnroll = async () => {
+    setLoading(true);
     // Close the modal and create the order
     try {
       setIsProcessing(true);
       await fetchCreateOrder(id, token);
       toast.success("Order Lesson Successfully!");
-      fetchClassDetail(id, token);
       setIsEnrolled(true);
     } catch (error) {
       if (error.response) {
@@ -204,6 +221,7 @@ export function ClassDetail() {
     } finally {
       setIsProcessing(false);
       setModalOpen(false);
+      setLoading(false);
     }
   };
 

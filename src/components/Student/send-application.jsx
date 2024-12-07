@@ -78,8 +78,9 @@ export function SendApplication() {
   ];
   const { balance, loadBalance } = useWallet();
   const token = sessionStorage.getItem("token");
-  console.log(balance);
   const [showModal, setShowModal] = useState(false);
+  const [loadingwd, setLoadingwd] = useState(false);
+  const [loadingother, setLoadingother] = useState(false);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -101,7 +102,18 @@ export function SendApplication() {
   });
   const handleWithdrawalSubmit = (e) => {
     e.preventDefault();
+    if (
+      withdrawalData.accountNumber.length < 8 ||
+      withdrawalData.accountNumber.length > 15
+    ) {
+      toast.error("Account number must be between 8 and 15 digits.");
+      return;
+    }
 
+    if (withdrawalData.amount < 50000) {
+      toast.error("Amount must be higher or equal than 50,000đ");
+      return;
+    }
     const calculatedNewBalance = balance - withdrawalData.amount;
     setUpdatedBalance(calculatedNewBalance);
 
@@ -158,22 +170,8 @@ export function SendApplication() {
   };
 
   const handleConfirmWithdrawal = async () => {
-    setShowModal(false); // Close the modal
-
-    if (
-      withdrawalData.accountNumber.length < 8 ||
-      withdrawalData.accountNumber.length > 15
-    ) {
-      toast.error("Account number must be between 8 and 15 digits.");
-      return;
-    }
-
-    if (withdrawalData.amount < 50000) {
-      toast.error("Amount must be higher or equal than 50,000đ");
-      return;
-    }
-
     try {
+      setLoadingwd(true);
       const response = await submitWithdrawal(withdrawalData, token);
       console.log(response);
       if (response) {
@@ -189,6 +187,7 @@ export function SendApplication() {
           amount: null,
           applicationTypeId: 1,
         });
+        setShowModal(false);
       }
     } catch (error) {
       if (error.response && typeof error.response.data === "string") {
@@ -202,6 +201,8 @@ export function SendApplication() {
       } else {
         toast.error("An unexpected error occurred.");
       }
+    } finally {
+      setLoadingwd(false);
     }
   };
   const handleCancel = () => {
@@ -211,6 +212,7 @@ export function SendApplication() {
   const handleOtherRequestSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoadingother(true);
       const response = await submitOther(otherRequestData, token);
       console.log("Other Application Submitted:", response);
       toast.success("Other application submitted successfully!");
@@ -223,6 +225,8 @@ export function SendApplication() {
     } catch (error) {
       console.error("Error submitting other request:", error);
       toast.error("Failed to submit other application.");
+    } finally {
+      setLoadingother(false);
     }
   };
 
@@ -382,12 +386,14 @@ export function SendApplication() {
                     <div className="flex justify-between mt-4">
                       <button
                         onClick={handleConfirmWithdrawal}
+                        disabled={loadingwd}
                         className="py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-transform duration-200 transform hover:scale-105 px-6"
                       >
-                        Yes
+                        {loadingwd ? "Loading..." : "Yes"}
                       </button>
                       <button
                         onClick={handleCancel}
+                        disabled={loadingwd}
                         className="py-2 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400 transition-transform duration-200 transform hover:scale-105 px-6"
                       >
                         No
@@ -450,10 +456,11 @@ export function SendApplication() {
               <CardFooter>
                 <Button
                   type="submit"
+                  disabled={loadingother}
                   className="w-full bg-blue-500 dark:bg-blue-700 text-white"
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  Submit Application
+                  {loadingother ? "Submitting..." : "Submit Other Application"}
                 </Button>
               </CardFooter>
             </form>

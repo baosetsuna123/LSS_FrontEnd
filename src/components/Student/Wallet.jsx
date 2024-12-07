@@ -66,18 +66,24 @@ export function MyWallet() {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
   useEffect(() => {
+    // Function to fetch the balance
     const getBalance = async () => {
+      setBalanceLoading(true); // Set loading to true when starting the fetch
       try {
         const data = await fetchBalance(token);
         setBalance(data.balance);
       } catch (error) {
         console.error("Failed to fetch balance:", error);
+        toast.error("Failed to fetch balance");
+      } finally {
+        setBalanceLoading(false); // Set loading to false after fetch finishes
       }
     };
-
-    // ... existing code ...
-    getBalance();
-  }, [token, location.search]);
+    if (balance === 0 && token) {
+      getBalance();
+    }
+  }, [token]);
+  const [balanceLoading, setBalanceLoading] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -86,6 +92,7 @@ export function MyWallet() {
 
     if (vnpAmount && vnpResponseCode) {
       const fetchPaymentReturn = async () => {
+        setBalanceLoading(true);
         try {
           const params = Object.fromEntries(urlParams.entries());
           await fetchVNPayReturn(params, token);
@@ -129,15 +136,27 @@ export function MyWallet() {
         } catch (error) {
           console.error("Error fetching payment return:", error);
           toast.error("An error occurred while processing the payment.");
+        } finally {
+          // Hide the spinner after processing the payment
+          setBalanceLoading(false);
         }
       };
 
       fetchPaymentReturn();
     }
   }, [location.search, token, navigate]);
+  const SpinnerOverlay = () => {
+    return (
+      <div className="flex justify-center items-center h-20">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+      </div>
+    );
+  };
 
   const formatTransactionDate = (dateString) => {
     const date = new Date(dateString);
+    date.setHours(date.getHours() + 7);
+
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = date.getFullYear();
@@ -146,6 +165,7 @@ export function MyWallet() {
 
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
+
   const handleRecharge = async () => {
     if (amount <= 0) {
       setErrorMessage("Amount must be larger than 0.");
@@ -186,9 +206,13 @@ export function MyWallet() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(balance)} {/* Hiển thị số dư đã định dạng */}
-            </p>
+            {balanceLoading ? (
+              <SpinnerOverlay />
+            ) : (
+              <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                {formatCurrency(balance)}
+              </p>
+            )}
           </CardContent>
         </Card>
         <Tabs defaultValue="add-funds" className="mb-6">

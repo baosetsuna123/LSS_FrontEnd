@@ -505,6 +505,25 @@ export const fetchInfoTeacher = async (name, token) => {
     throw error;
   }
 };
+export const getOrderDetailsByOrderId = async (
+  orderId,
+  token,
+  options = {}
+) => {
+  const { page = 0, size = 10 } = options; // Set default values for page and size
+  try {
+    const response = await api.get(`/api/order-details/order/${orderId}`, {
+      params: { page, size },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+    throw error; // Rethrow error for handling at the call site
+  }
+};
 //system
 export const fetchSystemParam = async (token) => {
   try {

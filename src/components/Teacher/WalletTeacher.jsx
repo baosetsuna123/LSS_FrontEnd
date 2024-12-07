@@ -8,91 +8,61 @@ import {
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import wallet from "../../assets/wallet.jpg"; // Ensure the path is correct
 import { useEffect, useState } from "react";
-import {
-  fetchVNPayReturn,
-  fetchWalletHistory,
-  fetchWalletTeacher,
-} from "../../data/api"; // Import the functions
-import { toast } from "react-hot-toast"; // Import toast
-import { useLocation, useNavigate } from "react-router-dom";
+import { fetchWalletHistory, fetchWalletTeacher } from "../../data/api"; // Import the functions
+import { useLocation } from "react-router-dom";
 
 export function WalletTeacher() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [loadingBalance, setLoadingBalance] = useState(true); // Loading state for balance
+  const [loadingTransactions, setLoadingTransactions] = useState(true); // Loading state for transactions
   const token = sessionStorage.getItem("token");
   const location = useLocation();
-  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchTransactions = async () => {
+      setLoadingTransactions(true); // Start loading for transactions
       try {
         const data = await fetchWalletHistory(token);
         const sortedData = data.sort(
           (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
         );
-        console.log("Transactions:", data);
         setTransactions(sortedData);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
+      } finally {
+        setLoadingTransactions(false); // End loading for transactions
       }
     };
 
     fetchTransactions();
   }, [token, location.state]);
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
 
   useEffect(() => {
     const getBalance = async () => {
+      setLoadingBalance(true); // Start loading for balance
       try {
         const data = await fetchWalletTeacher(token);
         setBalance(data.balance);
       } catch (error) {
         console.error("Failed to fetch balance:", error);
+      } finally {
+        setLoadingBalance(false); // End loading for balance
       }
     };
 
-    // ... existing code ...
     getBalance();
   }, [token, location.search]);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const vnpAmount = urlParams.get("vnp_Amount");
-    const vnpResponseCode = urlParams.get("vnp_ResponseCode");
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
 
-    // Only proceed if vnp_Amount and vnp_ResponseCode are present
-    if (vnpAmount && vnpResponseCode) {
-      const fetchPaymentReturn = async () => {
-        try {
-          const params = Object.fromEntries(urlParams.entries());
-          const result = await fetchVNPayReturn(params, token);
-
-          // Check for successful payment and navigate
-          if (vnpResponseCode === "00") {
-            console.log("Payment result:", result);
-
-            toast.success(
-              `Payment successful! Amount: ${formatCurrency(vnpAmount / 100)}`
-            );
-            navigate("/wallet"); // Redirect to the wallet page after successful payment
-          } else {
-            toast.error("Payment failed or canceled!");
-          }
-        } catch (error) {
-          console.error("Error fetching payment return:", error);
-          toast.error("An error occurred while processing the payment.");
-        }
-      };
-
-      fetchPaymentReturn();
-    }
-  }, [location.search, token, navigate]);
   const formatTransactionDate = (dateString) => {
     const date = new Date(dateString);
+    date.setHours(date.getHours() + 7); // Convert UTC to GMT+7
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = date.getFullYear();
@@ -115,20 +85,33 @@ export function WalletTeacher() {
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
           My Wallet
         </h1>
+
         <Card className="mb-6 shadow-md">
           <CardHeader className="text-center">
             <CardTitle>Current Balance</CardTitle>
             <CardDescription>Your available funds</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            <p className="text-4xl font-bold text-gray-900">
-              {formatCurrency(balance)}
-            </p>
+            {loadingBalance ? (
+              <div className="flex justify-center items-center ">
+                <div className="loader border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+              </div>
+            ) : (
+              <p className="text-4xl font-bold text-gray-900">
+                {formatCurrency(balance)}
+              </p>
+            )}
           </CardContent>
         </Card>
 
         <Card>
-          {transactions.length > 0 && (
+          {loadingTransactions ? (
+            <CardContent className="text-center">
+              <p className="text-gray-500 text-lg animate-pulse">
+                Loading transactions...
+              </p>
+            </CardContent>
+          ) : transactions.length > 0 ? (
             <>
               <CardHeader>
                 <CardTitle>Recent Transactions</CardTitle>
@@ -155,14 +138,13 @@ export function WalletTeacher() {
                             <p className="text-sm text-gray-500">
                               {formatTransactionDate(
                                 transaction.transactionDate
-                              )}{" "}
-                              {/* Display formatted date */}
+                              )}
                             </p>
                             <p className="text-xs text-gray-400">
                               Transaction ID: {index + 1}
                             </p>
                             <p className="text-xs text-gray-400">
-                              Type: {transaction.note} {/* Display the note */}
+                              Type: {transaction.note}
                             </p>
                           </div>
                         </div>
@@ -186,6 +168,10 @@ export function WalletTeacher() {
                 </ul>
               </CardContent>
             </>
+          ) : (
+            <CardContent className="text-center">
+              <p className="text-gray-500 text-lg">No transactions found</p>
+            </CardContent>
           )}
         </Card>
       </div>

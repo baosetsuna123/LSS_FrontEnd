@@ -10,8 +10,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import defaults from "@/assets/default.jfif";
 import avatar from "../../assets/avatar.png";
+import { CircularProgress } from "@mui/material";
 
 const TeacherProfile = () => {
+  const [loadingAll, setLoadingAll] = useState(false);
   const { teacherName } = useParams();
   const [classes, setClasses] = useState([]);
   const token = sessionStorage.getItem("token");
@@ -31,6 +33,7 @@ const TeacherProfile = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
+        setLoadingAll(true);
         const data = await fetchClassbyteacherName(teacherName, token);
         const filteredClasses = data.filter(
           (classItem) =>
@@ -53,6 +56,8 @@ const TeacherProfile = () => {
         setTotalStudents(totalStudentsCount);
       } catch (error) {
         console.error("Error fetching classes:", error);
+      } finally {
+        setLoadingAll(false);
       }
     };
 
@@ -138,7 +143,16 @@ const TeacherProfile = () => {
       </div>
     );
   };
-
+  const SpinnerOverlay = () => {
+    return (
+      <div className="fixed inset-0 flex justify-center items-center   z-50">
+        <CircularProgress color="primary" size={60} />
+      </div>
+    );
+  };
+  if (loadingAll) {
+    return <SpinnerOverlay />;
+  }
   const handleClassClick = (classId) => {
     navigate(`/class/${classId}`);
   };
@@ -245,51 +259,49 @@ const TeacherProfile = () => {
         </p>
       </div>
 
-      <h2 className="text-3xl font-semibold text-gray-800 mt-6 ml-5 dark:text-gray-100">
-        My Class ({classes.length})
-      </h2>
-      <div className="grid grid-cols-12 gap-6 mt-6">
-        {classes.length > 0 ? (
-          classes.map((classItem) => (
-            <div key={classItem.classId} className="col-span-6 md:col-span-3">
-              <Card
-                onClick={() => handleClassClick(classItem.classId)}
-                className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl dark:bg-gray-800 dark:hover:bg-gray-700"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col gap-4">
-                    <img
-                      src={classItem.imageUrl || defaults}
-                      alt={classItem.name}
-                      className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
-                    />
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 dark:text-gray-100 dark:hover:text-blue-500">
-                        {classItem.name}
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Course Code: {classItem.courseCode}
-                      </p>
+      {classes.length > 0 && (
+        <>
+          <h2 className="text-3xl font-semibold text-gray-800 mt-6 ml-5 dark:text-gray-100">
+            My Class ({classes.length})
+          </h2>
+          <div className="grid grid-cols-12 gap-6 mt-6">
+            {classes.map((classItem) => (
+              <div key={classItem.classId} className="col-span-6 md:col-span-3">
+                <Card
+                  onClick={() => handleClassClick(classItem.classId)}
+                  className="cursor-pointer bg-white shadow-lg rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl dark:bg-gray-800 dark:hover:bg-gray-700"
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col gap-4">
+                      <img
+                        src={classItem.imageUrl || defaults}
+                        alt={classItem.name}
+                        className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
+                      />
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors duration-300 dark:text-gray-100 dark:hover:text-blue-500">
+                          {classItem.name}
+                        </h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Course Code: {classItem.courseCode}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <p className="text-lg font-bold flex items-center text-gray-900 dark:text-gray-100">
+                          {formatCurrency(classItem.price)}
+                        </p>
+                        <Button className="hover:bg-blue-500 dark:bg-orange-500 hover:text-white transition-colors duration-300 dark:hover:bg-blue-600 dark:hover:text-gray-900">
+                          View Details
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-lg font-bold flex items-center text-gray-900 dark:text-gray-100">
-                        {formatCurrency(classItem.price)}
-                      </p>
-                      <Button className="hover:bg-blue-500 dark:bg-orange-500 hover:text-white transition-colors duration-300 dark:hover:bg-blue-600 dark:hover:text-gray-900">
-                        View Details
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-600 dark:text-gray-400">
-            No classes found for this teacher.
-          </p>
-        )}
-      </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 };

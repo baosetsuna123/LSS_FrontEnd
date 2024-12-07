@@ -55,9 +55,10 @@ const Classes = () => {
   const [newStatus, setNewStatus] = useState("");
   const token = sessionStorage.getItem("token");
   const itemsPerPage = 5;
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchClassData = async () => {
+      setIsLoading(true);
       try {
         const response = await fetchClasses(token);
         const sortedData = response.sort(
@@ -68,6 +69,8 @@ const Classes = () => {
         setTotalPages(Math.ceil(response.length / itemsPerPage));
       } catch (error) {
         console.error("Error fetching classes:", error);
+      } finally {
+        setIsLoading(false); // Ensure loading is set to false after fetching completes
       }
     };
     fetchClassData();
@@ -131,110 +134,122 @@ const Classes = () => {
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-4">Lessons</h1>
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          type="text"
-          placeholder="Search by lesson name"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Lesson Name</TableHead>
-            <TableHead>Start Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Tutor Name</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedClasses.map((cls, index) => (
-            <TableRow key={cls.classId}>
-              <TableCell className="font-medium">
-                {(currentPage - 1) * itemsPerPage + index + 1}
-              </TableCell>
-              <TableCell>{cls.name}</TableCell>
-              <TableCell>{formatDate(cls.startDate)}</TableCell>
-              <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full font-semibold text-sm ${
-                    cls.status === "PENDING"
-                      ? "bg-yellow-300 text-yellow-700"
-                      : cls.status === "ACTIVE"
-                      ? "bg-blue-300 text-blue-700"
-                      : cls.status === "ONGOING"
-                      ? "bg-purple-300 text-purple-700"
-                      : cls.status === "COMPLETED"
-                      ? "bg-green-300 text-green-700"
-                      : cls.status === "CANCELED"
-                      ? "bg-red-300 text-red-700"
-                      : "bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  {cls.status.charAt(0).toUpperCase() +
-                    cls.status.slice(1).toLowerCase()}
-                </span>
-              </TableCell>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+        </div>
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <Input
+              type="text"
+              placeholder="Search by lesson name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead>Lesson Name</TableHead>
+                <TableHead>Start Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Tutor Name</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedClasses.map((cls, index) => (
+                <TableRow key={cls.classId}>
+                  <TableCell className="font-medium">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </TableCell>
+                  <TableCell>{cls.name}</TableCell>
+                  <TableCell>{formatDate(cls.startDate)}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full font-semibold text-sm ${
+                        cls.status === "PENDING"
+                          ? "bg-yellow-300 text-yellow-700"
+                          : cls.status === "ACTIVE"
+                          ? "bg-blue-300 text-blue-700"
+                          : cls.status === "ONGOING"
+                          ? "bg-purple-300 text-purple-700"
+                          : cls.status === "COMPLETED"
+                          ? "bg-green-300 text-green-700"
+                          : cls.status === "CANCELED"
+                          ? "bg-red-300 text-red-700"
+                          : "bg-gray-300 text-gray-700"
+                      }`}
+                    >
+                      {cls.status.charAt(0).toUpperCase() +
+                        cls.status.slice(1).toLowerCase()}
+                    </span>
+                  </TableCell>
 
-              <TableCell>{cls.teacherName}</TableCell>
-              <TableCell className="text-right">
-                {(cls.status === "PENDING" || cls.status === "ACTIVE") && (
-                  <Button onClick={() => handleEdit(cls.classId, "ONGOING")}>
-                    Edit
-                  </Button>
-                )}
-                {cls.status === "ONGOING" && (
-                  <Button onClick={() => handleEdit(cls.classId, "COMPLETED")}>
-                    Edit
-                  </Button>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-sm text-muted-foreground">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredClasses.length)} of{" "}
-          {filteredClasses.length} results
-        </div>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
-        </div>
-      </div>
+                  <TableCell>{cls.teacherName}</TableCell>
+                  <TableCell className="text-right">
+                    {(cls.status === "PENDING" || cls.status === "ACTIVE") && (
+                      <Button
+                        onClick={() => handleEdit(cls.classId, "ONGOING")}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                    {cls.status === "ONGOING" && (
+                      <Button
+                        onClick={() => handleEdit(cls.classId, "COMPLETED")}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="text-sm text-muted-foreground">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, filteredClasses.length)} of{" "}
+              {filteredClasses.length} results
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Modal for updating the class status */}
       {isModalOpen && (

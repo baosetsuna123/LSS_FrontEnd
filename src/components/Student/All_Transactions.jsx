@@ -22,10 +22,11 @@ export function WalletHistory() {
   const [endDate, setEndDate] = useState("");
   const [transactionType, setTransactionType] = useState("all");
   const token = sessionStorage.getItem("token");
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
+        setLoading(true);
         const data = await fetchWalletHistory(token);
         console.log("Transactions:", data);
         const sortedData = data.sort(
@@ -36,6 +37,8 @@ export function WalletHistory() {
         setFilteredTransactions(sortedData); // Set initial filtered transactions
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -87,6 +90,7 @@ export function WalletHistory() {
 
   const formatTransactionDate = (dateString) => {
     const date = new Date(dateString);
+    date.setHours(date.getHours() + 7);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
@@ -200,7 +204,14 @@ export function WalletHistory() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredTransactions.length === 0 ? (
+          {loading ? ( // Show spinner or loading message while loading
+            <div className="flex items-center justify-center h-48">
+              <div className="loader border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+              <p className="text-lg text-gray-600 font-semibold ml-4">
+                Loading...
+              </p>
+            </div>
+          ) : filteredTransactions.length === 0 ? (
             <div className="flex items-center justify-center h-48">
               <p className="text-lg text-red-500 font-semibold">No Data</p>
             </div>

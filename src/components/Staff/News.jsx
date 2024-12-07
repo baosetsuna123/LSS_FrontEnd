@@ -73,7 +73,6 @@ const News = ({
     setNewContent("");
     setIsCreateModalOpen(true);
   };
-
   const handleCreateModalClose = () => {
     setNewTitle("");
     setNewContent("");
@@ -218,9 +217,10 @@ const News = ({
               currentData.map((item, index) => {
                 const formattedDate =
                   item.date && item.time
-                    ? `${new Date(`${item.date}T${item.time}`).toLocaleString(
+                    ? `${new Date(`${item.date}T${item.time}Z`).toLocaleString(
                         "en-GB",
                         {
+                          timeZone: "Asia/Bangkok", // GMT+7 timezone
                           day: "2-digit",
                           month: "2-digit",
                           year: "numeric",

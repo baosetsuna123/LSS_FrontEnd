@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import { fetchSystemParam, updateParam } from "@/data/api";
 import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -95,7 +94,11 @@ const EditParams = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+      </div>
+    );
   }
 
   if (error) {

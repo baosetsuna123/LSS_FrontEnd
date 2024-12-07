@@ -14,13 +14,16 @@ const Notifications = () => {
   const [hoveredNoti, setHoveredNoti] = useState(null);
   const token = sessionStorage.getItem("token");
   const [activeTab, setActiveTab] = useState("All");
-
+  const [loading, setLoading] = useState(false);
   const fetchNotifications = useCallback(async () => {
     try {
+      setLoading(true);
       const data = await viewallNoti(token);
       setNotifications(data);
     } catch (error) {
       console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false);
     }
   }, [token]);
 
@@ -62,7 +65,7 @@ const Notifications = () => {
   const [showMarkAllMenu, setShowMarkAllMenu] = useState(false);
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
-
+    date.setHours(date.getHours() + 7);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
     const year = date.getFullYear();
@@ -178,103 +181,111 @@ const Notifications = () => {
 
         {/* Notification List */}
         <div className="space-y-4">
-          {filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center text-gray-500 dark:text-gray-400">
-              <BellOff className="h-12 w-12 mb-4" />
-              <p>No Notifications Left</p>
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <div className="loader border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
             </div>
           ) : (
-            filteredNotifications
-              .slice(0, visibleCount)
-              .map((notification, index) => (
-                <div
-                  key={index}
-                  className="relative border-b border-gray-200 dark:border-gray-700 pb-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
-                >
-                  <div className="font-medium text-gray-800 dark:text-gray-100">
-                    {notification.type}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {notification.description}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {formatDateTime(notification.createAt)}
-                  </div>
-
-                  {/* Dropdown Icon */}
-                  <div className="absolute top-0 right-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setHoveredNoti((prev) =>
-                          prev === notification.id ? null : notification.id
-                        );
-                      }}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                      <EllipsisVertical />
-                    </button>
-                  </div>
-
-                  {/* Dropdown Menu */}
-                  {hoveredNoti === notification.id && (
-                    <div className="absolute right-2 top-8 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
-                      <button
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                      >
-                        <svg
-                          className="h-5 w-5 mr-2 text-green-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        Mark as Read
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleRemoveNotification(notification.id)
-                        }
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                      >
-                        <svg
-                          className="h-5 w-5 mr-2 text-red-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                        Remove
-                      </button>
-                    </div>
-                  )}
+            <>
+              {filteredNotifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center text-gray-500 dark:text-gray-400">
+                  <BellOff className="h-12 w-12 mb-4" />
+                  <p>No Notifications Left</p>
                 </div>
-              ))
-          )}
-          {visibleCount < filteredNotifications.length && (
-            <div className="text-center mt-4">
-              <button
-                onClick={loadMore}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-800"
-              >
-                Load More
-              </button>
-            </div>
+              ) : (
+                filteredNotifications
+                  .slice(0, visibleCount)
+                  .map((notification, index) => (
+                    <div
+                      key={index}
+                      className="relative border-b border-gray-200 dark:border-gray-700 pb-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
+                    >
+                      <div className="font-medium text-gray-800 dark:text-gray-100">
+                        {notification.type}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {notification.description}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {formatDateTime(notification.createAt)}
+                      </div>
+
+                      {/* Dropdown Icon */}
+                      <div className="absolute top-0 right-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoveredNoti((prev) =>
+                              prev === notification.id ? null : notification.id
+                            );
+                          }}
+                          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          <EllipsisVertical />
+                        </button>
+                      </div>
+
+                      {/* Dropdown Menu */}
+                      {hoveredNoti === notification.id && (
+                        <div className="absolute right-2 top-8 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+                          <button
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                          >
+                            <svg
+                              className="h-5 w-5 mr-2 text-green-500"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            Mark as Read
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleRemoveNotification(notification.id)
+                            }
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                          >
+                            <svg
+                              className="h-5 w-5 mr-2 text-red-500"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+              )}
+              {visibleCount < filteredNotifications.length && (
+                <div className="text-center mt-4">
+                  <button
+                    onClick={loadMore}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-800"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

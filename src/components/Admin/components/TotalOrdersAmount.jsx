@@ -179,7 +179,9 @@ const TotalOrdersAmountDetails = () => {
                       </TableCell>
                       <TableCell>{row.orderDTO.username}</TableCell>
                       <TableCell>
-                        {new Date(row.orderDTO.createAt).toLocaleString()}
+                        {new Date(row.orderDTO.createAt).toLocaleDateString(
+                          "en-GB"
+                        )}
                       </TableCell>
                       <TableCell>
                         {row.orderDTO.totalPrice.toLocaleString()} VND

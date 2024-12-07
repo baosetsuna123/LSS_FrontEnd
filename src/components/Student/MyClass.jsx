@@ -34,20 +34,28 @@ const MyClass = () => {
   const handleWeekChange = (week, range) => {
     setSelectedWeekData({ week, range });
   };
-
-  const fetchAllSlots = async () => {
-    try {
-      const fetchedSlots = await fetchSlots(token);
-      setSlots(fetchedSlots);
-    } catch (error) {
-      console.error("Error fetching dropdown data:", error);
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [dataFetched, setDataFetched] = useState(false);
 
   useEffect(() => {
+    const fetchAllSlots = async () => {
+      setLoading(true);
+      try {
+        const fetchedSlots = await fetchSlots(token);
+        setSlots(fetchedSlots);
+      } catch (error) {
+        console.error("Error fetching dropdown data:", error);
+      } finally {
+        setDataFetched(true);
+      }
+    };
     fetchAllSlots();
   }, [token, selectedWeekData]);
-
+  useEffect(() => {
+    if (slots.length > 0 && datesInTheWeek.length > 0) {
+      setLoading(false);
+    }
+  }, [slots, datesInTheWeek, dataFetched]);
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
       2: "Monday",
@@ -113,55 +121,57 @@ const MyClass = () => {
   const handleClick = (id) => {
     navigate(`/class/${id}`);
   };
-  const fetchTimetable = async () => {
-    try {
-      const classes = await fetchOrderClasses(token);
-      console.log(classes);
-      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
-      const startRange = new Date(startRangeStr);
-      const endRange = new Date(endRangeStr);
-      setDatesInTheWeek(getDatesInRange(startRange, endRange));
-      const filteredClasses = classes.data.content.filter((item) => {
-        const classStartDate = new Date(item.classDTO.startDate);
-        return classStartDate >= startRange && classStartDate <= endRange;
-      });
-      const courses = await fetchCoursesService(token);
-      const updatedClasses = filteredClasses.map((contentItem) => {
-        const classItem = contentItem.classDTO;
-        const matchedCourse = courses.find(
-          (course) => course.courseCode === classItem.courseCode
-        );
-
-        return {
-          ...contentItem,
-          classDTO: {
-            ...classItem,
-            courseName: matchedCourse ? matchedCourse.name : null,
-          },
-        };
-      });
-
-      setTimetable(convertClassesToTimetable(updatedClasses));
-    } catch (error) {
-      console.error("Error fetching timetable:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchTimetable = async () => {
+      try {
+        setLoading(true); // Set loading to true before fetching timetable data
+        const classes = await fetchOrderClasses(token);
+        const [startRangeStr, endRangeStr] =
+          selectedWeekData.range.split(" To ");
+        const startRange = new Date(startRangeStr);
+        const endRange = new Date(endRangeStr);
+        setDatesInTheWeek(getDatesInRange(startRange, endRange)); // Set dates in the week
+
+        const filteredClasses = classes.data.content.filter((item) => {
+          const classStartDate = new Date(item.classDTO.startDate);
+          return classStartDate >= startRange && classStartDate <= endRange;
+        });
+
+        const courses = await fetchCoursesService(token); // Fetch courses
+
+        const updatedClasses = filteredClasses.map((contentItem) => {
+          const classItem = contentItem.classDTO;
+          const matchedCourse = courses.find(
+            (course) => course.courseCode === classItem.courseCode
+          );
+
+          return {
+            ...contentItem,
+            classDTO: {
+              ...classItem,
+              courseName: matchedCourse ? matchedCourse.name : null,
+            },
+          };
+        });
+
+        setTimetable(convertClassesToTimetable(updatedClasses)); // Set timetable
+      } catch (error) {
+        console.error("Error fetching timetable:", error);
+      } finally {
+        setLoading(false); // Set loading to false after timetable data is fetched
+      }
+    };
+
     fetchTimetable();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, selectedWeekData]);
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
-
     if (lesson && lesson.orderStatus === "CANCELLED") {
       return <div className="min-h-[80px]"></div>; // Empty cell for cancelled classes
     }
-
     if (lesson) {
       const lessonStatus = lesson.orderStatus; // Use status from orderDTO
-      console.log(lessonStatus);
       return (
         <div className="p-6 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex flex-col h-full">
@@ -227,50 +237,56 @@ const MyClass = () => {
       </h2>
       <YearWeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg dark:bg-gray-900 dark:border-gray-700">
-          <thead>
-            <tr className="bg-gray-200 dark:bg-gray-800 text-center">
-              <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-300">
-                Slot
-              </th>
-              {datesInTheWeek.map((date, index) => {
-                const dayOfWeek = days[index % 7];
-                return (
-                  <th
-                    key={index}
-                    className="py-2 px-4 border-b border-r text-center text-gray-800 dark:text-gray-300"
-                  >
-                    <p>{dayOfWeek}</p>
-                    <p>{date}</p>
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {slots.map((slot, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150"
-              >
-                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-300">
-                  Slot {slot.period}
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {"(" + slot.start + " - " + slot.end + ")"}
-                  </div>
-                </td>
-                {days.map((day) => (
-                  <td
-                    key={`${day}-${slot.period}`}
-                    className="border-b border-r p-2 text-center max-w-[150px] text-gray-800 dark:text-gray-300"
-                  >
-                    {renderTimetableCell(day, slot.period)}
-                  </td>
-                ))}
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+          </div>
+        ) : (
+          <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg dark:bg-gray-900 dark:border-gray-700">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-gray-800 text-center">
+                <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-300">
+                  Slot
+                </th>
+                {datesInTheWeek.map((date, index) => {
+                  const dayOfWeek = days[index % 7];
+                  return (
+                    <th
+                      key={index}
+                      className="py-2 px-4 border-b border-r text-center text-gray-800 dark:text-gray-300"
+                    >
+                      <p>{dayOfWeek}</p>
+                      <p>{date}</p>
+                    </th>
+                  );
+                })}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {slots.map((slot, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150"
+                >
+                  <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-300">
+                    Slot {slot.period}
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      {"(" + slot.start + " - " + slot.end + ")"}
+                    </div>
+                  </td>
+                  {days.map((day) => (
+                    <td
+                      key={`${day}-${slot.period}`}
+                      className="border-b border-r p-2 text-center max-w-[150px] text-gray-800 dark:text-gray-300"
+                    >
+                      {renderTimetableCell(day, slot.period)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

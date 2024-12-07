@@ -447,7 +447,7 @@ export function CourseLandingPage() {
             <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
               {comments
                 .filter(
-                  (_, index) => index === 0 || index === 12 || index === 24
+                  (_, index) => index === 0 || index === 6 || index === 12
                 )
                 .map((testimonial, index) => (
                   <Card

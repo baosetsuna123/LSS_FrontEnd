@@ -117,7 +117,7 @@ export default function Teacher() {
       </div>
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center">Loading...</div>
       ) : (
         <>
           {filteredTeachers.length === 0 ? (

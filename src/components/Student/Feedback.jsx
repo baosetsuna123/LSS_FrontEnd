@@ -46,10 +46,12 @@ export default function FeedbackForm() {
   const { orderId } = useParams();
   const [questions, setQuestions] = useState([]);
   const token = sessionStorage.getItem("token");
-
+  const [loading, setLoading] = useState(false);
+  const [loadingbutton, setLoadingbutton] = useState(false);
   useEffect(() => {
     const fetchCate = async () => {
       try {
+        setLoading(true);
         const data = await fetchQuestionFeedback();
         if (Array.isArray(data)) {
           setQuestions(data);
@@ -62,6 +64,8 @@ export default function FeedbackForm() {
         }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCate();
@@ -97,7 +101,7 @@ export default function FeedbackForm() {
       toast.error("Please answer all questions before submitting.");
       return;
     }
-
+    setLoadingbutton(true);
     try {
       setIsSubmitting(true);
 
@@ -128,6 +132,7 @@ export default function FeedbackForm() {
       toast.error(error.response?.data?.message || "Failed to submit feedback");
     } finally {
       setIsSubmitting(false);
+      setLoadingbutton(false);
     }
   };
   const navigate = useNavigate();
@@ -157,108 +162,125 @@ export default function FeedbackForm() {
         <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           Lesson Feedback
         </h1>
-        <form onSubmit={handleSubmit}>
-          <Card className="mb-6 dark:bg-gray-700">
-            <CardContent>
-              <Table className="min-w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/3 text-gray-800 dark:text-gray-100">
-                      Question
-                    </TableHead>
-                    {ratingOptions.map((option) => (
-                      <TableHead
-                        key={option.value}
-                        className="text-center text-gray-800 dark:text-gray-100"
-                      >
-                        {option.label} {/* Show label only in header */}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {questions.map((question) => (
-                    <TableRow key={question.id} className="dark:bg-gray-700">
-                      <TableCell className="text-gray-800 dark:text-gray-100">
-                        {question.questionText}
-                      </TableCell>
-                      {ratingOptions.map((option) => (
-                        <TableCell key={option.value} className="text-center">
-                          <RadioGroup
-                            value={
-                              feedbackData.feedbackAnswers
-                                .find((a) => a.questionId === question.id)
-                                ?.rating.toString() || ""
-                            }
-                            onValueChange={(value) =>
-                              handleRatingChange(question.id, parseInt(value))
-                            }
-                            className="flex justify-center"
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit}>
+              <Card className="mb-6 dark:bg-gray-700">
+                <CardContent>
+                  <Table className="min-w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-1/3 text-gray-800 dark:text-gray-100">
+                          Question
+                        </TableHead>
+                        {ratingOptions.map((option) => (
+                          <TableHead
+                            key={option.value}
+                            className="text-center text-gray-800 dark:text-gray-100"
                           >
-                            <RadioGroupItem
-                              value={option.value.toString()}
-                              id={`q${question.id}-o${option.value}`}
-                              className="sr-only"
-                            />
-                            <Label
-                              htmlFor={`q${question.id}-o${option.value}`}
-                              className="cursor-pointer"
+                            {option.label} {/* Show label only in header */}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {questions.map((question) => (
+                        <TableRow
+                          key={question.id}
+                          className="dark:bg-gray-700"
+                        >
+                          <TableCell className="text-gray-800 dark:text-gray-100">
+                            {question.questionText}
+                          </TableCell>
+                          {ratingOptions.map((option) => (
+                            <TableCell
+                              key={option.value}
+                              className="text-center"
                             >
-                              <div className="relative">
-                                {/* Outer circle with stroke effect */}
-                                <div
-                                  className={`size-5 rounded-full border-2 transition-all duration-200 ${
-                                    feedbackData.feedbackAnswers.find(
-                                      (a) => a.questionId === question.id
-                                    )?.rating === option.value
-                                      ? "border-blue-500 bg-blue-500"
-                                      : "border-gray-300 bg-white hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500"
-                                  }`}
+                              <RadioGroup
+                                value={
+                                  feedbackData.feedbackAnswers
+                                    .find((a) => a.questionId === question.id)
+                                    ?.rating.toString() || ""
+                                }
+                                onValueChange={(value) =>
+                                  handleRatingChange(
+                                    question.id,
+                                    parseInt(value)
+                                  )
+                                }
+                                className="flex justify-center"
+                              >
+                                <RadioGroupItem
+                                  value={option.value.toString()}
+                                  id={`q${question.id}-o${option.value}`}
+                                  className="sr-only"
                                 />
+                                <Label
+                                  htmlFor={`q${question.id}-o${option.value}`}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="relative">
+                                    {/* Outer circle with stroke effect */}
+                                    <div
+                                      className={`size-5 rounded-full border-2 transition-all duration-200 ${
+                                        feedbackData.feedbackAnswers.find(
+                                          (a) => a.questionId === question.id
+                                        )?.rating === option.value
+                                          ? "border-blue-500 bg-blue-500"
+                                          : "border-gray-300 bg-white hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500"
+                                      }`}
+                                    />
 
-                                {/* Additional outer ring when selected */}
-                                {feedbackData.feedbackAnswers.find(
-                                  (a) => a.questionId === question.id
-                                )?.rating === option.value && (
-                                  <div className="absolute -inset-1 rounded-full border-2 border-blue-500 animate-scale" />
-                                )}
-                              </div>
-                            </Label>
-                          </RadioGroup>
-                        </TableCell>
+                                    {/* Additional outer ring when selected */}
+                                    {feedbackData.feedbackAnswers.find(
+                                      (a) => a.questionId === question.id
+                                    )?.rating === option.value && (
+                                      <div className="absolute -inset-1 rounded-full border-2 border-blue-500 animate-scale" />
+                                    )}
+                                  </div>
+                                </Label>
+                              </RadioGroup>
+                            </TableCell>
+                          ))}
+                        </TableRow>
                       ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
 
-          <Card className="dark:bg-gray-700">
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-gray-100">
-                Additional Comments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Please provide any additional feedback here..."
-                value={feedbackData.comment}
-                onChange={handleCommentChange}
-                className="min-h-[100px] dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
-              />
-            </CardContent>
-            <CardFooter>
-              <Button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-              >
-                Submit Feedback
-              </Button>
-            </CardFooter>
-          </Card>
-        </form>
-
+              <Card className="dark:bg-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-gray-800 dark:text-gray-100">
+                    Additional Comments
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    placeholder="Please provide any additional feedback here..."
+                    value={feedbackData.comment}
+                    onChange={handleCommentChange}
+                    className="min-h-[100px] dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                  />
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    type="submit"
+                    disabled={loadingbutton}
+                    className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                  >
+                    {loadingbutton ? "Loading..." : "Submit"}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </>
+        )}
         {showSuccessModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">

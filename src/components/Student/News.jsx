@@ -5,9 +5,16 @@ import Breadcrumb from "../Home/Breadcrumb";
 import { useNavigate } from "react-router-dom";
 
 const formatDateTime = (date, time) => {
-  const [year, month, day] = date.split("-");
-  const [hour, minute] = time.split(":");
-  return `${day}/${month}/${year.slice(2)} ${hour}:${minute}`;
+  const dateObject = new Date(`${date}T${time}Z`); // Treat input as UTC
+  const options = {
+    timeZone: "Asia/Bangkok", // Set timezone to GMT+7
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Intl.DateTimeFormat("en-GB", options).format(dateObject);
 };
 
 const News = () => {
@@ -47,7 +54,12 @@ const News = () => {
     fetchNews();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+      </div>
+    );
   if (error) return <div>{error}</div>;
 
   const breadcrumbItems = [

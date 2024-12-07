@@ -65,7 +65,18 @@ export default function TransactionHistory() {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+  const formatTransactionDate = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() + 7);
 
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   return (
     <div className="col-span-2 min-h-[500px]">
       <div className="flex flex-col justify-center h-full items-center w-full bg-white shadow-lg py-2 rounded-lg px-8">
@@ -106,7 +117,7 @@ export default function TransactionHistory() {
                     </TableCell>
 
                     <TableCell>
-                      {new Date(row.transactionDate).toLocaleString()}
+                      {formatTransactionDate(row.transactionDate)}
                     </TableCell>
                     <TableCell>
                       {row.balanceAfterTransaction.toLocaleString()} VND

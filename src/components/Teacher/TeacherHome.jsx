@@ -143,6 +143,9 @@ function TeacherHome() {
     if (!num) return "";
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Convert num to string and add commas
   };
+  const [loading, setLoading] = useState(true);
+  const [dataFetched, setDataFetched] = useState(false);
+
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
       2: "Monday",
@@ -194,6 +197,7 @@ function TeacherHome() {
   };
 
   const fetchTimetable = async () => {
+    setLoading(true);
     try {
       const classes = await fetchClassbyteacher(token);
       setClassCreate(classes);
@@ -224,18 +228,27 @@ function TeacherHome() {
       setTimetable(convertClassesToTimetable(updatedClasses));
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false); // Stop loading when finished
     }
   };
 
   const fetchDropdownData = async () => {
     try {
+      setLoading(true);
       const fetchedSlots = await fetchSlots(token);
       setSlots(fetchedSlots);
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
+    } finally {
+      setDataFetched(true); // Stop loading when finished
     }
   };
-
+  useEffect(() => {
+    if (slots.length > 0 && datesInTheWeek.length > 0) {
+      setLoading(false);
+    }
+  }, [slots, datesInTheWeek, dataFetched]);
   useEffect(() => {
     fetchTimetable();
     fetchDropdownData();
@@ -392,45 +405,56 @@ function TeacherHome() {
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
       <div className="w-full">
-        <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700">
-              <th className="py-2 px-4 border-b border-r">Slot</th>
-              {datesInTheWeek.map((date, index) => {
-                const dayOfWeek = days[index % 7];
-                return (
-                  <th key={index} className="py-2 px-4 border-b text-center">
-                    <p>{dayOfWeek}</p>
-                    <p>{date}</p>
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {slots.map((slot, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-100 transition duration-150"
-              >
-                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
-                  Period {slot.period}
-                  <div className="text-xs text-gray-600">
-                    {"(" + slot.start + " - " + slot.end + ")"}
-                  </div>
-                </td>
-                {days.map((day) => (
-                  <td
-                    key={`${day}-${slot.period}`}
-                    className="border-b border-r p-2 text-center"
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+          </div>
+        ) : (
+          <>
+            <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
+              <thead>
+                <tr className="bg-gray-200 text-gray-700">
+                  <th className="py-2 px-4 border-b border-r">Slot</th>
+                  {datesInTheWeek.map((date, index) => {
+                    const dayOfWeek = days[index % 7];
+                    return (
+                      <th
+                        key={index}
+                        className="py-2 px-4 border-b text-center"
+                      >
+                        <p>{dayOfWeek}</p>
+                        <p>{date}</p>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {slots.map((slot, index) => (
+                  <tr
+                    key={index}
+                    className="hover:bg-gray-100 transition duration-150"
                   >
-                    {renderTimetableCell(day, slot.period)}
-                  </td>
+                    <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
+                      Period {slot.period}
+                      <div className="text-xs text-gray-600">
+                        {"(" + slot.start + " - " + slot.end + ")"}
+                      </div>
+                    </td>
+                    {days.map((day) => (
+                      <td
+                        key={`${day}-${slot.period}`}
+                        className="border-b border-r p-2 text-center"
+                      >
+                        {renderTimetableCell(day, slot.period)}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
       <Modal
         isOpen={isModalOpen}

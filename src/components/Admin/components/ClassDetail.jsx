@@ -1,4 +1,5 @@
 import { Box, Button, Typography, Modal, Grid, Paper } from "@mui/material";
+import defaults from "../../../assets/default.jfif";
 
 const ClassDetail = ({ data, open, setOpen }) => {
   return (
@@ -36,7 +37,7 @@ const ClassDetail = ({ data, open, setOpen }) => {
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className="p-4">
               <img
-                src={data?.imageUrl || "https://via.placeholder.com/150"}
+                src={data?.imageUrl || defaults}
                 alt={data?.name}
                 className="w-full h-auto object-cover rounded-md mb-4"
               />
@@ -89,17 +90,6 @@ const ClassDetail = ({ data, open, setOpen }) => {
                   <Typography variant="body1">
                     <strong>Start Date:</strong>{" "}
                     {new Date(data?.startDate).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>End Date:</strong>{" "}
-                    {new Date(data?.endDate).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Day of Week:</strong> {data?.dayOfWeek}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>

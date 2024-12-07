@@ -19,9 +19,12 @@ const WithdrawApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingApproval, setLoadingApproval] = useState(false);
+
   useEffect(() => {
     const loadAppWithdraws = async () => {
       const token = sessionStorage.getItem("token");
+      setLoadingApproval(true);
       try {
         const data = await getApplicationsByType(1, token);
         const sortedData = data.sort(
@@ -31,6 +34,8 @@ const WithdrawApp = () => {
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");
+      } finally {
+        setLoadingApproval(false);
       }
     };
 
@@ -80,7 +85,18 @@ const WithdrawApp = () => {
     setIsModalOpen(false);
   };
   const [imageLoaded, setImageLoaded] = useState(false);
+  const formatTransactionDate = (dateString) => {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() + 7);
 
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
@@ -113,94 +129,105 @@ const WithdrawApp = () => {
         </div>
       </div>
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Account Number
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bank
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedApplications.length > 0 ? (
-              paginatedApplications.map((app, index) => {
-                const { accountNumber, bank } = parseDescription(
-                  app.description
-                );
-                return (
-                  <tr key={app.applicationUserId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {app.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {accountNumber}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {bank}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          app.status === "completed"
-                            ? "bg-green-100 text-green-800"
-                            : app.status === "Canceled"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
+        {loadingApproval ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+          </div>
+        ) : (
+          <>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Account Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Bank
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left  text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedApplications.length > 0 ? (
+                  paginatedApplications.map((app, index) => {
+                    const { accountNumber, bank } = parseDescription(
+                      app.description
+                    );
+                    return (
+                      <tr
+                        key={app.applicationUserId}
+                        className="hover:bg-gray-50"
                       >
-                        {app.status.charAt(0).toUpperCase() +
-                          app.status.slice(1).toLowerCase()}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
-                      {app.amountFromDescription.toLocaleString()} VND
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {app.status === "completed" && (
-                        <button
-                          onClick={() =>
-                            handleDetailsClick(app.applicationUserId)
-                          }
-                          className="text-blue-600 hover:text-blue-800"
-                          disabled={loading} // Disable button while loading
-                        >
-                          {loading ? "Loading..." : "Details"}
-                        </button>
-                      )}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {app.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {accountNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {bank}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              app.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : app.status === "Canceled"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {app.status.charAt(0).toUpperCase() +
+                              app.status.slice(1).toLowerCase()}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
+                          {app.amountFromDescription.toLocaleString()} VND
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {app.status === "completed" && (
+                            <button
+                              onClick={() =>
+                                handleDetailsClick(app.applicationUserId)
+                              }
+                              className="text-blue-600 hover:text-blue-800"
+                              disabled={loading} // Disable button while loading
+                            >
+                              {loading ? "Loading..." : "Details"}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No withdrawal applications found.
                     </td>
                   </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td
-                  colSpan="6"
-                  className="px-6 py-4 text-center text-sm text-gray-500"
-                >
-                  No withdrawal applications found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                )}
+              </tbody>
+            </table>
+          </>
+        )}
       </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -225,7 +252,7 @@ const WithdrawApp = () => {
                       Approval Date
                     </p>
                     <p className="text-sm text-gray-900 dark:text-gray-100">
-                      {new Date(approvalDetail.approvalDate).toLocaleString()}
+                      {formatTransactionDate(approvalDetail.approvalDate)}
                     </p>
                   </div>
                 </div>

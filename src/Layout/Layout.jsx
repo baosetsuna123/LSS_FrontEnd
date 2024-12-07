@@ -195,7 +195,7 @@ export function Layout({ children }) {
   const [showMarkAllMenu, setShowMarkAllMenu] = useState(false);
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
-
+    date.setHours(date.getHours() + 7);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
     const year = date.getFullYear();
@@ -223,7 +223,6 @@ export function Layout({ children }) {
   };
   const handleRefreshClick = () => {
     fetchNotifications(); // Fetch notifications when the button is clicked
-    toast.success("Notifications refreshed successfully");
   };
   const filteredNotifications =
     activeTab === "All"
@@ -251,7 +250,7 @@ export function Layout({ children }) {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search lessons ..."
+                placeholder="Search lessons by name"
                 value={searchTerm}
                 onChange={handleSearchInputChange}
                 className="border rounded px-4 py-1 w-96 

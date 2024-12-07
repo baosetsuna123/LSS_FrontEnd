@@ -50,9 +50,10 @@ export function ApplicationManagement() {
   const [withdrawPage, setWithdrawPage] = useState(1); // Separate page for Withdraw Applications
   const [otherPage, setOtherPage] = useState(1); // Separate page for Other Applications
   const [applicationsPerPage] = useState(5);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchApplications = async () => {
+      setLoading(true);
       try {
         const data = await viewAllApplications(token);
         const sortedData = data.sort(
@@ -62,6 +63,8 @@ export function ApplicationManagement() {
         console.log(data);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchApplications();
@@ -176,7 +179,11 @@ export function ApplicationManagement() {
       {/* Tab Content */}
       {selectedTab === "Withdraw Applications" && (
         <>
-          {withdrawApplications.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center w-full h-full">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+            </div>
+          ) : withdrawApplications.length === 0 ? (
             <p className="flex items-center text-red-500 justify-center text-center w-full h-full">
               No Data
             </p>
@@ -293,40 +300,38 @@ export function ApplicationManagement() {
               </TableBody>
             </Table>
           )}
-
-          {/* Pagination Controls */}
-          {applications.length > applicationsPerPage &&
-            withdrawApplications.length > 0 &&
-            searchQuery === "" && (
-              <div className="flex justify-end items-center mt-4">
-                <div className="flex items-center">
-                  <Button
-                    onClick={() => paginateWithdraw(withdrawPage - 1)}
-                    disabled={withdrawPage === 1}
-                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                  >
-                    <FaChevronLeft />
-                  </Button>
-
-                  <span className="px-4 text-lg">{withdrawPage}</span>
-
-                  <Button
-                    onClick={() => paginateWithdraw(withdrawPage + 1)}
-                    disabled={
-                      withdrawPage ===
-                      Math.ceil(
-                        withdrawApplications.length / applicationsPerPage
-                      )
-                    }
-                    className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
-                  >
-                    <FaChevronRight />
-                  </Button>
-                </div>
-              </div>
-            )}
         </>
       )}
+
+      {/* Pagination Controls */}
+      {applications.length > applicationsPerPage &&
+        withdrawApplications.length > 0 &&
+        searchQuery === "" && (
+          <div className="flex justify-end items-center mt-4">
+            <div className="flex items-center">
+              <Button
+                onClick={() => paginateWithdraw(withdrawPage - 1)}
+                disabled={withdrawPage === 1}
+                className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+              >
+                <FaChevronLeft />
+              </Button>
+
+              <span className="px-4 text-lg">{withdrawPage}</span>
+
+              <Button
+                onClick={() => paginateWithdraw(withdrawPage + 1)}
+                disabled={
+                  withdrawPage ===
+                  Math.ceil(withdrawApplications.length / applicationsPerPage)
+                }
+                className="text-gray-500 hover:bg-gray-700 hover:text-white rounded-full p-2"
+              >
+                <FaChevronRight />
+              </Button>
+            </div>
+          </div>
+        )}
 
       {selectedTab === "Other Applications" && (
         <>

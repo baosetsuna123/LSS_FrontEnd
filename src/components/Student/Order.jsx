@@ -8,14 +8,22 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import { fetchOrderClasses, CancelOrder } from "@/data/api";
+import {
+  fetchOrderClasses,
+  CancelOrder,
+  getOrderDetailsByOrderId,
+} from "@/data/api";
 import toast from "react-hot-toast";
 import {
   FaChevronLeft,
   FaChevronRight,
   FaExclamationTriangle,
+  FaTimes,
 } from "react-icons/fa";
 import { useWallet } from "@/context/WalletContext";
+import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
+import avatar from "../../assets/avatar.png";
 
 const statusColors = {
   COMPLETED:
@@ -39,23 +47,46 @@ const formatCurrency = (amount) => {
 
 export function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false); // Modal visibility state
   const [selectedOrder, setSelectedOrder] = useState(null); // Order to cancel
   const [newBalance, setNewBalance] = useState(null); // New balance after cancellation
   const itemsPerPage = 5;
+  const [loading, setLoading] = useState(false);
   const token = sessionStorage.getItem("token");
   const { balance, loadBalance } = useWallet();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
       loadBalance(token);
     }
   }, [token, loadBalance]);
-
+  const [orderDetails, setOrderDetails] = useState(null);
+  const handleShowDetails = async (order) => {
+    setSelectedOrder(order);
+    try {
+      const data = await getOrderDetailsByOrderId(
+        order.orderDTO.orderId,
+        token
+      );
+      setOrderDetails(data.content[0]);
+      setShowDetailsModal(true);
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      toast.error("Failed to fetch order details");
+    }
+  };
+  const handleNavigate = (name) => {
+    navigate(`/profile/${encodeURIComponent(name)}`, {
+      state: { classId: orderDetails.classDTO.classId },
+    });
+  };
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true);
       try {
         const response = await fetchOrderClasses(token);
         const sortedData = response.data.content.sort(
@@ -66,6 +97,8 @@ export function MyOrders() {
         console.log(response.data.content);
       } catch (error) {
         console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchOrders();
@@ -145,13 +178,12 @@ export function MyOrders() {
         </div>
 
         {/* Display message if no orders */}
-        {filteredOrders.length === 0 && (
-          <div className="text-center text-xl font-semibold text-gray-500 dark:text-gray-300 mt-8">
-            No Data
-          </div>
-        )}
 
-        {filteredOrders.length > 0 && (
+        {loading ? ( // Check if data is being loaded
+          <div className="flex justify-center items-center w-full h-full">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+          </div>
+        ) : filteredOrders.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -214,11 +246,23 @@ export function MyOrders() {
                         Cancel
                       </button>
                     )}
+                    {order.orderDTO.status === "COMPLETED" && (
+                      <Button
+                        onClick={() => handleShowDetails(order)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 w-24"
+                      >
+                        Detail
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        ) : (
+          <div className="text-center text-gray-500 dark:text-gray-300">
+            No orders available.
+          </div>
         )}
 
         {orders.length > itemsPerPage && !searchQuery && (
@@ -243,6 +287,56 @@ export function MyOrders() {
           </div>
         )}
       </div>
+      {showDetailsModal && orderDetails && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full dark:bg-gray-800">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                Order Details
+              </h2>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              {/* Left Column */}
+              <div>
+                <h3 className="font-bold mb-2">{orderDetails.classDTO.name}</h3>
+                <p className="mb-2">
+                  Price: {formatCurrency(orderDetails.price)}
+                </p>
+                <p className="mb-2">
+                  Status:{" "}
+                  <span className="capitalize text-green-600">
+                    {orderDetails.orderDTO.status.toLowerCase()}
+                  </span>
+                </p>
+              </div>
+              {/* Right Column */}
+              <div className="flex flex-col justify-center items-center group">
+                {/* Teacher Name */}
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
+                  {orderDetails.classDTO.teacherName}
+                </p>
+                {/* Avatar Image */}
+                <div className="w-20 h-20 rounded-full bg-transparent group-hover:border-[3px] hover:border-blue-400 flex items-center justify-center transition-all duration-100">
+                  <img
+                    src={orderDetails.classDTO.avatarImage || avatar}
+                    alt="Teacher Avatar"
+                    onClick={() =>
+                      handleNavigate(orderDetails.classDTO.teacherName)
+                    }
+                    className="w-16 h-16 rounded-full cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {showModal && (
