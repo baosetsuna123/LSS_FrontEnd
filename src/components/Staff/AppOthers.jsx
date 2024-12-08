@@ -44,10 +44,6 @@ const AppOthers = ({
     const token = sessionStorage.getItem("token");
     try {
       if (actionType === "approve") {
-        if (!approvalImage) {
-          toast.error("Please choose a receipt image before submitting.");
-          return;
-        }
         setLoading(true);
         await approveOtherApp(selectedId, token, approvalImage);
         toast.success("Application approved successfully!");
@@ -114,7 +110,7 @@ const AppOthers = ({
                       htmlFor="file-upload"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      Upload Receipt
+                      Upload File (optional)
                     </Label>
                     <div className="flex items-center gap-2">
                       <Button

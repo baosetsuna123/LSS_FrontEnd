@@ -78,7 +78,7 @@ export default function SignUp() {
     setIsLoading(true);
     try {
       if (userType === "student") {
-        await fetchSignUpStudent(
+        const data = await fetchSignUpStudent(
           username,
           password,
           email,
@@ -87,6 +87,7 @@ export default function SignUp() {
           categoryIds
         );
         toast.success("Please verify your email with OTP");
+        console.log(data);
         navigate("/verify-otp-register");
       } else if (userType === "tutor") {
         await fetchSignUpTeacher(

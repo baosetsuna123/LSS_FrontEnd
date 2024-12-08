@@ -21,6 +21,7 @@ export default defineConfig({
           "https://fptslsp-b6ash4b6cea2gweq.southeastasia-01.azurewebsites.net",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: true,
       },
     },
   },

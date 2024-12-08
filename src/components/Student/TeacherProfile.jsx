@@ -45,6 +45,7 @@ const TeacherProfile = () => {
         const totalStudentsCount = data
           .filter(
             (classItem) =>
+              classItem.status === "PENDING" ||
               classItem.status === "ACTIVE" ||
               classItem.status === "ONGOING" ||
               classItem.status === "COMPLETED"

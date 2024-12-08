@@ -150,6 +150,7 @@ export function ClassDetail() {
       setLoadingAll(true);
       const response = await fetchClassbyID(id, token);
       setClassDetail(response);
+      console.log("Class Detail:", response);
 
       const storedResult = localStorage.getItem("result");
       const currentUserName = storedResult
@@ -196,12 +197,33 @@ export function ClassDetail() {
 
   const handleConfirmEnroll = async () => {
     setLoading(true);
-    // Close the modal and create the order
     try {
+      // Simulate order creation
       setIsProcessing(true);
       await fetchCreateOrder(id, token);
       toast.success("Order Lesson Successfully!");
       setIsEnrolled(true);
+
+      // Get current user info from local storage
+      const storedResult = localStorage.getItem("result");
+      const currentUser = storedResult ? JSON.parse(storedResult) : null;
+
+      if (currentUser) {
+        // Update the students array locally
+        setClassDetail((prevDetail) => ({
+          ...prevDetail,
+          students: [
+            ...prevDetail.students,
+            {
+              userName: currentUser.username,
+              phoneNumber: currentUser.phoneNumber,
+              email: currentUser.email,
+              fullName: currentUser.fullName,
+              address: currentUser.address,
+            },
+          ],
+        }));
+      }
     } catch (error) {
       if (error.response) {
         const errorMessage =

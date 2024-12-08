@@ -4,7 +4,6 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "/api", // Use VITE_API_URL from environment variables or fall back to local proxy
   withCredentials: true,
 });
-
 //Login api
 export const fetchLogin = async (username, password) => {
   return await api.post("/auth/login", {

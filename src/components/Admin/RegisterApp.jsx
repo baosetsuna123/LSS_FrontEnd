@@ -121,9 +121,6 @@ const RegisterApp = () => {
                   <th className="px-6 py-3 whitespace-nowrap  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Staff Assigned
                   </th>
-                  <th className="px-6 py-3 whitespace-nowrap  text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rejection Reason
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -240,17 +237,6 @@ const RegisterApp = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {app.assignedStaff || "N/A"}
-                      </td>
-
-                      <td
-                        className="px-6 py-4 whitespace-nowrap text-sm cursor-pointer text-gray-500"
-                        title={app.rejectionReason}
-                      >
-                        {app.rejectionReason
-                          ? app.rejectionReason.length > 10
-                            ? `${app.rejectionReason.slice(0, 10)}...`
-                            : app.rejectionReason
-                          : "N/A"}
                       </td>
                     </tr>
                   ))

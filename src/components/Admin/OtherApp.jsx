@@ -1,23 +1,13 @@
-import { getApplicationsByType, getApprovalDetail } from "@/data/api";
+import { getApplicationsByType } from "@/data/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  ImageIcon,
-  User,
-  Calendar,
-  X,
-} from "lucide-react";
-import { Button } from "../ui/button";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 const OtherApp = () => {
   const [appOther, setAppOther] = useState([]);
   const [filterStatus, setFilterStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [loadingOther, setLoadingOther] = useState(false);
   const itemsPerPage = 5;
 
@@ -41,24 +31,7 @@ const OtherApp = () => {
 
     loadAppOthers();
   }, []);
-  const [loading, setLoading] = useState(false);
-  const token = sessionStorage.getItem("token");
-  const [approvalDetail, setApprovalDetail] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleDetailsClick = async (applicationUserId) => {
-    setLoading(true); // Set loading to true when the Details button is clicked
-    try {
-      const approvalRecord = await getApprovalDetail(applicationUserId, token);
-      console.log("Approval Record: ", approvalRecord);
-      setApprovalDetail(approvalRecord);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Error fetching approval record:", error);
-      toast.error("Failed to fetch approval record.");
-    } finally {
-      setLoading(false); // Set loading to false when the API call is completed
-    }
-  };
+
   const parseDescription = (description) => {
     const rollNoMatch = description.match(/Student Roll No:\s*(.*?),/i);
     const reasonMatch = description.match(/Reason:\s*(.+)/i);
@@ -80,27 +53,13 @@ const OtherApp = () => {
       .includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
 
   const pageCount = Math.ceil(filteredApplications.length / itemsPerPage);
   const paginatedApplications = filteredApplications.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const formatTransactionDate = (dateString) => {
-    const date = new Date(dateString);
-    date.setHours(date.getHours() + 7);
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
@@ -190,19 +149,6 @@ const OtherApp = () => {
                               app.status.slice(1).toLowerCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {app.status === "completed" && (
-                            <button
-                              onClick={() =>
-                                handleDetailsClick(app.applicationUserId)
-                              }
-                              className="text-blue-600 hover:text-blue-800"
-                              disabled={loading} // Disable button while loading
-                            >
-                              {loading ? "Loading..." : "Details"}
-                            </button>
-                          )}
-                        </td>
                       </tr>
                     );
                   })
@@ -221,79 +167,6 @@ const OtherApp = () => {
           </>
         )}
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative">
-            <Button
-              onClick={closeModal}
-              variant="ghost"
-              className="absolute right-2 top-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-              Approval Details
-            </h2>
-            {approvalDetail ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Calendar className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
-                      Approval Date
-                    </p>
-                    <p className="text-sm text-gray-900 dark:text-gray-100">
-                      {formatTransactionDate(approvalDetail.approvalDate)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <User className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
-                      Approved By
-                    </p>
-                    <p className="text-sm text-gray-900 dark:text-gray-100">
-                      {approvalDetail.approvedBy}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4">
-                    <ImageIcon className="h-5 w-5 text-red-500" />
-                    <p className="font-semibold text-sm text-gray-500 dark:text-gray-400">
-                      Approval Image
-                    </p>
-                  </div>
-                  <div className="w-full h-auto flex justify-center items-center">
-                    {!imageLoaded && (
-                      <div className="text-gray-500 dark:text-gray-400">
-                        Loading image...
-                      </div>
-                    )}
-                    <img
-                      src={approvalDetail.approvalImage}
-                      alt="Approval Image"
-                      className={`rounded-lg shadow-md ${
-                        imageLoaded ? "block" : "hidden"
-                      }`}
-                      onLoad={() => setImageLoaded(true)}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="py-4 text-center text-gray-500 dark:text-gray-400">
-                Loading approval details...
-              </div>
-            )}
-            <Button onClick={closeModal} className="mt-6 w-full">
-              Close
-            </Button>
-          </div>
-        </div>
-      )}
       {pageCount > 1 && (
         <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
           <div className="flex flex-1 justify-between sm:hidden">

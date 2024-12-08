@@ -6,6 +6,7 @@ const RejectModal = ({
   onSubmit,
   rejectionReason,
   setRejectionReason,
+  loadingr,
 }) => {
   if (!isOpen) return null;
 
@@ -44,6 +45,7 @@ const RejectModal = ({
           <div className="flex justify-end mt-4">
             <button
               type="button"
+              disabled={loadingr}
               className="mr-2 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 transition duration-200 ease-in-out"
               onClick={onClose}
             >
@@ -51,9 +53,10 @@ const RejectModal = ({
             </button>
             <button
               type="submit"
+              disabled={loadingr}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 ease-in-out"
             >
-              Submit
+              {loadingr ? "Rejecting..." : "Reject"}
             </button>
           </div>
         </form>

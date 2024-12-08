@@ -22,6 +22,8 @@ const ApplicationLayout = ({
   setSearchQuery,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadinga, setLoadinga] = useState(false);
+  const [loadingr, setLoadingr] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
@@ -49,6 +51,7 @@ const ApplicationLayout = ({
   const handleApproveApplication = async () => {
     if (!selectedApplication) return;
     try {
+      setLoadinga(true);
       await fetchApproveApplication(selectedApplication, token);
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
@@ -63,6 +66,8 @@ const ApplicationLayout = ({
       console.error("Failed to approve application:", error);
       toast.error("Failed to approve application.");
       setIsApproveModalOpen(false);
+    } finally {
+      setLoadinga(false);
     }
   };
 
@@ -73,6 +78,7 @@ const ApplicationLayout = ({
     }
 
     try {
+      setLoadingr(true);
       await rejectApplication(selectedApplication, rejectionReason, token);
       setApplications((prevApplications) =>
         prevApplications.map((app) =>
@@ -88,6 +94,7 @@ const ApplicationLayout = ({
     } finally {
       setIsModalOpen(false);
       setRejectionReason("");
+      setLoadingr(false);
       setSelectedApplication(null);
     }
   };
@@ -360,11 +367,13 @@ const ApplicationLayout = ({
               <Button
                 onClick={handleApproveApplication}
                 className="mr-2 bg-green-500 hover:bg-green-600"
+                disabled={loadinga}
               >
-                Yes
+                {loadinga ? "Approving..." : "Yes"}
               </Button>
               <Button
                 variant="secondary"
+                disabled={loadinga}
                 onClick={() => setIsApproveModalOpen(false)}
               >
                 No
@@ -378,6 +387,7 @@ const ApplicationLayout = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleReject}
+        loadingr={loadingr}
         rejectionReason={rejectionReason}
         setRejectionReason={setRejectionReason}
       />

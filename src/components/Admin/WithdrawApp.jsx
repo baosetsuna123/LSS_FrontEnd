@@ -64,11 +64,9 @@ const WithdrawApp = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const [loading, setLoading] = useState(false);
   const [approvalDetail, setApprovalDetail] = useState(null);
   const token = sessionStorage.getItem("token");
   const handleDetailsClick = async (applicationUserId) => {
-    setLoading(true); // Set loading to true when the Details button is clicked
     try {
       const approvalRecord = await getApprovalDetail(applicationUserId, token);
       console.log("Approval Record: ", approvalRecord);
@@ -77,8 +75,6 @@ const WithdrawApp = () => {
     } catch (error) {
       console.error("Error fetching approval record:", error);
       toast.error("Failed to fetch approval record.");
-    } finally {
-      setLoading(false); // Set loading to false when the API call is completed
     }
   };
   const closeModal = () => {
@@ -205,9 +201,8 @@ const WithdrawApp = () => {
                                 handleDetailsClick(app.applicationUserId)
                               }
                               className="text-blue-600 hover:text-blue-800"
-                              disabled={loading} // Disable button while loading
                             >
-                              {loading ? "Loading..." : "Details"}
+                              Details
                             </button>
                           )}
                         </td>
