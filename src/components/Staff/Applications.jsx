@@ -149,9 +149,6 @@ const ApplicationLayout = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Tutor Name
               </th>
-              <th className="px-6 whitespace-nowrap py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Rejection Reason
-              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Action
               </th>
@@ -209,13 +206,6 @@ const ApplicationLayout = ({
                       ? `${app.teacherName.slice(0, 12)}...`
                       : app.teacherName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {app.rejectionReason
-                      ? app.rejectionReason.length > 10
-                        ? `${app.rejectionReason.slice(0, 10)}...`
-                        : app.rejectionReason
-                      : "N/A"}
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -259,16 +249,6 @@ const ApplicationLayout = ({
                               )}
                             </div>
                           </div>
-
-                          {/* Rejection Reason (if available) */}
-                          {app.rejectionReason && (
-                            <div className="mb-4">
-                              <span className="font-bold">
-                                Rejection Reason:
-                              </span>
-                              <div>{app.rejectionReason}</div>
-                            </div>
-                          )}
                         </div>
                       </DialogContent>
                     </Dialog>
