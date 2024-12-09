@@ -31,7 +31,7 @@ const ClassDetail = ({ data, open, setOpen }) => {
           gutterBottom
           className="text-primary font-bold"
         >
-          Class Detail
+          Lesson Detail
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
