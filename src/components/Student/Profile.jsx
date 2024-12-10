@@ -16,6 +16,7 @@ import profile from "../../assets/profilebg.jfif";
 export default function Profile() {
   const result = JSON.parse(localStorage.getItem("result") || "{}");
   const token = sessionStorage.getItem("token");
+  const [loading, setLoading] = useState(false);
 
   const [profileData, setProfileData] = useState({
     username: result.username || "",
@@ -83,6 +84,7 @@ export default function Profile() {
     };
 
     try {
+      setLoading(true);
       await updateCurrentUser(token, updatedProfileData);
       toast.success("Profile updated successfully!");
       const updatedMajor = allCategories.filter((category) =>
@@ -102,6 +104,8 @@ export default function Profile() {
     } catch (e) {
       console.log(e);
       toast.error("Failed to update profile.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -222,10 +226,11 @@ export default function Profile() {
             onClick={handleUpdateProfile}
             variant="contained"
             color="primary"
+            disabled={loading}
             fullWidth
             className="mt-6 py-3 text-lg font-semibold rounded-lg shadow-xl hover:bg-blue-700 transition duration-300 dark:hover:bg-blue-800"
           >
-            Update Profile
+            {loading ? "Updating..." : "Update Profile"}
           </Button>
         </div>
       </div>
