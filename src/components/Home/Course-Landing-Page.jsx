@@ -16,28 +16,33 @@ import "./Course-Landing-Page.css";
 
 export function CourseLandingPage() {
   const [majorClasses, setMajorClasses] = useState([]);
+  const [loadingm, setLoadingm] = useState(false);
   useEffect(() => {
     const fetchMajorClasses = async () => {
       try {
         const token = sessionStorage.getItem("token");
-        if (token) {
-          const classes = await fetchMajorClassByStudent(token);
+        setLoadingm(true);
+        const classes = await fetchMajorClassByStudent(token);
+        console.log(loadingm);
 
-          const sortedClasses = classes.sort(
-            (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
-          );
+        const sortedClasses = classes.sort(
+          (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
+        );
 
-          setMajorClasses(sortedClasses);
-          console.log(sortedClasses);
-        }
+        setMajorClasses(sortedClasses);
+        console.log(sortedClasses);
       } catch (error) {
         console.error("Error fetching major classes:", error);
+      } finally {
+        setLoadingm(false);
       }
     };
 
     fetchMajorClasses();
   }, []);
-
+  useEffect(() => {
+    console.log("Loadingm changed:", loadingm);
+  }, [loadingm]);
   const [comments, setComments] = useState([]);
   const [loadingc, setLoadingc] = useState(false);
   useEffect(() => {
@@ -256,7 +261,7 @@ export function CourseLandingPage() {
                 <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
                   Related Lessons
                 </h2>
-                {loading ? (
+                {loadingm ? (
                   <div className="flex justify-center">
                     <Loader className="w-10 h-10 animate-spin" />
                   </div>
