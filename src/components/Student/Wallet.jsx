@@ -84,7 +84,7 @@ export function MyWallet() {
     }
   }, [token]);
   const [balanceLoading, setBalanceLoading] = useState(false);
-
+  const [processing, setProcessing] = useState(false);
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const vnpAmount = urlParams.get("vnp_Amount");
@@ -92,19 +92,20 @@ export function MyWallet() {
 
     if (vnpAmount && vnpResponseCode) {
       const fetchPaymentReturn = async () => {
-        setBalanceLoading(true);
         try {
+          setBalanceLoading(true);
+          setProcessing(true);
+
           const params = Object.fromEntries(urlParams.entries());
           await fetchVNPayReturn(params, token);
 
           if (vnpResponseCode === "00") {
             const creditedAmount = parseFloat(vnpAmount) / 100; // Convert VNPay amount to actual
 
-            // Use functional updates to avoid stale state issues
+            // Update balance and transactions
             setBalance((prevBalance) => {
               const updatedBalance = prevBalance + creditedAmount;
 
-              // Add new transaction after updating balance
               setTransactions((prevTransactions) => [
                 ...prevTransactions,
                 {
@@ -122,13 +123,14 @@ export function MyWallet() {
             toast.success(
               `Payment successful! Amount: ${formatCurrency(creditedAmount)}`
             );
-            const classId = localStorage.getItem("classId");
 
+            // Determine navigation destination
+            const classId = localStorage.getItem("classId");
             if (classId) {
-              navigate(`/class/${classId}`);
               localStorage.removeItem("classId");
+              navigate(`/class/${classId}`, { replace: true });
             } else {
-              navigate("/wallet");
+              navigate("/wallet", { replace: true });
             }
           } else {
             toast.error("Payment failed or canceled!");
@@ -137,14 +139,30 @@ export function MyWallet() {
           console.error("Error fetching payment return:", error);
           toast.error("An error occurred while processing the payment.");
         } finally {
-          // Hide the spinner after processing the payment
           setBalanceLoading(false);
+          setProcessing(false);
         }
       };
 
       fetchPaymentReturn();
+    } else {
+      setProcessing(false);
     }
-  }, [location.search, token, navigate]);
+  }, [
+    location.search,
+    token,
+    navigate,
+    setBalance,
+    setTransactions,
+    setBalanceLoading,
+  ]);
+  if (processing) {
+    return (
+      <div className="flex justify-center items-center h-20">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
+      </div>
+    );
+  }
   const SpinnerOverlay = () => {
     return (
       <div className="flex justify-center items-center h-20">
