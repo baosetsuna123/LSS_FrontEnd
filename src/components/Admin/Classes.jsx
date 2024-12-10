@@ -93,9 +93,10 @@ const Classes = () => {
     setNewStatus(status);
     setIsModalOpen(true);
   };
-
+  const [loadingS, setLoadingS] = useState(false);
   const handleStatusUpdate = async () => {
     if (!classToEdit) return;
+    setLoadingS(true);
     try {
       if (newStatus === "ONGOING") {
         await activateClassImmediately(classToEdit.classId, token);
@@ -115,6 +116,8 @@ const Classes = () => {
     } catch (error) {
       console.error(`Error changing class status to ${newStatus}:`, error);
       toast.error("Failed to update class status. Please try again.");
+    } finally {
+      setLoadingS(false);
     }
   };
 
@@ -271,9 +274,10 @@ const Classes = () => {
               </Button>
               <Button
                 onClick={handleStatusUpdate}
+                disabled={loadingS}
                 className="bg-green-500 text-white"
               >
-                Yes, Change
+                {isLoading ? "Processing" : "Yes, Change"}
               </Button>
             </div>
           </div>
