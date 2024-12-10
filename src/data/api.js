@@ -1442,12 +1442,30 @@ export const getUserCountByRole = async (token) => {
   }
 };
 
-export const getTotalOrdersAndAmount = async (token) => {
+export const getTotalOrders = async (token) => {
   try {
     const response = await api.get(`/admin/total-order`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching total orders and amount:", error);
+    throw error;
+  }
+};
+export const getDetailTotalOrdersAndAmount = async (
+  startDate,
+  endDate,
+  token
+) => {
+  try {
+    const response = await api.get(`/admin/total`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { startDate, endDate },
     });
     return response.data;
   } catch (error) {

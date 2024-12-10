@@ -1,4 +1,4 @@
-import { getTotalOrdersAndAmount } from "@/data/api";
+import { getDetailTotalOrdersAndAmount, getTotalOrders } from "@/data/api";
 import { useEffect, useState } from "react";
 import Modal from "@mui/material/Modal";
 import {
@@ -79,7 +79,11 @@ const TotalOrdersAmountDetails = () => {
       if (!dateMin || !dateMax || !token) return;
       const dateStart = convertDateToDateTime(dateMin);
       const dateEnd = convertDateToDateTime(dateMax, true);
-      const res = await getTotalOrdersAndAmount(dateStart, dateEnd, token);
+      const res = await getDetailTotalOrdersAndAmount(
+        dateStart,
+        dateEnd,
+        token
+      );
       setAmount(res.totalOrderDTO.amount || 0);
       setTotalPrice(res.totalOrderDTO.totalPrice || 0);
       setOrderDetails(res.orderDetails);
@@ -226,8 +230,8 @@ export default function TotalOrdersAmount() {
 
   const getTotalOrdersAndAmount = async () => {
     try {
-      const res = await getTotalOrdersAndAmount(token);
-      setTotalOrdersAndAmount(res); // The response is now just a number
+      const res = await getTotalOrders(token);
+      setTotalOrdersAndAmount(res);
     } catch (error) {
       console.log(error);
     }
@@ -241,8 +245,8 @@ export default function TotalOrdersAmount() {
 
   return (
     <div className="h-full w-full bg-blue-600 text-white shadow-lg py-2 rounded-lg px-4">
-      <h1 className="font-semibold text-xl pb-4 tracking-wider h-[75%]">
-        Total Orders And Amount
+      <h1 className="font-semibold text-xl pb-4 tracking-wider">
+        Total Orders
       </h1>
       <div className="text-white text-3xl mt-2 font-semibold h-[40%] text-center">
         <span>{totalOrdersAmount}</span>
