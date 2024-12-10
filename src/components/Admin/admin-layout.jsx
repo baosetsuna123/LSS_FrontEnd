@@ -34,7 +34,6 @@ export function AdminLayout({ children }) {
   };
 
   const handleLogoutClick = () => {
-    console.log("Logout button clicked"); // Debugging line
     setIsModalOpen(true);
   };
 

@@ -20,6 +20,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useClassContext } from "@/context/ClassContext";
 import { ModeToggle } from "@/components/ui/Mode-Toggle";
 import defaults from "../assets/default.jfif";
+import Modal from "@/components/Helper/Modal";
 
 import {
   deleteNoti,
@@ -32,6 +33,7 @@ export function Layout({ children }) {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const searchInputRef = useRef(null);
   const { isLoggedIn, logout } = useAuth();
   const [isSearchPopupVisible, setIsSearchPopupVisible] = useState(false);
@@ -53,6 +55,7 @@ export function Layout({ children }) {
       console.error("Error parsing result from localStorage:", error);
     }
   }
+
   const [notifications, setNotifications] = useState([]);
   const token = sessionStorage.getItem("token");
   const fetchNotifications = useCallback(async () => {
@@ -113,7 +116,9 @@ export function Layout({ children }) {
     setIsSearchPopupVisible(false);
     navigate(`/class/${classId}`);
   };
-
+  const handleLogoutClick = () => {
+    setIsModalOpen(true);
+  };
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== "undefined") {
@@ -162,9 +167,10 @@ export function Layout({ children }) {
     logout();
     setIsUserPopupVisible(false);
     clearClasses();
+    setIsModalOpen(false);
     setLoading(true);
     toast.success("Logged out successfully");
-    navigate("/");
+    navigate("/login");
   };
 
   const handleMarkAsRead = async (notificationId) => {
@@ -602,7 +608,7 @@ export function Layout({ children }) {
                       View Applications
                     </Link>
                     <button
-                      onClick={handleLogout}
+                      onClick={handleLogoutClick}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
@@ -634,6 +640,11 @@ export function Layout({ children }) {
           </Link>
         </nav>
       </footer>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }

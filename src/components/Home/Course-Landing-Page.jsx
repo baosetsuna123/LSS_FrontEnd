@@ -39,14 +39,18 @@ export function CourseLandingPage() {
   }, []);
 
   const [comments, setComments] = useState([]);
+  const [loadingc, setLoadingc] = useState(false);
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        setLoadingc(true);
         const data = await fetchCommentsHome();
         setComments(data);
         console.log(data);
       } catch (error) {
         console.error("Error fetching major classes:", error);
+      } finally {
+        setLoadingc(false);
       }
     };
 
@@ -444,32 +448,40 @@ export function CourseLandingPage() {
             <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-center mb-12 text-zinc-800 dark:text-zinc-100">
               What Our Students Say
             </h2>
-            <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
-              {comments
-                .filter((_, index) => index === 0 || index === 1 || index === 2)
-                .map((testimonial, index) => (
-                  <Card
-                    key={index}
-                    className="transition-transform transform hover:scale-105 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 rounded-lg shadow-lg hover:shadow-xl p-8 relative border border-gray-200 dark:border-zinc-700"
-                  >
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center rounded-full shadow-md">
-                      <span className="text-xl font-bold uppercase">
-                        {testimonial.username[0]}
-                      </span>
-                    </div>
-                    <CardHeader className="mt-6 text-center">
-                      <CardTitle className="text-xl font-semibold tracking-wide">
-                        {testimonial.username}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="relative text-zinc-500 dark:text-zinc-400 italic text-lg leading-relaxed before:content-['“'] before:text-4xl before:font-bold before:absolute before:-top-2 before:-left-6 before:text-blue-500 after:content-['”'] after:text-4xl after:font-bold after:absolute after:-bottom-2 after:-right-6 after:text-purple-500 transition-transform duration-300 hover:scale-105">
-                        {testimonial.comment}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
+            {loadingc ? (
+              <div className="flex justify-center">
+                <Loader className="w-10 h-10 animate-spin" />
+              </div>
+            ) : (
+              <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+                {comments
+                  .filter(
+                    (_, index) => index === 0 || index === 1 || index === 2
+                  )
+                  .map((testimonial, index) => (
+                    <Card
+                      key={index}
+                      className="transition-transform transform hover:scale-105 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 rounded-lg shadow-lg hover:shadow-xl p-8 relative border border-gray-200 dark:border-zinc-700"
+                    >
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center rounded-full shadow-md">
+                        <span className="text-xl font-bold uppercase">
+                          {testimonial.username[0]}
+                        </span>
+                      </div>
+                      <CardHeader className="mt-6 text-center">
+                        <CardTitle className="text-xl font-semibold tracking-wide">
+                          {testimonial.username}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="relative text-zinc-500 dark:text-zinc-400 italic text-lg leading-relaxed before:content-['“'] before:text-4xl before:font-bold before:absolute before:-top-2 before:-left-6 before:text-blue-500 after:content-['”'] after:text-4xl after:font-bold after:absolute after:-bottom-2 after:-right-6 after:text-purple-500 transition-transform duration-300 hover:scale-105">
+                          {testimonial.comment}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            )}
           </div>
         </section>
 
