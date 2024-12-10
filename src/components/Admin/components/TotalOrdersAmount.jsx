@@ -220,11 +220,35 @@ const TotalOrdersAmountDetails = () => {
 };
 
 export default function TotalOrdersAmount() {
+  const [totalOrdersAndAmount, setTotalOrdersAndAmount] = useState(0);
+  const result = localStorage.getItem("result");
+  let token;
+  if (result) {
+    try {
+      const parsedResult = JSON.parse(result);
+      token = parsedResult.token;
+    } catch (error) {
+      console.error("Error parsing result from localStorage:", error);
+    }
+  }
+  const getTotalOrdersAndAmount = async () => {
+    try {
+      const res = await getTotalOrdersAndAmount(token);
+      setTotalOrdersAndAmount(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getTotalOrdersAndAmount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
   return (
     <div className="h-full w-full bg-blue-600 *:text-white shadow-lg py-2 rounded-lg px-4">
-      <h1 className="font-semibold text-xl pb-4 tracking-wider h-[75%]">
-        Total Orders And Amount
-      </h1>
+      <div className="*:text-white text-3xl mt-2 font-semibold h-[40%] text-center ">
+        <span>{totalOrdersAndAmount}</span>
+      </div>
       <TotalOrdersAmountDetails />
     </div>
   );

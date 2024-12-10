@@ -1442,13 +1442,12 @@ export const getUserCountByRole = async (token) => {
   }
 };
 
-export const getTotalOrdersAndAmount = async (startDate, endDate, token) => {
+export const getTotalOrdersAndAmount = async (token) => {
   try {
-    const response = await api.get(`/admin/total`, {
+    const response = await api.get(`/admin/total-order`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      params: { startDate, endDate },
     });
     return response.data;
   } catch (error) {
