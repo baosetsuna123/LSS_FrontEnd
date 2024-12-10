@@ -47,7 +47,7 @@ const CategoryLayout = ({
         onUpdatePagination(updatedCategories.length);
         return updatedCategories;
       });
-      toast.success("Category created successfully!");
+      toast.success("Major created successfully!");
       setNewCategory({ name: "" });
       setIsCreateDialogOpen(false);
     } catch (error) {
@@ -60,7 +60,7 @@ const CategoryLayout = ({
 
   const handleEditCategory = async () => {
     if (!newCategory.name) {
-      toast.error("Category name cannot be empty.");
+      toast.error("Major name cannot be empty.");
       return;
     }
     setLoading(true);
@@ -75,7 +75,7 @@ const CategoryLayout = ({
           cat.categoryId === editCategoryId ? updatedCategory : cat
         )
       );
-      toast.success("Category updated successfully!");
+      toast.success("Major updated successfully!");
       setIsEditDialogOpen(false);
       setNewCategory({ name: "" });
       setEditCategoryId(null);
@@ -102,18 +102,18 @@ const CategoryLayout = ({
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="mr-2 h-4 w-4" /> Create New Category
+              <Plus className="mr-2 h-4 w-4" /> Create New Major
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create New Category</DialogTitle>
+              <DialogTitle>Create New Major</DialogTitle>
               <DialogDescription>
-                Enter the name for the new category.
+                Enter the name for the new major.
               </DialogDescription>
             </DialogHeader>
             <Input
-              placeholder="Category Name"
+              placeholder="Major Name"
               value={newCategory.name}
               onChange={(e) => setNewCategory({ name: e.target.value })}
             />
@@ -137,7 +137,7 @@ const CategoryLayout = ({
         >
           <Search size={16} className="mr-2" />
           <Input
-            placeholder="Search Categories By Name"
+            placeholder="Search Majors By Name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -202,13 +202,13 @@ const CategoryLayout = ({
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
-                            <DialogTitle>Edit Category</DialogTitle>
+                            <DialogTitle>Edit Major</DialogTitle>
                             <DialogDescription>
-                              Update the name of the category.
+                              Update the name of the major.
                             </DialogDescription>
                           </DialogHeader>
                           <Input
-                            placeholder="Category Name"
+                            placeholder="Major Name"
                             value={newCategory.name}
                             onChange={(e) =>
                               setNewCategory({ name: e.target.value })

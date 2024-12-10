@@ -338,11 +338,11 @@ export function Dashboard() {
                 handleTabClick("categories"); // Reset to page 1 when changing category
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
-                activeCategory === "category" ? "bg-gray-700" : ""
+                activeCategory === "categories" ? "bg-gray-700" : ""
               }`}
             >
               <LayoutGrid size={20} className="mr-2" />
-              Category
+              Major
             </button>
             <button
               onClick={() => {

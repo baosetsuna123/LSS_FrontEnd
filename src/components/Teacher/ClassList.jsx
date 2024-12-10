@@ -217,14 +217,14 @@ function ClassList() {
                       >
                         Details
                       </button>
-                      {cls.students.length > 0 && (
+                      {
                         <button
                           onClick={() => handleShowStudentList(cls)}
                           className="text-white font-bold bg-green-600 hover:bg-green-700 border border-green-600 px-4 py-2 rounded-md"
                         >
                           List
                         </button>
-                      )}
+                      }
                     </td>
                   </tr>
                 ))}
@@ -341,24 +341,30 @@ function StudentsListModal({ cls, onClose }) {
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
         <h3 className="text-xl font-semibold mb-4">Student List</h3>
         <ScrollArea>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cls.students.map((student, index) => (
-                <TableRow key={student.email}>
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{student.userName}</TableCell>
-                  <TableCell>{student.email}</TableCell>
+          {cls.students.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Username</TableHead>
+                  <TableHead>Email</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {cls.students.map((student, index) => (
+                  <TableRow key={student.email}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>{student.userName}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center py-4 text-gray-500">
+              No students have ordered yet.
+            </p>
+          )}
         </ScrollArea>
         <div className="mt-4 flex justify-end">
           <Button onClick={onClose} variant="destructive">

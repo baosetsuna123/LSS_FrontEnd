@@ -375,9 +375,6 @@ function TeacherHome() {
           <p className="text-sm text-gray-600 whitespace-nowrap">
             Course: {lesson.code}
           </p>
-          <p className="text-sm text-gray-600 whitespace-nowrap">
-            CourseName: {lesson.subject}
-          </p>
           {lesson.room && (
             <button
               onClick={() => window.open(lesson.room, "_blank")}
@@ -466,7 +463,7 @@ function TeacherHome() {
         <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
           Create Lesson
         </h2>
-        <div className="grid grid-cols-2 gap-4 py-2">
+        <div className="grid grid-cols-2 gap-4 py-2 relative">
           <div className="relative flex items-center">
             <Book name="book" className="mr-2 text-gray-600" />
             <input

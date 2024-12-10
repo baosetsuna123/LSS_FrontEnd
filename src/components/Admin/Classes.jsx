@@ -112,7 +112,7 @@ const Classes = () => {
       setClasses(updatedClasses);
       setFilteredClasses(updatedClasses);
       setIsModalOpen(false);
-      toast.success(`Class status changed to ${newStatus}.`);
+      toast.success(`Lesson status changed to ${newStatus}.`);
     } catch (error) {
       console.error(`Error changing class status to ${newStatus}:`, error);
       toast.error("Failed to update class status. Please try again.");
