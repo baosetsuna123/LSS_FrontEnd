@@ -80,7 +80,7 @@ export function CourseLandingPage() {
     },
   };
   const navigate = useNavigate();
-  const { classes, loading, getClasses } = useClassContext();
+  const { classes, loading } = useClassContext();
   const [sortedClasses, setSortedClasses] = useState([]);
 
   useEffect(() => {
@@ -93,33 +93,6 @@ export function CourseLandingPage() {
     }
   }, [classes]);
   const { isLoggedIn } = useAuth();
-  const storedResult = localStorage.getItem("result");
-  const currentUserName = storedResult ? JSON.parse(storedResult) : null;
-  const [enrollmentStatus, setEnrollmentStatus] = useState(false);
-
-  useEffect(() => {
-    // Fetch classes and then check enrollment status
-    const fetchAndCheckStatus = async () => {
-      await getClasses(); // Fetch classes again
-      if (classes.length > 0 && currentUserName) {
-        const status = {};
-        const username = currentUserName.username;
-        classes.forEach((course) => {
-          const classDetail = classes.find(
-            (cls) => cls.classId === course.classId
-          );
-          if (classDetail?.students) {
-            status[course.classId] = classDetail.students.some(
-              (student) => student.userName === username
-            );
-          }
-        });
-        setEnrollmentStatus(status);
-      }
-    };
-
-    fetchAndCheckStatus(); // Call the function
-  }, [currentUserName]);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
   };
@@ -321,13 +294,8 @@ export function CourseLandingPage() {
                                 Created by {course.teacherName}
                               </p>
                             </div>
-                            <Button
-                              className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
-                              disabled={enrollmentStatus[course.classId]}
-                            >
-                              {enrollmentStatus[course.classId]
-                                ? "Enrolled"
-                                : "Enroll Now"}
+                            <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
+                              View Details
                             </Button>
                           </CardContent>
                         </Card>
@@ -420,13 +388,8 @@ export function CourseLandingPage() {
                                 Created by {course.teacherName}
                               </p>
                             </div>
-                            <Button
-                              className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700"
-                              disabled={enrollmentStatus[course.classId]}
-                            >
-                              {enrollmentStatus[course.classId]
-                                ? "Enrolled"
-                                : "Enroll Now"}
+                            <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
+                              View Details
                             </Button>
                           </CardContent>
                         </Card>
