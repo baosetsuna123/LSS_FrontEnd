@@ -94,21 +94,20 @@ export function CourseLandingPage() {
   }, [classes]);
   const { isLoggedIn } = useAuth();
   const storedResult = localStorage.getItem("result");
-  const currentUserName = storedResult
-    ? JSON.parse(storedResult).username
-    : null;
-  const [enrollmentStatus, setEnrollmentStatus] = useState({});
+  const currentUserName = storedResult ? JSON.parse(storedResult) : null;
+  const [enrollmentStatus, setEnrollmentStatus] = useState(false);
 
   useEffect(() => {
     if (classes.length > 0 && currentUserName) {
       const status = {};
+      const username = currentUserName.username;
       classes.forEach((course) => {
         const classDetail = classes.find(
           (cls) => cls.classId === course.classId
         );
         if (classDetail && classDetail.students) {
           status[course.classId] = classDetail.students.some(
-            (student) => student.userName === currentUserName
+            (student) => student.userName === username
           );
         }
       });
