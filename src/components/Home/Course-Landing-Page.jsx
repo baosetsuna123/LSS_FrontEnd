@@ -80,7 +80,7 @@ export function CourseLandingPage() {
     },
   };
   const navigate = useNavigate();
-  const { classes, loading } = useClassContext();
+  const { classes, loading, getClasses } = useClassContext();
   const [sortedClasses, setSortedClasses] = useState([]);
 
   useEffect(() => {
@@ -98,22 +98,28 @@ export function CourseLandingPage() {
   const [enrollmentStatus, setEnrollmentStatus] = useState(false);
 
   useEffect(() => {
-    if (classes.length > 0 && currentUserName) {
-      const status = {};
-      const username = currentUserName.username;
-      classes.forEach((course) => {
-        const classDetail = classes.find(
-          (cls) => cls.classId === course.classId
-        );
-        if (classDetail && classDetail.students) {
-          status[course.classId] = classDetail.students.some(
-            (student) => student.userName === username
+    // Fetch classes and then check enrollment status
+    const fetchAndCheckStatus = async () => {
+      await getClasses(); // Fetch classes again
+      if (classes.length > 0 && currentUserName) {
+        const status = {};
+        const username = currentUserName.username;
+        classes.forEach((course) => {
+          const classDetail = classes.find(
+            (cls) => cls.classId === course.classId
           );
-        }
-      });
-      setEnrollmentStatus(status);
-    }
-  }, [classes, currentUserName]);
+          if (classDetail?.students) {
+            status[course.classId] = classDetail.students.some(
+              (student) => student.userName === username
+            );
+          }
+        });
+        setEnrollmentStatus(status);
+      }
+    };
+
+    fetchAndCheckStatus(); // Call the function
+  }, [currentUserName]);
   const handleClassClick = (id) => {
     navigate(`/class/${id}`);
   };
