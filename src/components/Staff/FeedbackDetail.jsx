@@ -145,7 +145,7 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
   };
 
   const loadMore = () => {
-    setDisplayedCount((prevCount) => prevCount + 3); // Load three more items
+    setDisplayedCount((prevCount) => prevCount + 6); // Load three more items
   };
 
   // Determine if there's more detailed feedback to load
