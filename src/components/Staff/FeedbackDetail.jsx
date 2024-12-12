@@ -21,7 +21,7 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
   const safeQuestions = Array.isArray(questions) ? questions : [];
   const [feedback, setFeedback] = useState([]);
   const [detailedFeedback, setDetailedFeedback] = useState([]);
-  const [displayedCount, setDisplayedCount] = useState(3); // Count of displayed detailed feedback items
+  const [displayedCount, setDisplayedCount] = useState(6); // Count of displayed detailed feedback items
   const [isDetailedFetched, setIsDetailedFetched] = useState(false); // Track if detailed feedback has been fetched
   const token = sessionStorage.getItem("token");
   const feedbackLookup = feedback.reduce((acc, item) => {
