@@ -165,7 +165,7 @@ export function MyWallet() {
   }
   const SpinnerOverlay = () => {
     return (
-      <div className="flex justify-center items-center h-20">
+      <div className="flex justify-center mt-24 items-center h-20">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
       </div>
     );
