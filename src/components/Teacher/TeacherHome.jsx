@@ -6,7 +6,7 @@ import {
   fetchCourseByMajor,
   fetchSystemParam,
 } from "@/data/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
@@ -172,7 +172,12 @@ function TeacherHome() {
   };
 
   const handleWeekChange = (week, range) => {
-    setSelectedWeekData({ week, range });
+    setSelectedWeekData((prev) => {
+      if (prev.week === week && prev.range === range) {
+        return prev;
+      }
+      return { week, range };
+    });
   };
   const getDatesInRange = (startDate, endDate) => {
     const dates = [];
@@ -249,11 +254,16 @@ function TeacherHome() {
       setLoading(false);
     }
   }, [slots, datesInTheWeek, dataFetched]);
+
+  const didMount = useRef(false);
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
     fetchTimetable();
     fetchDropdownData();
-  }, [token, selectedWeekData]);
-
+  }, [selectedWeekData]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     console.log(`Changing ${name} to ${value}`);
