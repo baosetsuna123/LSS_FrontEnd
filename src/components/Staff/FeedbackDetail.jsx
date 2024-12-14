@@ -115,29 +115,36 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
     }
   }, [params, startDate]);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [loadingemail, setLoadingEmail] = useState(false);
   const fetchSendEmail = async () => {
     try {
+      setLoadingEmail(true);
+      setIsDisabled(true); // Disable the button
       await fetchSendEmailStaff(token, classId);
       toast.success("Feedback sent successfully!");
-      setIsDisabled(true); // Disable the button
       setTimeout(() => {
         setIsDisabled(false); // Re-enable after 2 seconds
-      }, 2000);
+      }, 5000);
     } catch (error) {
       console.error("Error fetching feedback:", error);
       toast.error("Failed to fetch feedback.");
+    } finally {
+      setLoadingEmail(false);
     }
   };
-
+  const [loadingfeedback, setLoadingFeedback] = useState(false);
   const handleFetchDetailedFeedback = async () => {
     if (!isDetailedFetched) {
       try {
+        setLoadingFeedback(true);
         const data = await fetchFeedbackDetail(token, classId); // Assuming this function takes token and classId
         setDetailedFeedback(data); // Set the detailed feedback
         setIsDetailedFetched(true); // Mark that detailed feedback has been fetched
       } catch (error) {
         console.error("Error fetching detailed feedback:", error);
         toast.error("Failed to fetch detailed feedback.");
+      } finally {
+        setLoadingFeedback(false);
       }
     } else {
       loadMore(); // If already fetched, just load more
@@ -145,7 +152,7 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
   };
 
   const loadMore = () => {
-    setDisplayedCount((prevCount) => prevCount + 6); // Load three more items
+    setDisplayedCount((prevCount) => prevCount + 6);
   };
 
   // Determine if there's more detailed feedback to load
@@ -198,10 +205,11 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
         {detailedFeedback.length === 0 || !isDetailedFetched ? (
           <button
             type="button"
+            disabled={loadingfeedback}
             className="w-32 btn btn-primary bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow-md transition duration-200 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
             onClick={handleFetchDetailedFeedback}
           >
-            Show Detail
+            {loadingfeedback ? "Loading..." : "Show Details"}
           </button>
         ) : hasMoreFeedback ? (
           <button
@@ -218,9 +226,18 @@ const FeedbackDetail = ({ classId, params, startDate }) => {
             type="button"
             className="w-32 btn btn-primary bg-green-500 whitespace-nowrap text-white font-semibold py-2 px-3 rounded shadow-md transition duration-200 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
             onClick={fetchSendEmail}
-            disabled={isDisabled}
+            disabled={isDisabled || loadingemail}
           >
-            {isDisabled ? "Please wait ..." : "Send Feedback"}
+            {loadingemail ? (
+              <>
+                <span className="loader inline-block w-4 h-4 border-2 border-t-2 border-white rounded-full animate-spin mr-2"></span>
+                Sending...
+              </>
+            ) : isDisabled ? (
+              "Please wait ..."
+            ) : (
+              "Send Feedback"
+            )}
           </button>
         )}
       </div>
