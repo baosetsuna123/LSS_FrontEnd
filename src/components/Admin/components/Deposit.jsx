@@ -59,10 +59,18 @@ export default function Deposit() {
           ...item,
         };
       });
-      const totalBalanceData = completeData.map((item) => item.totalBalance);
-      const totalExpensesData = completeData.map((item) => item.totalExpenses);
-      const totalIncomeData = completeData.map((item) => item.totalIncome);
-      const totalOrdersData = completeData.map((item) => item.totalOrders); // Extract Total Orders
+      const totalBalanceData = completeData.map((item) =>
+        Number(item.totalBalance)
+      );
+      const totalExpensesData = completeData.map((item) =>
+        Number(item.totalExpenses)
+      );
+      const totalIncomeData = completeData.map((item) =>
+        Number(item.totalIncome)
+      );
+      const totalOrdersData = completeData.map((item) =>
+        Number(item.totalOrders)
+      ); // Extract Total Orders
 
       setChartData({
         totalBalance: totalBalanceData,

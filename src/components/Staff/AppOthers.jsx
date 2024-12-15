@@ -39,12 +39,12 @@ const AppOthers = ({
       setApprovalImage(null); // If no file is selected, reset the file name state
     } // Store the selected file
   };
-  const [loading, setLoading] = useState(false);
+  const [loadinga, setLoadinga] = useState(false);
   const handleAction = async () => {
     const token = sessionStorage.getItem("token");
     try {
       if (actionType === "approve") {
-        setLoading(true);
+        setLoadinga(true);
         await approveOtherApp(selectedId, token, approvalImage);
         toast.success("Application approved successfully!");
         setAppOther((prevApplications) =>
@@ -56,6 +56,7 @@ const AppOthers = ({
         );
         setModalVisible(false);
       } else if (actionType === "reject") {
+        setLoadinga(true);
         await rejectAppOther(selectedId, token);
         toast.success("Application rejected successfully!");
         setAppOther((prevApplications) =>
@@ -71,7 +72,7 @@ const AppOthers = ({
       console.error("Error performing action:", error);
       toast.error("Something went wrong!");
     } finally {
-      setLoading(false);
+      setLoadinga(false);
     }
   };
 
@@ -143,35 +144,26 @@ const AppOthers = ({
               )}
             </div>
             <div className="flex justify-between items-center w-full">
-              {!loading ? (
-                <>
-                  <button
-                    onClick={handleAction}
-                    className={`px-4 py-2 rounded text-white ${
-                      actionType === "approve"
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-red-600 hover:bg-red-700"
-                    }`}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    onClick={closeModal}
-                    className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
-                  >
-                    No
-                  </button>
-                </>
-              ) : (
-                <div className="w-full flex justify-center">
-                  <button
-                    disabled
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md w-24"
-                  >
-                    Loading...
-                  </button>
-                </div>
-              )}
+              <>
+                <button
+                  onClick={handleAction}
+                  disabled={loadinga}
+                  className={`px-4 py-2 rounded text-white ${
+                    actionType === "approve"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {loadinga ? "Loading..." : "Yes"}
+                </button>
+                <button
+                  onClick={closeModal}
+                  disabled={loadinga}
+                  className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+                >
+                  No
+                </button>
+              </>
             </div>
           </div>
         </div>

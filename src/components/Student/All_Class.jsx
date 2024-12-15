@@ -159,7 +159,13 @@ export function ViewAllClasses() {
               </CardHeader>
               <CardContent>
                 {Array.from(
-                  new Set(contextClasses.map((c) => c.courseCode))
+                  new Set(
+                    contextClasses
+                      .filter(
+                        (c) => c.status === "PENDING" || c.status === "ACTIVE"
+                      ) // Filter by status
+                      .map((c) => c.courseCode)
+                  )
                 ).map((code) => (
                   <div key={code} className="flex items-center space-x-2 mb-2">
                     <Checkbox

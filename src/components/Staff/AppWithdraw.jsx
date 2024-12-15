@@ -268,31 +268,22 @@ const AppWithDraw = ({
               />
             </div>
             <div className="mt-4 flex justify-between">
-              {!loading ? (
-                <>
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleApprove}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-24"
-                  >
-                    Yes
-                  </button>
-                </>
-              ) : (
-                <div className="w-full flex justify-center">
-                  <button
-                    disabled
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md w-24"
-                  >
-                    Loading...
-                  </button>
-                </div>
-              )}
+              <>
+                <button
+                  onClick={handleCancel}
+                  disabled={loading}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 w-24"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleApprove}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-24"
+                >
+                  {loading ? "Loading..." : "Approve"}
+                </button>
+              </>
             </div>
           </div>
         </div>
