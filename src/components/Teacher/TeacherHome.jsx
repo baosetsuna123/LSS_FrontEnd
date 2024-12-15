@@ -412,56 +412,53 @@ function TeacherHome() {
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
       <div className="w-full">
-        {loading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
-          </div>
-        ) : (
-          <>
-            <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
-              <thead>
-                <tr className="bg-gray-200 text-gray-700">
-                  <th className="py-2 px-4 border-b border-r">Slot</th>
-                  {datesInTheWeek.map((date, index) => {
-                    const dayOfWeek = days[index % 7];
-                    return (
-                      <th
-                        key={index}
-                        className="py-2 px-4 border-b text-center"
-                      >
-                        <p>{dayOfWeek}</p>
-                        <p>{date}</p>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {slots.map((slot, index) => (
-                  <tr
+
+        <>
+          <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="py-2 px-4 border-b border-r">Slot</th>
+                {days.map((day, index) => (
+                  <th
                     key={index}
-                    className="hover:bg-gray-100 transition duration-150"
+                    className="py-2 px-4 border-b border-r text-center"
                   >
-                    <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
-                      Period {slot.period}
-                      <div className="text-xs text-gray-600">
-                        {"(" + slot.start + " - " + slot.end + ")"}
-                      </div>
-                    </td>
-                    {days.map((day) => (
-                      <td
-                        key={`${day}-${slot.period}`}
-                        className="border-b border-r p-2 text-center"
-                      >
-                        {renderTimetableCell(day, slot.period)}
-                      </td>
-                    ))}
-                  </tr>
+                    <p>{day}</p>
+                    {!loading && <p>{datesInTheWeek[index]}</p>}
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </>
-        )}
+              </tr>
+            </thead>
+            <tbody className="relative">
+              {slots.map((slot, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 transition duration-150"
+                >
+                  <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800">
+                    Period {slot.period}
+                    <div className="text-xs text-gray-600">
+                      {"(" + slot.start + " - " + slot.end + ")"}
+                    </div>
+                  </td>
+
+                  {days.map((day) => (
+                    <td
+                      key={`${day}-${slot.period}`}
+                      className="border-b border-r p-2 text-center"
+                    >
+                      {loading ? (
+                        <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
+                      ) : (
+                        renderTimetableCell(day, slot.period)
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       </div>
       <Modal
         isOpen={isModalOpen}
