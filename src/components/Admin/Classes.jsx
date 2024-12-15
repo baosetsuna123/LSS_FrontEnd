@@ -277,7 +277,7 @@ const Classes = () => {
                 disabled={loadingS}
                 className="bg-green-500 text-white"
               >
-                {isLoading ? "Processing" : "Yes, Change"}
+                {loadingS ? "Processing..." : "Yes, Change"}
               </Button>
             </div>
           </div>
