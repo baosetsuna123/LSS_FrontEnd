@@ -35,6 +35,7 @@ const MyClass = () => {
     setSelectedWeekData({ week, range });
   };
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [dataFetched, setDataFetched] = useState(false);
 
   useEffect(() => {
@@ -125,8 +126,7 @@ const MyClass = () => {
     try {
       setLoading(true); // Set loading to true before fetching timetable data
       const classes = await fetchOrderClasses(token);
-      const [startRangeStr, endRangeStr] =
-        selectedWeekData.range.split(" To ");
+      const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = new Date(startRangeStr);
       const endRange = new Date(endRangeStr);
       setDatesInTheWeek(getDatesInRange(startRange, endRange)); // Set dates in the week
@@ -161,7 +161,6 @@ const MyClass = () => {
     }
   };
 
-
   const didMount = useRef(false);
   useEffect(() => {
     if (!didMount.current) {
@@ -191,8 +190,7 @@ const MyClass = () => {
                 </h3>
               </div>
               <p className="text-sm text-gray-600 mb-1 whitespace-nowrap">
-                <span className="font-semibold">Course Code:</span>{" "}
-                {lesson.code}
+                <span className="font-semibold">Course:</span> {lesson.code}
               </p>
               <p className="text-sm text-gray-600 mb-4 whitespace-nowrap">
                 <span className="font-semibold">Tutor:</span>{" "}
@@ -202,7 +200,7 @@ const MyClass = () => {
 
             <div className="mt-auto">
               {lessonStatus === "COMPLETED" &&
-                !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
                 <button
                   key={lesson.orderId}
                   onClick={() => navigate(`/feedback/${lesson.orderId}`)}
