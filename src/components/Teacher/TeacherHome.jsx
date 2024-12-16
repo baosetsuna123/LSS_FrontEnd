@@ -234,26 +234,26 @@ function TeacherHome() {
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false); // Stop loading when finished
+      setLoading(false);
     }
   };
 
   const fetchDropdownData = async () => {
     try {
-      setLoading(true);
+      setDataFetched(true);
       const fetchedSlots = await fetchSlots(token);
       setSlots(fetchedSlots);
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
     } finally {
-      setDataFetched(true); // Stop loading when finished
+      setDataFetched(false); // Stop loading when finished
     }
   };
-  useEffect(() => {
-    if (slots.length > 0 && datesInTheWeek.length > 0) {
-      setLoading(false);
-    }
-  }, [slots, datesInTheWeek, dataFetched]);
+  // useEffect(() => {
+  //   if (slots.length > 0 && datesInTheWeek.length > 0) {
+  //     setLoading(false);
+  //   }
+  // }, [slots, datesInTheWeek, dataFetched]);
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -310,7 +310,6 @@ function TeacherHome() {
       return toast.error("Price must be between 100,000 and 500,000");
     }
     try {
-      setIsLoading(true);
       await fetchCreateClass(classData, image, token);
       toast.success("Class created successfully");
       setIsModalOpen(false);
@@ -323,8 +322,6 @@ function TeacherHome() {
         toast.error(error.message || "Failed to create lesson");
       }
       console.log(error.message);
-    } finally {
-      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -447,7 +444,7 @@ function TeacherHome() {
                       key={`${day}-${slot.period}`}
                       className="border-b border-r p-2 text-center"
                     >
-                      {loading ? (
+                      {loading || dataFetched ? (
                         <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
                       ) : (
                         renderTimetableCell(day, slot.period)

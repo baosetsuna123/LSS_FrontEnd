@@ -39,7 +39,6 @@ const MyClass = () => {
 
   useEffect(() => {
     const fetchAllSlots = async () => {
-      setLoading(true);
       try {
         const fetchedSlots = await fetchSlots(token);
         setSlots(fetchedSlots);
@@ -51,11 +50,11 @@ const MyClass = () => {
     };
     fetchAllSlots();
   }, [token, selectedWeekData]);
-  useEffect(() => {
-    if (slots.length > 0 && datesInTheWeek.length > 0) {
-      setLoading(false);
-    }
-  }, [slots, datesInTheWeek, dataFetched]);
+  // useEffect(() => {
+  //   if (slots.length > 0 && datesInTheWeek.length > 0) {
+  //     setLoading(false);
+  //   }
+  // }, [slots, datesInTheWeek, dataFetched]);
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
       2: "Monday",
@@ -281,7 +280,7 @@ const MyClass = () => {
                       key={`${day}-${slot.period}`}
                       className="border-b border-r p-2 text-center"
                     >
-                      {loading ? (
+                      {loading || dataFetched ? (
                         <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
                       ) : (
                         renderTimetableCell(day, slot.period)
