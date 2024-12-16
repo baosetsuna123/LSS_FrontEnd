@@ -72,6 +72,7 @@ export function MyOrders() {
         order.orderDTO.orderId,
         token
       );
+      console.log(data);
       setOrderDetails(data.content[0]);
       setShowDetailsModal(true);
     } catch (error) {
@@ -301,36 +302,50 @@ export function MyOrders() {
                 <FaTimes />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              {/* Left Column */}
-              <div>
-                <h3 className="font-bold mb-2">{orderDetails.classDTO.name}</h3>
-                <p className="mb-2">
-                  Price: {formatCurrency(orderDetails.price)}
-                </p>
-                <p className="mb-2">
-                  Status:{" "}
-                  <span className="capitalize text-green-600">
-                    {orderDetails.orderDTO.status.toLowerCase()}
-                  </span>
-                </p>
-              </div>
-              {/* Right Column */}
-              <div className="flex flex-col justify-center items-center group">
-                {/* Teacher Name */}
-                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
-                  {orderDetails.classDTO.teacherName}
-                </p>
-                {/* Avatar Image */}
-                <div className="w-20 h-20 rounded-full bg-transparent group-hover:border-[3px] hover:border-blue-400 flex items-center justify-center transition-all duration-100">
-                  <img
-                    src={orderDetails.classDTO.avatarImage || avatar}
-                    alt="Teacher Avatar"
-                    onClick={() =>
-                      handleNavigate(orderDetails.classDTO.teacherName)
-                    }
-                    className="w-16 h-16 rounded-full cursor-pointer"
-                  />
+            <div className="mt-4">
+              {/* Name Centered Across Both Columns */}
+              <h3 className="font-bold text-center mb-4">
+                {orderDetails.classDTO.name}
+              </h3>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                {/* Left Column */}
+                <div>
+                  <p className="mb-2">
+                    Course: {orderDetails.classDTO.courseCode}
+                  </p>
+                  <p className="mb-2">
+                    StartDate:{" "}
+                    {new Date(
+                      orderDetails.classDTO.startDate
+                    ).toLocaleDateString()}
+                  </p>
+                  <p className="mb-2">
+                    Price: {formatCurrency(orderDetails.price)}
+                  </p>
+                  <p className="mb-2">
+                    Status:{" "}
+                    <span className="capitalize text-green-600">
+                      {orderDetails.orderDTO.status.toLowerCase()}
+                    </span>
+                  </p>
+                </div>
+                {/* Right Column */}
+                <div className="flex flex-col justify-center items-center group">
+                  {/* Teacher Name */}
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-2">
+                    {orderDetails.classDTO.teacherName}
+                  </p>
+                  {/* Avatar Image */}
+                  <div className="w-20 h-20 rounded-full bg-transparent group-hover:border-[3px] hover:border-blue-400 flex items-center justify-center transition-all duration-100">
+                    <img
+                      src={orderDetails.classDTO.imageTeacher || avatar}
+                      alt="Teacher Avatar"
+                      onClick={() =>
+                        handleNavigate(orderDetails.classDTO.teacherName)
+                      }
+                      className="w-16 h-16 rounded-full cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
