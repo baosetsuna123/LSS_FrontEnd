@@ -178,7 +178,7 @@ const MyClass = () => {
     if (lesson) {
       const lessonStatus = lesson.orderStatus; // Use status from orderDTO
       return (
-        <div className="p-6 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+        <div className="p-3 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex flex-col h-full">
             <div className="flex-grow">
               <div className="flex justify-center">
