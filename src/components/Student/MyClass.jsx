@@ -1,5 +1,5 @@
 import { fetchCoursesService, fetchOrderClasses, fetchSlots } from "@/data/api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import YearWeekSelector from "../Teacher/YearSelector";
 import { useFeedback } from "@/context/FeedbackContext";
@@ -121,49 +121,54 @@ const MyClass = () => {
   const handleClick = (id) => {
     navigate(`/class/${id}`);
   };
+
+  const fetchTimetable = async () => {
+    try {
+      setLoading(true); // Set loading to true before fetching timetable data
+      const classes = await fetchOrderClasses(token);
+      const [startRangeStr, endRangeStr] =
+        selectedWeekData.range.split(" To ");
+      const startRange = new Date(startRangeStr);
+      const endRange = new Date(endRangeStr);
+      setDatesInTheWeek(getDatesInRange(startRange, endRange)); // Set dates in the week
+
+      const filteredClasses = classes.data.content.filter((item) => {
+        const classStartDate = new Date(item.classDTO.startDate);
+        return classStartDate >= startRange && classStartDate <= endRange;
+      });
+
+      const courses = await fetchCoursesService(token); // Fetch courses
+
+      const updatedClasses = filteredClasses.map((contentItem) => {
+        const classItem = contentItem.classDTO;
+        const matchedCourse = courses.find(
+          (course) => course.courseCode === classItem.courseCode
+        );
+
+        return {
+          ...contentItem,
+          classDTO: {
+            ...classItem,
+            courseName: matchedCourse ? matchedCourse.name : null,
+          },
+        };
+      });
+
+      setTimetable(convertClassesToTimetable(updatedClasses)); // Set timetable
+    } catch (error) {
+      console.error("Error fetching timetable:", error);
+    } finally {
+      setLoading(false); // Set loading to false after timetable data is fetched
+    }
+  };
+  const didMount = useRef(false);
   useEffect(() => {
-    const fetchTimetable = async () => {
-      try {
-        setLoading(true); // Set loading to true before fetching timetable data
-        const classes = await fetchOrderClasses(token);
-        const [startRangeStr, endRangeStr] =
-          selectedWeekData.range.split(" To ");
-        const startRange = new Date(startRangeStr);
-        const endRange = new Date(endRangeStr);
-        setDatesInTheWeek(getDatesInRange(startRange, endRange)); // Set dates in the week
-
-        const filteredClasses = classes.data.content.filter((item) => {
-          const classStartDate = new Date(item.classDTO.startDate);
-          return classStartDate >= startRange && classStartDate <= endRange;
-        });
-
-        const courses = await fetchCoursesService(token); // Fetch courses
-
-        const updatedClasses = filteredClasses.map((contentItem) => {
-          const classItem = contentItem.classDTO;
-          const matchedCourse = courses.find(
-            (course) => course.courseCode === classItem.courseCode
-          );
-
-          return {
-            ...contentItem,
-            classDTO: {
-              ...classItem,
-              courseName: matchedCourse ? matchedCourse.name : null,
-            },
-          };
-        });
-
-        setTimetable(convertClassesToTimetable(updatedClasses)); // Set timetable
-      } catch (error) {
-        console.error("Error fetching timetable:", error);
-      } finally {
-        setLoading(false); // Set loading to false after timetable data is fetched
-      }
-    };
-
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
     fetchTimetable();
-  }, [token, selectedWeekData]);
+  }, [selectedWeekData]);
 
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
@@ -196,7 +201,7 @@ const MyClass = () => {
 
             <div className="mt-auto">
               {lessonStatus === "COMPLETED" &&
-              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
                 <button
                   key={lesson.orderId}
                   onClick={() => navigate(`/feedback/${lesson.orderId}`)}
@@ -248,18 +253,15 @@ const MyClass = () => {
                 <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-300">
                   Slot
                 </th>
-                {datesInTheWeek.map((date, index) => {
-                  const dayOfWeek = days[index % 7];
-                  return (
-                    <th
-                      key={index}
-                      className="py-2 px-4 border-b border-r text-center text-gray-800 dark:text-gray-300"
-                    >
-                      <p>{dayOfWeek}</p>
-                      <p>{date}</p>
-                    </th>
-                  );
-                })}
+                {days.map((day, index) => (
+                  <th
+                    key={index}
+                    className="py-2 px-4 border-b border-r text-center"
+                  >
+                    <p>{day}</p>
+                    {!loading && <p>{datesInTheWeek[index]}</p>}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -269,7 +271,7 @@ const MyClass = () => {
                   className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150"
                 >
                   <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-300">
-                    Slot {slot.period}
+                    Period {slot.period}
                     <div className="text-xs text-gray-600 dark:text-gray-400">
                       {"(" + slot.start + " - " + slot.end + ")"}
                     </div>
@@ -277,9 +279,13 @@ const MyClass = () => {
                   {days.map((day) => (
                     <td
                       key={`${day}-${slot.period}`}
-                      className="border-b border-r p-2 text-center max-w-[150px] text-gray-800 dark:text-gray-300"
+                      className="border-b border-r p-2 text-center"
                     >
-                      {renderTimetableCell(day, slot.period)}
+                      {loading ? (
+                        <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
+                      ) : (
+                        renderTimetableCell(day, slot.period)
+                      )}
                     </td>
                   ))}
                 </tr>
