@@ -160,6 +160,8 @@ const MyClass = () => {
       setLoading(false); // Set loading to false after timetable data is fetched
     }
   };
+
+
   const didMount = useRef(false);
   useEffect(() => {
     if (!didMount.current) {
@@ -241,57 +243,51 @@ const MyClass = () => {
       </h2>
       <YearWeekSelector onWeekChange={handleWeekChange} />
       <div className="overflow-x-auto">
-        {loading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
-          </div>
-        ) : (
-          <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg dark:bg-gray-900 dark:border-gray-700">
-            <thead>
-              <tr className="bg-gray-200 dark:bg-gray-800 text-center">
-                <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-300">
-                  Slot
+        <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg dark:bg-gray-900 dark:border-gray-700">
+          <thead>
+            <tr className="bg-gray-200 dark:bg-gray-800 text-center">
+              <th className="py-2 px-4 border-b border-r text-gray-800 dark:text-gray-300">
+                Slot
+              </th>
+              {days.map((day, index) => (
+                <th
+                  key={index}
+                  className="py-2 px-4 border-b border-r text-center"
+                >
+                  <p>{day}</p>
+                  {!loading && <p>{datesInTheWeek[index]}</p>}
                 </th>
-                {days.map((day, index) => (
-                  <th
-                    key={index}
-                    className="py-2 px-4 border-b border-r text-center"
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {slots.map((slot, index) => (
+              <tr
+                key={index}
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150"
+              >
+                <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-300">
+                  Period {slot.period}
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {"(" + slot.start + " - " + slot.end + ")"}
+                  </div>
+                </td>
+                {days.map((day) => (
+                  <td
+                    key={`${day}-${slot.period}`}
+                    className="border-b border-r p-2 text-center"
                   >
-                    <p>{day}</p>
-                    {!loading && <p>{datesInTheWeek[index]}</p>}
-                  </th>
+                    {loading ? (
+                      <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
+                    ) : (
+                      renderTimetableCell(day, slot.period)
+                    )}
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {slots.map((slot, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150"
-                >
-                  <td className="py-2 px-4 border-b border-r font-bold text-center text-gray-800 dark:text-gray-300">
-                    Period {slot.period}
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {"(" + slot.start + " - " + slot.end + ")"}
-                    </div>
-                  </td>
-                  {days.map((day) => (
-                    <td
-                      key={`${day}-${slot.period}`}
-                      className="border-b border-r p-2 text-center"
-                    >
-                      {loading || dataFetched ? (
-                        <div className="animate-pulse bg-gray-200 rounded h-6 w-3/4 mx-auto"></div>
-                      ) : (
-                        renderTimetableCell(day, slot.period)
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
