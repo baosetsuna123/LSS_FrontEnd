@@ -37,7 +37,6 @@ function TeacherHome() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [minDateString, setMinDateString] = useState("");
   const [image, setImage] = useState(null);
-  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [infoClass, setInfoClass] = useState(null);
@@ -52,6 +51,7 @@ function TeacherHome() {
     week: null,
     range: "",
   });
+
   const [datesInTheWeek, setDatesInTheWeek] = useState([]);
   useEffect(() => {
     const fetchParam = async () => {
@@ -122,6 +122,21 @@ function TeacherHome() {
     courseCode: "",
     dayOfWeek: "",
   });
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setClassData({
+      name: "",
+      code: "",
+      description: "",
+      status: "ACTIVE",
+      maxStudents: 0,
+      price: "",
+      slotId: "",
+      startDate: "",
+      courseCode: "",
+      dayOfWeek: "",
+    });
+  };
   const days = [
     "Monday",
     "Tuesday",
@@ -311,6 +326,7 @@ function TeacherHome() {
       return toast.error("Price must be between 100,000 and 500,000");
     }
     try {
+      setIsLoading(true);
       await fetchCreateClass(classData, image, token);
       toast.success("Class created successfully");
       setIsModalOpen(false);
@@ -319,10 +335,19 @@ function TeacherHome() {
     } catch (error) {
       if (error.message && error.message.includes("duplicate")) {
         toast.error("Code is already in use");
+      } else if (
+        error.message &&
+        error.message.includes(
+          "A class with the same start date, teacher, slot, and day of the week already exists and is not canceled."
+        )
+      ) {
+        toast.error("A lesson with the same details already exists.");
       } else {
-        toast.error(error.message || "Failed to create lesson");
+        toast.error(error.message || "Failed to create class");
       }
       console.log(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -459,7 +484,7 @@ function TeacherHome() {
       </div>
       <Modal
         isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
+        onRequestClose={() => handleModalClose()}
         contentLabel="Create Class"
         className="bg-white p-4 rounded-lg shadow-lg max-w-5xl min-w-[40rem] mx-auto"
         overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"

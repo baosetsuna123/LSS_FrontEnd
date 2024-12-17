@@ -6,7 +6,7 @@ import {
 } from "@/data/api";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FaClock, FaSearch } from "react-icons/fa";
+import { FaClock, FaPencilAlt, FaSearch } from "react-icons/fa";
 
 function UpdateSchedule() {
   const [classes, setClasses] = useState([]);
@@ -18,6 +18,7 @@ function UpdateSchedule() {
   const [slots, setSlots] = useState([]);
   const [classShow, setClassShow] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const result = localStorage.getItem("result");
   let token;
   if (result) {
@@ -172,7 +173,7 @@ function UpdateSchedule() {
         );
         return; // Exit early if maxStudents is invalid
       }
-
+      setSaving(true);
       // Proceed with saving the updated class
       await fetchUpdateClass({ data: { ...updatedClass }, token });
 
@@ -189,6 +190,8 @@ function UpdateSchedule() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to update the class. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -271,9 +274,9 @@ function UpdateSchedule() {
                 </div>
                 <button
                   onClick={() => handleEdit(cls)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
                 >
-                  Edit
+                  <FaPencilAlt className="w-4 h-4" />
                 </button>
               </div>
             </li>
@@ -312,22 +315,13 @@ function UpdateSchedule() {
                   >
                     Subject
                   </label>
-                  <select
+                  <input
                     name="course"
                     value={editingClass.courseCode || ""}
                     onChange={handleInputChange}
                     disabled
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  >
-                    <option value="" disabled>
-                      Select a course
-                    </option>
-                    {courses.map((course) => (
-                      <option key={course.courseCode} value={course.courseCode}>
-                        {course.name}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
                 <div>
                   <label
@@ -356,7 +350,7 @@ function UpdateSchedule() {
                     htmlFor="teacher"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Teacher
+                    Tutor
                   </label>
                   <input
                     id="teacher"
@@ -391,45 +385,46 @@ function UpdateSchedule() {
                   >
                     Day of the Week
                   </label>
-                  <select
-                    name="dayofWeek"
-                    value={editingClass.dayOfWeek}
-                    onChange={handleInputChange}
+                  <input
+                    name="dayOfWeek"
+                    value={(() => {
+                      const dayMapping = {
+                        2: "Monday",
+                        3: "Tuesday",
+                        4: "Wednesday",
+                        5: "Thursday",
+                        6: "Friday",
+                        7: "Saturday",
+                        8: "Sunday",
+                      };
+                      return (
+                        dayMapping[editingClass.dayOfWeek] || "Invalid Day"
+                      ); // Fallback if day not found
+                    })()}
                     disabled
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  >
-                    {daysOfWeek.map((day) => (
-                      <option key={day.value} value={day.value.toString()}>
-                        {day.name}
-                      </option>
-                    ))}
-                  </select>
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    readOnly
+                  />
                 </div>
                 <div>
                   <label
                     htmlFor="slotId"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Class Time
+                    Lesson Time
                   </label>
                   <div className="relative">
                     <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <select
-                      name="slotId"
-                      value={editingClass.slotId}
-                      onChange={handleInputChange}
-                      disabled
-                      className="mt-1 block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                    >
-                      {slots.map((slot) => (
-                        <option
-                          key={slot.slotId}
-                          value={slot.slotId.toString()}
-                        >
-                          Slot {slot.slotId} ({slot.start} - {slot.end})
-                        </option>
-                      ))}
-                    </select>
+                    <div className="mt-1 block w-full pl-10 rounded-md border border-gray-300 bg-gray-100 shadow-sm text-gray-700">
+                      {(() => {
+                        const slot = slots.find(
+                          (slot) => slot.slotId === editingClass.slotId
+                        );
+                        return slot
+                          ? `Slot ${slot.slotId} (${slot.start} - ${slot.end})`
+                          : "Slot not found";
+                      })()}
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -458,9 +453,10 @@ function UpdateSchedule() {
             <div className="flex justify-end space-x-2 mt-6">
               <button
                 onClick={() => handleSave(editingClass)}
+                disabled={saving}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
               >
-                Save
+                {saving ? "Saving..." : "Save"}
               </button>
               <button
                 onClick={() => {

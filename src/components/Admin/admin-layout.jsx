@@ -189,7 +189,7 @@ export function AdminLayout({ children }) {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className={`text-gray-600 hover:text-gray-800 mr-[85px] hover:bg-gray-100 ${
+              className={`text-gray-600 hover:text-gray-800 mr-[100px] hover:bg-gray-100 ${
                 isLogoutHovered ? "text-red-500" : ""
               }`}
               onMouseEnter={() => setIsLogoutHovered(true)}

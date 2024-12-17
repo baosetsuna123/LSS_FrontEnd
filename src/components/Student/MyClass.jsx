@@ -35,8 +35,6 @@ const MyClass = () => {
     setSelectedWeekData({ week, range });
   };
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line no-unused-vars
-  const [dataFetched, setDataFetched] = useState(false);
 
   useEffect(() => {
     const fetchAllSlots = async () => {
@@ -45,8 +43,6 @@ const MyClass = () => {
         setSlots(fetchedSlots);
       } catch (error) {
         console.error("Error fetching dropdown data:", error);
-      } finally {
-        setDataFetched(true);
       }
     };
     fetchAllSlots();
