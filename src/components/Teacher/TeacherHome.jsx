@@ -116,7 +116,7 @@ function TeacherHome() {
     status: "ACTIVE",
     maxStudents: 15,
     price: "",
-    slotId: "1",
+    slotId: "",
     startDate: "",
     courseCode: "",
     dayOfWeek: "",
@@ -409,7 +409,6 @@ function TeacherHome() {
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
       <div className="w-full">
-
         <>
           <table className="table-auto w-full text-sm bg-white border border-gray-300 rounded-lg shadow-sm">
             <thead>
