@@ -37,6 +37,7 @@ function TeacherHome() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [minDateString, setMinDateString] = useState("");
   const [image, setImage] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [infoClass, setInfoClass] = useState(null);
@@ -114,7 +115,7 @@ function TeacherHome() {
     code: "",
     description: "",
     status: "ACTIVE",
-    maxStudents: 15,
+    maxStudents: 0,
     price: "",
     slotId: "",
     startDate: "",
