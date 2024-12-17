@@ -187,9 +187,7 @@ export function AboutMe() {
         </p>
         <Button
           className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mr-4"
-          onClick={() =>
-            navigate("/signup", { state: { userType: "teacher" } })
-          }
+          onClick={() => navigate("/signup", { state: { userType: "tutor" } })}
         >
           Sign Up as Tutor
         </Button>
