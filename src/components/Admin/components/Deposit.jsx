@@ -131,12 +131,12 @@ export default function Deposit() {
             },
             {
               data: chartData.totalExpenses,
-              label: "Total Refunded",
+              label: "Total Expenses",
               id: "totalExpensesId",
             },
             {
               data: chartData.totalIncome,
-              label: "Total Deposit",
+              label: "Total Income",
               id: "totalIncomeId",
             },
             {
