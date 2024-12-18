@@ -23,7 +23,7 @@ export default function Profile() {
     fullName: result.fullName || "",
     email: result.email || "",
     phoneNumber: result.phoneNumber || "",
-    address: result.address || "",
+    address: result.address || "135 Nguyen xi, Binh Thanh, HCMC",
   });
 
   const [categoryIds, setCategoryIds] = useState([]);
@@ -170,7 +170,7 @@ export default function Profile() {
             />
           </div>
 
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <label className="w-1/3 text-lg font-semibold text-gray-800 dark:text-gray-300">
               Address:
             </label>
@@ -182,7 +182,7 @@ export default function Profile() {
               variant="outlined"
               className="text-lg dark:bg-gray-700 dark:text-white"
             />
-          </div>
+          </div> */}
 
           <div className="flex items-center space-x-4">
             <InputLabel
