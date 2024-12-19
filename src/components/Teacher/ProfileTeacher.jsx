@@ -48,9 +48,9 @@ const ProfileTeacher = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState(0);
   const teacherName = result ? result.username : null;
-
+  console.log(teacherName);
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
