@@ -1,4 +1,4 @@
-import { fetchAllCategories } from "@/data/api";
+import { fetchAllCategories, fetchInfoTeacher } from "@/data/api";
 import {
   Checkbox,
   FormControl,
@@ -48,7 +48,24 @@ const ProfileTeacher = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const [info, setInfo] = useState({});
+  const teacherName = result ? result.username : null;
 
+  const token = sessionStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const data = await fetchInfoTeacher(teacherName, token);
+        console.log(data);
+        setInfo(data);
+      } catch (error) {
+        console.error("Error fetching teacher info:", error);
+      }
+    };
+
+    fetchInfo();
+  }, [teacherName, token]);
   // Handle changes in profile fields
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
@@ -306,6 +323,14 @@ const ProfileTeacher = () => {
                 ))}
               </Select>
             </FormControl>
+          </div>
+          <div className="mb-4 flex items-center">
+            <label className="text-gray-700 font-semibold w-1/4">
+              Violation Point
+            </label>
+            <div className="w-3/4 p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-800">
+              {info.violation}
+            </div>
           </div>
 
           <div className="mt-4">
