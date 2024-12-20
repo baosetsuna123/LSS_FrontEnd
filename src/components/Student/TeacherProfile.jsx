@@ -221,7 +221,7 @@ const TeacherProfile = () => {
               Certificates
             </h3>
             {info.certificate && info.certificate.length > 0 ? (
-              <div className="mt-4 space-y-4">
+              <div className="mt-4 ml-4 space-y-4">
                 {info.certificate.map((certificate, index) => (
                   <li key={index}>
                     <a
