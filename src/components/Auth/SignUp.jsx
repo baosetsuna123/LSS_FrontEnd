@@ -41,16 +41,6 @@ export default function SignUp() {
   const [categoryIds, setCategoryIds] = useState([]); // To hold selected category IDs
   const [allCategories, setAllCategories] = useState([]);
   const navigate = useNavigate();
-  const handleCategoryChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    if (userType === "student") {
-      setCategoryIds([value]);
-    } else {
-      setCategoryIds(typeof value === "string" ? value.split(",") : value);
-    }
-  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -172,24 +162,27 @@ export default function SignUp() {
               <FormControl fullWidth variant="outlined">
                 <Select
                   labelId="category-label"
-                  multiple={userType === "tutor"} // Allow multiple selection for teachers only
+                  multiple={false} // Restrict selection to one item for all users
                   value={categoryIds}
-                  onChange={handleCategoryChange}
+                  onChange={(event) => {
+                    const {
+                      target: { value },
+                    } = event;
+
+                    // Wrap the value in an array to match the backend's expected data type
+                    setCategoryIds([value]);
+                  }}
                   displayEmpty // Ensures the placeholder is shown when no selection is made
                   renderValue={(selected) => {
-                    const selectedNames = allCategories
-                      .filter((category) =>
-                        selected.includes(category.categoryId)
-                      )
-                      .map((category) => category.name);
-                    const placeholderText =
-                      userType === "tutor"
-                        ? "Choose your majors"
-                        : "Choose your major";
+                    const selectedCategory = allCategories.find(
+                      (category) => category.categoryId === selected[0] // Adjust to read first item
+                    );
 
-                    return selectedNames.length === 0
-                      ? placeholderText // Placeholder when no selection is made
-                      : selectedNames.join(", ");
+                    const placeholderText = "Choose your major";
+
+                    return selectedCategory
+                      ? selectedCategory.name
+                      : placeholderText;
                   }}
                 >
                   {allCategories.map((category) => (
@@ -198,7 +191,7 @@ export default function SignUp() {
                       value={category.categoryId}
                     >
                       <Checkbox
-                        checked={categoryIds.includes(category.categoryId)}
+                        checked={categoryIds.includes(category.categoryId)} // Adjusted for array comparison
                       />
                       <ListItemText primary={category.name} />
                     </MenuItem>
