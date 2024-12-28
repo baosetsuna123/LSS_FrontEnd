@@ -465,7 +465,7 @@ export const fetchBalanceTeacher = async (token) => {
 //get all classes
 export const fetchClasses = async (token) => {
   try {
-    const response = await api.get("/classes", {
+    const response = await api.get("/classes/with-teacher", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -476,6 +476,7 @@ export const fetchClasses = async (token) => {
     throw error;
   }
 };
+
 //get by id
 export const fetchClassbyID = async (id, token) => {
   try {
@@ -564,6 +565,84 @@ export const deleteParam = async (id, token) => {
     throw error;
   }
 };
+//Document
+export const createDocument = async (documentData, file, token) => {
+  const formData = new FormData();
+  formData.append("document", JSON.stringify(documentData));
+  formData.append("file", file);
+
+  try {
+    const response = await api.post("/api/documents", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    throw error;
+  }
+};
+export const updateDocument = async (id, documentData, file, token) => {
+  const formData = new FormData();
+  formData.append("document", JSON.stringify(documentData));
+  if (file) {
+    formData.append("file", file);
+  }
+
+  try {
+    const response = await api.put(`/api/documents/${id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating document:", error);
+    throw error;
+  }
+};
+export const getAllDocuments = async (token) => {
+  try {
+    const response = await api.get("/api/documents", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    throw error;
+  }
+};
+export const getDocumentById = async (id, token) => {
+  try {
+    const response = await api.get(`/api/documents/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching document:", error);
+    throw error;
+  }
+};
+export const deleteDocument = async (id, token) => {
+  try {
+    await api.delete(`/api/documents/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    throw error;
+  }
+};
+
 export const completeClassImmediately = async (classId, token) => {
   try {
     const response = await api.put(

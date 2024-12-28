@@ -13,6 +13,7 @@ import {
   FileX,
   FileQuestion,
   FileText,
+  Files,
 } from "lucide-react";
 import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
@@ -25,6 +26,7 @@ import {
   fetchAllCourses,
   fetchApplicationStaff,
   fetchClassStaff,
+  getAllDocuments,
   getAllNews,
   getApplicationsByType,
   // fetchClasses,
@@ -35,6 +37,7 @@ import AppOthers from "./AppOthers";
 import ClassLayout from "./Class";
 import { useQuestionContext } from "@/context/QuestionContext";
 import News from "./News";
+import Documents from "./Documents";
 
 export function Dashboard() {
   const { logout } = useAuth();
@@ -59,6 +62,8 @@ export function Dashboard() {
   const [searchQueryCourse, setSearchQueryCourse] = useState("");
   const [searchQueryDraw, setSearchQueryDraw] = useState("");
   const [searchQueryOther, setSearchQueryOther] = useState("");
+  const [documents, setDocuments] = useState([]);
+  const [searchQueryDoc, setSearchQueryDoc] = useState("");
 
   const [searchQueryClass, setSearchQueryClass] = useState("");
   const [totalCategories, setTotalCategories] = useState(0); // Track total categories
@@ -80,6 +85,9 @@ export function Dashboard() {
       } else if (activeCategory === "courses") {
         const data = await fetchAllCourses(token); // Pass token if required
         setCourses(data || []);
+      } else if (activeCategory === "documents") {
+        const data = await getAllDocuments(token); // Pass token if required
+        setDocuments(data || []);
       } else if (activeCategory === "applications") {
         const data = await fetchApplicationStaff(token);
         console.log(data.content);
@@ -144,6 +152,21 @@ export function Dashboard() {
     loadCategories();
   }, []);
   useEffect(() => {
+    const loadDocuments = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const data = await getAllDocuments(token);
+        setDocuments(data || []); // Ensure categories is always an array
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to fetch categories.");
+        setDocuments([]); // Set to an empty array on error
+      }
+    };
+
+    loadDocuments();
+  }, []);
+  useEffect(() => {
     const loadNews = async () => {
       try {
         const token = sessionStorage.getItem("token");
@@ -152,7 +175,7 @@ export function Dashboard() {
       } catch (error) {
         console.error("Failed to fetch news:", error);
         toast.error("Failed to fetch news.");
-        setCategories([]); // Set to an empty array on error
+        setNews([]); // Set to an empty array on error
       }
     };
 
@@ -170,7 +193,7 @@ export function Dashboard() {
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");
-        setApplications([]); // Set to an empty array on error
+        setAppWithdraw([]); // Set to an empty array on error
       }
     };
 
@@ -185,7 +208,7 @@ export function Dashboard() {
       } catch (error) {
         console.error("Failed to fetch applications:", error);
         toast.error("Failed to fetch applications.");
-        setApplications([]); // Set to an empty array on error
+        setAppOther([]); // Set to an empty array on error
       }
     };
 
@@ -235,7 +258,7 @@ export function Dashboard() {
       } catch (error) {
         console.error("Failed to fetch classes:", error);
         // toast.error("Failed to fetch classes.");
-        setCourses([]);
+        setClasses([]);
       }
     };
     loadClasses();
@@ -248,7 +271,7 @@ export function Dashboard() {
   const pageCountDraw = Math.ceil(appwithdraw.length / itemsPerPage);
   const pageCountOther = Math.ceil(appother.length / itemsPerPage);
   const pageCountNews = Math.ceil(news.length / itemsPerPage);
-
+  const pageCountDocs = Math.ceil(documents.length / itemsPerPage);
   // Function to check if any search query is active
   const isSearchActive = () => {
     return (
@@ -258,7 +281,8 @@ export function Dashboard() {
       searchQueryClass.trim() !== "" ||
       searchQueryDraw.trim() !== "" ||
       searchQueryOther.trim() !== "" ||
-      searchQueryNews.trim() !== ""
+      searchQueryNews.trim() !== "" ||
+      searchQueryDoc.trim() !== ""
     );
   };
 
@@ -415,6 +439,17 @@ export function Dashboard() {
             </button>
             <button
               onClick={() => {
+                handleTabClick("documents");
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "documents" ? "bg-gray-700" : ""
+              }`}
+            >
+              <Files size={20} className="mr-2" />
+              Documents
+            </button>
+            <button
+              onClick={() => {
                 handleTabClick("news");
               }}
               className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
@@ -541,6 +576,19 @@ export function Dashboard() {
                 loading={loading}
               />
             )}
+            {activeCategory === "documents" && (
+              <Documents
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                documents={documents}
+                setDocuments={setDocuments}
+                searchQuery={searchQueryDoc}
+                setSearchQuery={setSearchQueryDoc}
+                onDelete={resetCurrentPage}
+                loading={loading}
+              />
+            )}
             {activeCategory === "withdraw" && (
               <AppWithDraw
                 currentPage={currentPage}
@@ -603,6 +651,34 @@ export function Dashboard() {
                         )
                       }
                       disabled={currentPage === pageCountCate}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              {activeCategory === "documents" &&
+                documents.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountDocs}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountDocs)
+                        )
+                      }
+                      disabled={currentPage === pageCountDocs}
                       className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                     >
                       <ChevronRight size={20} />

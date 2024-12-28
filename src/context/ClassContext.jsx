@@ -32,7 +32,7 @@ export const ClassProvider = ({ children }) => {
       setLoading(true);
       try {
         const response = await fetchClasses(token);
-        console.log("Fetched classes:", response); // Log the response to verify it's correct
+        console.log("Fetched classes:", response);
 
         if (response && !isEqual(response, classes)) {
           setClasses(response);

@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import {
+  createDocument,
   fetchAllCategories,
   fetchCreateCourse,
   fetchDeleteCourse,
   fetchUpdateCourse,
 } from "@/data/api";
 import { toast } from "react-hot-toast";
-import { Search, Trash2 } from "lucide-react";
+import { AlertTriangle, Edit3, FileText, Search, Trash2 } from "lucide-react";
 
 export default function CourseLayout({
   currentPage,
@@ -27,14 +28,23 @@ export default function CourseLayout({
   const [courseToDelete, setCourseToDelete] = useState(null);
 
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null); // State for image preview
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isDocumentVisible, setIsDocumentVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false); // State for image modal
   const [selectedImage, setSelectedImage] = useState(null); // State for selected course image
   const token = sessionStorage.getItem("token");
+  const [status, setStatus] = useState("Create Course");
+  const [isCourseCreated, setIsCourseCreated] = useState(false); // Track if course was created
+  const [file, setFile] = useState(null); // Document file to upload
+  const [documentData, setDocumentData] = useState({
+    title: "", // Name of the document
+    content: "", // Description of the document
+    // You can add other fields here if your form has more fields
+  });
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
 
   const modalRef = useRef(); // Create a ref for the modal
   const [modalSize, setModalSize] = useState({ width: "auto", height: "auto" }); // State for modal size
@@ -44,6 +54,13 @@ export default function CourseLayout({
       ...courseDTO,
       [e.target.name]: e.target.value,
     });
+  };
+  const handleChangeDoc = (e) => {
+    const { name, value } = e.target;
+    setDocumentData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -61,8 +78,8 @@ export default function CourseLayout({
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
-    setImagePreview(URL.createObjectURL(file)); // Set image preview
   };
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleCreateCourse = async (e) => {
     e.preventDefault();
@@ -79,22 +96,46 @@ export default function CourseLayout({
 
     try {
       const response = await fetchCreateCourse(courseDTO, image, token);
-      toast.success("Course created successfully!");
 
       let courseData = response;
       if (typeof response === "string" && response.includes("{")) {
         const jsonString = response.substring(response.indexOf("{"));
         courseData = JSON.parse(jsonString);
       }
-
+      toast.success("Done partially! Please create a document for the course.");
       setCourses((prevCourses) => [...prevCourses, courseData]);
+      setStatus("Creating Document...");
       setIsFormVisible(false);
+      setIsDocumentVisible(true); // Show the document form
+      setIsCourseCreated(true);
     } catch (error) {
       console.error("Failed to create course:", error);
       toast.error("Failed to create course.");
     } finally {
       // Ensure that loading state is cleared after 2 seconds
       setIsLoading(false);
+    }
+  };
+  const handleCreateDocument = async (e) => {
+    e.preventDefault();
+    setIsLoadingDocument(true);
+    const documentDTO = {
+      title: documentData.title, // Make sure the name matches your documentDTO properties
+      content: documentData.content, // Example field, use what you have
+      // Add any other fields that are part of your DocumentDTO here
+    };
+    try {
+      // Now, create the document for the course
+      await createDocument(documentDTO, file, token); // Call the createDocument API
+      toast.success("Course created successfully!");
+      setIsDocumentVisible(false); // Hide the document form
+      setIsCourseCreated(false);
+    } catch (error) {
+      toast.error("Error creating document");
+      console.error(error);
+    } finally {
+      setIsLoadingDocument(false);
+      setStatus("Completed"); // Update status when the operation is complete
     }
   };
 
@@ -104,7 +145,6 @@ export default function CourseLayout({
     );
     setCourseDTO(courseToEdit);
     setImage(courseToEdit.image);
-    setImagePreview(courseToEdit.image); // Set image preview for editing
     setIsEditing(true);
     setIsFormVisible(true);
   };
@@ -173,6 +213,9 @@ export default function CourseLayout({
   const handleDeleteClick = (course) => {
     setCourseToDelete(course);
     setShowDeleteModal(true);
+  };
+  const closeDocumentModal = () => {
+    setIsDocumentVisible(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -258,6 +301,7 @@ export default function CourseLayout({
           onClick={() => {
             setIsFormVisible(!isFormVisible);
             setIsEditing(false);
+            setStatus("Creating Course...");
             setCourseDTO({
               courseCode: "",
               name: "",
@@ -265,7 +309,6 @@ export default function CourseLayout({
               categoryId: 1,
             });
             setImage(null); // Reset image
-            setImagePreview(null); // Reset image preview
           }}
         >
           Add Course
@@ -302,136 +345,273 @@ export default function CourseLayout({
           </div>
         </div>
       )}
+      {isCourseCreated && isDocumentVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+            {!isEditing && (isFormVisible || isDocumentVisible) && (
+              <div className="mb-6">
+                <div className="flex items-center space-x-4 bg-gray-100 p-4 rounded-lg">
+                  <div
+                    className={`flex-1 flex items-center justify-center space-x-2 p-2 rounded-md transition-colors duration-300 ${
+                      status === "Creating Course..."
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <Edit3 size={20} />
+                    <span className="text-sm font-medium">Create Course</span>
+                  </div>
+                  <div
+                    className={`flex-1 flex items-center justify-center space-x-2 p-2 rounded-md transition-colors duration-300 ${
+                      status === "Creating Document..."
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <FileText size={20} />
+                    <span className="text-sm font-medium">Create Document</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <form
+              onSubmit={handleCreateDocument}
+              className="bg-white rounded-lg shadow-md p-6 w-full"
+            >
+              <h2 className="text-2xl font-semibold text-center">
+                Create Document for Course
+              </h2>
+
+              {/* Document Form Fields */}
+              <div className="space-y-2">
+                <div>
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    value={documentData.title}
+                    onChange={handleChangeDoc}
+                    placeholder="Enter Document Title"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="content"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Content
+                  </label>
+                  <textarea
+                    name="content"
+                    id="content"
+                    value={documentData.content}
+                    onChange={handleChangeDoc}
+                    placeholder="Enter Document Content"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="4"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="document"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Upload Document
+                  </label>
+                  <input
+                    type="file"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="submit"
+                  className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 ${
+                    isLoadingDocument ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isLoadingDocument}
+                >
+                  {isLoadingDocument ? "Processing..." : "Create Document"}
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+                  onClick={() => setShowConfirm(true)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {isFormVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <form
-            onSubmit={isEditing ? handleSaveUpdateCourse : handleCreateCourse}
-            className="bg-white shadow-lg rounded-lg p-6 w-1/2 max-w-lg"
-          >
-            <h2 className="text-xl font-semibold mb-4 text-center">
+          <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+            {/* Status bar logic */}
+            {!isEditing && (isFormVisible || isDocumentVisible) && (
+              <div className="mb-6">
+                <div className="flex items-center space-x-4 bg-gray-100 p-4 rounded-lg">
+                  <div
+                    className={`flex-1 flex items-center justify-center space-x-2 p-2 rounded-md transition-colors duration-300 ${
+                      status === "Creating Course..."
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <Edit3 size={20} />
+                    <span className="text-sm font-medium">Create Course</span>
+                  </div>
+                  <div
+                    className={`flex-1 flex items-center justify-center space-x-2 p-2 rounded-md transition-colors duration-300 ${
+                      status === "Creating Document..."
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <FileText size={20} />
+                    <span className="text-sm font-medium">Create Document</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
               {isEditing ? "Edit Course" : "Create New Course"}
             </h2>
-            <div className="flex flex-wrap -mx-2">
-              <div className="w-full md:w-1/2 px-2 mb-4">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="courseCode"
-                >
-                  Course Code
-                </label>
-                <input
-                  type="text"
-                  name="courseCode"
-                  id="courseCode"
-                  value={courseDTO.courseCode}
-                  onChange={handleChange}
-                  placeholder="Enter Course Code"
-                  className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                  disabled={isEditing}
-                />
-              </div>
-              <div className="w-full md:w-1/2 px-2 mb-4">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="name"
-                >
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  value={courseDTO.name}
-                  onChange={handleChange}
-                  placeholder="Enter Course Name"
-                  className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div className="w-full md:w-1/2 px-2 mb-4">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="description"
-                >
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  id="description"
-                  value={courseDTO.description}
-                  onChange={handleChange}
-                  placeholder="Enter Course Description"
-                  className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                  rows="3"
-                />
-              </div>
-              <div className="w-full md:w-1/2 px-2 mb-4">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="categoryId"
-                >
-                  Category
-                </label>
-                <select
-                  name="categoryId"
-                  id="categoryId"
-                  value={courseDTO.categoryId}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  {categories.map((category) => (
-                    <option
-                      key={category.categoryId}
-                      value={category.categoryId}
-                    >
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-full px-2 mb-4">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="image"
-                >
-                  Course Image
-                </label>
-                <input
-                  type="file"
-                  onChange={handleImageChange}
-                  className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-                {imagePreview && (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="mt-2 w-full h-32 object-cover rounded-md"
+
+            <form
+              onSubmit={isEditing ? handleSaveUpdateCourse : handleCreateCourse}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="courseCode"
+                  >
+                    Course Code
+                  </label>
+                  <input
+                    type="text"
+                    name="courseCode"
+                    id="courseCode"
+                    value={courseDTO.courseCode}
+                    onChange={handleChange}
+                    placeholder="Enter Course Code"
+                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isEditing}
                   />
-                )}
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="name"
+                  >
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    value={courseDTO.name}
+                    onChange={handleChange}
+                    placeholder="Enter Course Name"
+                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="description"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    id="description"
+                    value={courseDTO.description}
+                    onChange={handleChange}
+                    placeholder="Enter Course Description"
+                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="categoryId"
+                  >
+                    Category
+                  </label>
+                  <select
+                    name="categoryId"
+                    id="categoryId"
+                    value={courseDTO.categoryId}
+                    onChange={handleChange}
+                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option
+                        key={category.categoryId}
+                        value={category.categoryId}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor="image"
+                  >
+                    Course Image
+                  </label>
+                  <input
+                    type="file"
+                    onChange={handleImageChange}
+                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={isLoading} // Disable the button while API call is in progress
-              >
-                {isLoading
-                  ? "Processing..."
-                  : isEditing
-                  ? "Update Course"
-                  : "Create Course"}
-              </button>
-              <button
-                type="button"
-                className="ml-2 px-4 py-2 bg-gray-300 text-white rounded-md hover:bg-gray-400 transition duration-200"
-                onClick={() => setIsFormVisible(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="submit"
+                  className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ${
+                    isLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isLoading}
+                >
+                  {isLoading
+                    ? "Processing..."
+                    : isEditing
+                    ? "Update Course"
+                    : "Create Course"}
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+                  onClick={() => setIsFormVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -532,7 +712,40 @@ export default function CourseLayout({
           </tbody>
         </table>
       </div>
-
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+            <div className="flex items-center justify-center mb-6">
+              <div className="bg-red-100 rounded-full p-3">
+                <AlertTriangle className="h-8 w-8 text-red-500" />
+              </div>
+            </div>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Confirm Exit
+              </h2>
+              <p className="text-gray-600">
+                Are you sure you want to exit? Your course-creating progress
+                will be lost and you will need to start over.
+              </p>
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
+              <button
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all"
+                onClick={() => setShowConfirm(false)}
+              >
+                Stay Here
+              </button>
+              <button
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
+                onClick={closeDocumentModal}
+              >
+                Yes, Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Image Preview Modal */}
       {showImageModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
