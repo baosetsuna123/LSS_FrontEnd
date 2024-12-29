@@ -1,7 +1,6 @@
 import { Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import Modal from "../Staff/Modal";
-import toast from "react-hot-toast";
+import { useState } from "react";
+import CreateClassForm from "./CreateClassForm";
 
 const All_Class = ({
   currentPage,
@@ -11,15 +10,11 @@ const All_Class = ({
   lessons,
   setLessons,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState(null);
-  const token = sessionStorage.getItem("token");
+  const [showCreateClassForm, setShowCreateClassForm] = useState(false);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedClassId(null);
+  const toggleCreateClassForm = () => {
+    setShowCreateClassForm(!showCreateClassForm);
   };
-
   // Calculate the current data to display based on pagination and search query
   const filteredClass = lessons.filter((cls) =>
     cls.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -54,13 +49,18 @@ const All_Class = ({
         </div>
         <button
           className="mr-10 px-4 py-2 bg-blue-500 text-white rounded-md ml-4 flex items-center"
-          onClick={() => {}}
+          onClick={toggleCreateClassForm}
         >
           <Plus className="h-5 w-5 mr-2" />
           Add Class
         </button>
       </div>
-
+      {showCreateClassForm && (
+        <CreateClassForm
+          toggleCreateClassForm={toggleCreateClassForm}
+          setLessons={setLessons}
+        />
+      )}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
