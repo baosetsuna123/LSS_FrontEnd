@@ -13,7 +13,7 @@ import defaults from "../../assets/default.jfif";
 export function ViewAllClasses() {
   const { classes: contextClasses, getClasses } = useClassContext();
   const [searchTerm, setSearchTerm] = useState("");
-  const [maxPrice, setMaxPrice] = useState(250000);
+  const [maxPrice, setMaxPrice] = useState(2000000);
   const [selectedCourseCodes, setSelectedCourseCodes] = useState([]);
   const [filteredClasses, setFilteredClasses] = useState(contextClasses);
 
@@ -137,9 +137,9 @@ export function ViewAllClasses() {
             </CardHeader>
             <CardContent>
               <Slider
-                min={100000}
-                max={1000000}
-                step={50000}
+                min={500000}
+                max={2000000}
+                step={100000}
                 value={[maxPrice]}
                 onValueChange={(value) => setMaxPrice(value[0])}
               />

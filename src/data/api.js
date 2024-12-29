@@ -56,7 +56,20 @@ export const fetchSignUpTeacher = async (
 //Get major class by student
 export const fetchMajorClassByStudent = async (token) => {
   try {
-    const response = await api.get("/classes/by-major", {
+    const response = await api.get("/classes/with-teacher-by-major", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
+export const getAllClass = async (token) => {
+  try {
+    const response = await api.get("/classes", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -476,7 +489,19 @@ export const fetchClasses = async (token) => {
     throw error;
   }
 };
-
+export const getDocumentsByCourseCode = async (courseCode, token) => {
+  try {
+    const response = await api.get(`/api/documents/${courseCode}/documents`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch balance:", error);
+    throw error;
+  }
+};
 //get by id
 export const fetchClassbyID = async (id, token) => {
   try {

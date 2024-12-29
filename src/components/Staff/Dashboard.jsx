@@ -14,6 +14,7 @@ import {
   FileQuestion,
   FileText,
   Files,
+  MessageSquare,
 } from "lucide-react";
 import ApplicationLayout from "./Applications";
 import CourseLayout from "./Course";
@@ -26,6 +27,7 @@ import {
   fetchAllCourses,
   fetchApplicationStaff,
   fetchClassStaff,
+  getAllClass,
   getAllDocuments,
   getAllNews,
   getApplicationsByType,
@@ -38,6 +40,7 @@ import ClassLayout from "./Class";
 import { useQuestionContext } from "@/context/QuestionContext";
 import News from "./News";
 import Documents from "./Documents";
+import All_Class from "./All_Class";
 
 export function Dashboard() {
   const { logout } = useAuth();
@@ -64,6 +67,8 @@ export function Dashboard() {
   const [searchQueryOther, setSearchQueryOther] = useState("");
   const [documents, setDocuments] = useState([]);
   const [searchQueryDoc, setSearchQueryDoc] = useState("");
+  const [lessons, setLessons] = useState([]);
+  const [searchQueryLesson, setSearchQueryLesson] = useState("");
 
   const [searchQueryClass, setSearchQueryClass] = useState("");
   const [totalCategories, setTotalCategories] = useState(0); // Track total categories
@@ -99,6 +104,9 @@ export function Dashboard() {
       } else if (activeCategory === "news") {
         const data = await getAllNews(token);
         setNews(data || []);
+      } else if (activeCategory === "lessons") {
+        const data = await getAllClass(token);
+        setLessons(data || []);
       } else if (activeCategory === "withdraw") {
         const appWithdrawData = await getApplicationsByType(1, token);
         setAppWithdraw(appWithdrawData || []);
@@ -150,6 +158,20 @@ export function Dashboard() {
     };
 
     loadCategories();
+  }, []);
+  useEffect(() => {
+    const loadLessons = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const data = await getAllClass(token);
+        setLessons(data || []); // Ensure categories is always an array
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        setCategories([]); // Set to an empty array on error
+      }
+    };
+
+    loadLessons();
   }, []);
   useEffect(() => {
     const loadDocuments = async () => {
@@ -272,6 +294,8 @@ export function Dashboard() {
   const pageCountOther = Math.ceil(appother.length / itemsPerPage);
   const pageCountNews = Math.ceil(news.length / itemsPerPage);
   const pageCountDocs = Math.ceil(documents.length / itemsPerPage);
+  const pageCountLessons = Math.ceil(lessons.length / itemsPerPage);
+
   // Function to check if any search query is active
   const isSearchActive = () => {
     return (
@@ -282,7 +306,8 @@ export function Dashboard() {
       searchQueryDraw.trim() !== "" ||
       searchQueryOther.trim() !== "" ||
       searchQueryNews.trim() !== "" ||
-      searchQueryDoc.trim() !== ""
+      searchQueryDoc.trim() !== "" ||
+      searchQueryLesson.trim() !== ""
     );
   };
 
@@ -434,8 +459,19 @@ export function Dashboard() {
                 activeCategory === "class" ? "bg-gray-700" : ""
               }`}
             >
+              <MessageSquare size={20} className="mr-2" />
+              Feedback
+            </button>
+            <button
+              onClick={() => {
+                handleTabClick("lessons");
+              }}
+              className={`w-full flex items-center py-2 px-4 hover:bg-gray-700 ${
+                activeCategory === "lessons" ? "bg-gray-700" : ""
+              }`}
+            >
               <School size={20} className="mr-2" />
-              Lesson
+              Classes
             </button>
             <button
               onClick={() => {
@@ -540,6 +576,17 @@ export function Dashboard() {
                 initialCategories={categories}
                 searchQuery={searchQueryCategory}
                 setSearchQuery={setSearchQueryCategory}
+              />
+            )}
+            {activeCategory === "lessons" && (
+              <All_Class
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                setCurrentPage={setCurrentPage}
+                lessons={lessons}
+                setLessons={setLessons}
+                searchQuery={searchQueryLesson}
+                setSearchQuery={setSearchQueryLesson}
               />
             )}
             {activeCategory === "applications" && (
@@ -679,6 +726,34 @@ export function Dashboard() {
                         )
                       }
                       disabled={currentPage === pageCountDocs}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
+              {activeCategory === "lessons" &&
+                documents.length > itemsPerPage && (
+                  <div className="mt-4 flex justify-between items-center">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {currentPage} of {pageCountLessons}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, pageCountLessons)
+                        )
+                      }
+                      disabled={currentPage === pageCountLessons}
                       className="px-4 py-2 border border-zinc-200 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
                     >
                       <ChevronRight size={20} />

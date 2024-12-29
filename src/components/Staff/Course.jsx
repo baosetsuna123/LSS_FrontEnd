@@ -5,6 +5,8 @@ import {
   fetchCreateCourse,
   fetchDeleteCourse,
   fetchUpdateCourse,
+  getDocumentsByCourseCode,
+  updateDocument,
 } from "@/data/api";
 import { toast } from "react-hot-toast";
 import { AlertTriangle, Edit3, FileText, Search, Trash2 } from "lucide-react";
@@ -26,7 +28,14 @@ export default function CourseLayout({
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
+  const [EditmodalOpen, setEditModalOpen] = useState(false); // State for modal visibility
+  const [loading, setLoading] = useState(false);
 
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    file: null,
+  });
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +48,8 @@ export default function CourseLayout({
   const [status, setStatus] = useState("Create Course");
   const [isCourseCreated, setIsCourseCreated] = useState(false); // Track if course was created
   const [file, setFile] = useState(null); // Document file to upload
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const [documentData, setDocumentData] = useState({
     title: "", // Name of the document
     content: "", // Description of the document
@@ -49,10 +60,36 @@ export default function CourseLayout({
   const modalRef = useRef(); // Create a ref for the modal
   const [modalSize, setModalSize] = useState({ width: "auto", height: "auto" }); // State for modal size
 
+  const handleEditClick = async (courseCode) => {
+    if (!courseCode) {
+      alert("Course code is missing. Cannot fetch documents.");
+      return;
+    }
+
+    try {
+      const documents = await getDocumentsByCourseCode(courseCode, token);
+      console.log(documents);
+      setSelectedItem(documents[0]); // Set the selected document
+      setEditModalOpen(true); // Open the modal
+      setIsFormVisible(false); // Hide the form if needed
+    } catch (error) {
+      // Handle errors (e.g., network issues, API failures)
+      console.error("Error fetching documents:", error);
+      alert("Failed to fetch documents. Please try again later.");
+    }
+  };
+
   const handleChange = (e) => {
     setCourseDTO({
       ...courseDTO,
       [e.target.name]: e.target.value,
+    });
+  };
+  const handleDocChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
     });
   };
   const handleChangeDoc = (e) => {
@@ -63,6 +100,33 @@ export default function CourseLayout({
     }));
   };
 
+  const handleUpdate = async () => {
+    try {
+      setLoading(true); // Set loading state
+      // Call the updateDocument API
+      const updatedDocument = await updateDocument(
+        selectedItem.id,
+        formData,
+        formData.file,
+        token
+      );
+      console.log("Document updated:", updatedDocument);
+      toast.success("Document updated successfully"); // Show success message
+      setEditModalOpen(false); // Close the modal
+    } catch (err) {
+      toast.error("Error updating document");
+      console.error("Error updating document:", err);
+    } finally {
+      setLoading(false); // Reset loading
+    }
+  };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({
+      ...formData,
+      file, // Store selected file
+    });
+  };
   useEffect(() => {
     const fetchCate = async () => {
       try {
@@ -138,7 +202,15 @@ export default function CourseLayout({
       setStatus("Completed"); // Update status when the operation is complete
     }
   };
-
+  useEffect(() => {
+    if (selectedItem) {
+      setFormData({
+        title: selectedItem.title || "",
+        content: selectedItem.content || "",
+        file: selectedItem.filePath || null, // Set the initial file (filePath) when editing
+      });
+    }
+  }, [selectedItem]);
   const handleUpdateCourse = (courseCode) => {
     const courseToEdit = courses.find(
       (course) => course.courseCode === courseCode
@@ -588,7 +660,23 @@ export default function CourseLayout({
                   />
                 </div>
               </div>
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-between space-x-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+                  onClick={() => setIsFormVisible(false)}
+                >
+                  Cancel
+                </button>
+                {isEditing && (
+                  <button
+                    type="button"
+                    className="px-4 py-2  text-white bg-green-500 rounded-md hover:bg-green-600 transition duration-200"
+                    onClick={() => handleEditClick(courseDTO.courseCode)}
+                  >
+                    Edit Document
+                  </button>
+                )}
                 <button
                   type="submit"
                   className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ${
@@ -602,15 +690,167 @@ export default function CourseLayout({
                     ? "Update Course"
                     : "Create Course"}
                 </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
-                  onClick={() => setIsFormVisible(false)}
-                >
-                  Cancel
-                </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {EditmodalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20">
+          <div className="bg-white p-6 rounded-md w-96">
+            <h2 className="text-xl font-semibold mb-4">Edit Document</h2>
+
+            {/* Title Field */}
+            <div className="mb-4">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleDocChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Content Field */}
+            <div className="mb-4">
+              <label
+                htmlFor="content"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Content
+              </label>
+              <textarea
+                id="content"
+                name="content"
+                value={formData.content}
+                onChange={handleDocChange}
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                rows="4"
+              />
+            </div>
+
+            {/* File Field */}
+            {/* Show Current File Preview (if no new file is selected) */}
+            {selectedItem && selectedItem.filePath && !formData.file && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Current File
+                </label>
+                <div className="mt-2">
+                  {selectedItem.filePath.endsWith(".pdf") ? (
+                    // For PDF files, use an embed tag to show a preview
+                    <embed
+                      src={selectedItem.filePath}
+                      type="application/pdf"
+                      width="100%"
+                      height="120px"
+                    />
+                  ) : selectedItem.filePath.endsWith(".docx") ||
+                    selectedItem.filePath.endsWith(".doc") ? (
+                    // For Word files, display an icon
+                    <div className="text-center text-gray-500">
+                      <span>Unsupported File Type</span>
+                    </div>
+                  ) : selectedItem.filePath.endsWith(".jpg") ||
+                    selectedItem.filePath.endsWith(".jpeg") ||
+                    selectedItem.filePath.endsWith(".png") ? (
+                    // For Image files (JPG, JPEG, PNG), show an image preview
+                    <img
+                      src={selectedItem.filePath}
+                      alt="File Preview"
+                      className="w-full h-auto max-w-[60px] mx-auto object-contain"
+                    />
+                  ) : (
+                    <div className="text-center text-gray-500">
+                      <span>Unsupported File Type</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Show Preview of the Selected File (if file is selected) */}
+            {formData.file && formData.file instanceof File && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Selected File
+                </label>
+                <div className="mt-2">
+                  {formData.file.type.startsWith("image/") ? (
+                    <img
+                      src={URL.createObjectURL(formData.file)} // Create object URL for the selected file
+                      alt="File Preview"
+                      className="w-full h-auto max-w-[150px] mx-auto object-contain"
+                    />
+                  ) : formData.file.type === "application/pdf" ? (
+                    <embed
+                      src={URL.createObjectURL(formData.file)}
+                      type="application/pdf"
+                      width="100%"
+                      height="120px"
+                    />
+                  ) : formData.file.type === "application/msword" ||
+                    formData.file.type ===
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
+                    <div className="flex justify-center items-center">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Microsoft_Office_Word_2013_logo.svg/1200px-Microsoft_Office_Word_2013_logo.svg.png"
+                        alt="Word Document"
+                        className="w-12 h-12 object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-500">
+                      <span>Unsupported File Type</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* File Input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Upload File
+              </label>
+              <input
+                type="file"
+                name="file"
+                onChange={handleFileChange}
+                className="mt-2 w-full border border-gray-300 p-2 rounded-md"
+              />
+            </div>
+
+            {/* File Input */}
+
+            {/* Loading/Error */}
+
+            {/* Update Button */}
+            <div className="flex justify-between mt-4">
+              {/* Update Button */}
+              <button
+                onClick={handleUpdate}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-auto"
+              >
+                {loading ? "Updating..." : "Update"}
+              </button>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md w-auto"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

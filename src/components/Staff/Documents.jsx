@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { EllipsisVertical, Search, Edit, Trash, Eye } from "lucide-react";
-import { deleteDocument, getDocumentById, updateDocument } from "@/data/api";
+import { EllipsisVertical, Search, Edit, Eye } from "lucide-react";
+import { getDocumentById, updateDocument } from "@/data/api";
 import toast from "react-hot-toast";
-import { FaTrashAlt } from "react-icons/fa";
 const Documents = ({
   currentPage,
   itemsPerPage,
@@ -20,70 +19,7 @@ const Documents = ({
     content: "",
     file: null,
   });
-  const DeleteModal = ({ isOpen, document, onClose, onDeleteSuccess }) => {
-    const [loading, setLoading] = useState(false);
 
-    const handleDelete = async () => {
-      try {
-        const token = sessionStorage.getItem("token"); // Get token from session storage
-        setLoading(true); // Set loading state
-        await deleteDocument(document.id, token); // Call the deleteDocument API
-        toast.success("Document deleted successfully"); // Show success message
-        onDeleteSuccess(document.id); // Notify parent component to update the table
-        onClose(); // Close the modal
-      } catch (error) {
-        toast.error("Error deleting document");
-        console.error("Error deleting document:", error);
-      } finally {
-        setLoading(false); // Reset loading state
-      }
-    };
-
-    return (
-      isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-md w-auto">
-            <div className="flex items-center mb-4">
-              {/* Warning Icon */}
-              <div className="text-yellow-500 mr-3">
-                <i className="fas fa-exclamation-triangle text-2xl"></i>
-              </div>
-              <h2 className="text-lg text-center items-center justify-center font-semibold whitespace-nowrap">
-                Are you sure you want to delete this document?
-              </h2>
-            </div>
-            <p className="mt-2 text-center text-red-500 ">
-              This action cannot be undone.
-            </p>
-            <div className="mt-4 flex justify-between">
-              <button
-                className="bg-gray-300 text-black p-2 rounded-md flex items-center"
-                onClick={onClose}
-              >
-                <i className="fas fa-times mr-2"></i> Cancel
-              </button>
-              <button
-                className="bg-red-500 text-white p-2 rounded-md flex items-center"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <i className="fas fa-spinner animate-spin mr-2"></i>{" "}
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <FaTrashAlt className="mr-2" /> Delete
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )
-    );
-  };
   const handleEditClick = (item) => {
     setSelectedItem(item); // Set the selected item
     setFormData({
@@ -107,17 +43,9 @@ const Documents = ({
     setEditModalOpen(false); // Close the modal
     setSelectedItem(null); // Clear selected item
   };
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false); // Modal open state
-  const [documentToDelete, setDocumentToDelete] = useState(null);
-  const handleDeleteClick = (document) => {
-    setDocumentToDelete(document); // Set the document to delete
-    setDeleteModalOpen(true); // Open the delete modal
-  };
 
   // Function to remove the deleted document from the table
-  const handleDeleteSuccess = (id) => {
-    setDocuments(documents.filter((doc) => doc.id !== id)); // Remove deleted document from state
-  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -202,7 +130,7 @@ const Documents = ({
           <Search size={16} className="mr-2" />
           <input
             type="text"
-            placeholder="Search News by Title"
+            placeholder="Search Documents by Title"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm hover:shadow-md"
@@ -273,7 +201,7 @@ const Documents = ({
                           View File
                         </a>
                       ) : (
-                        <span>No file available</span> // Fallback text if no file exists
+                        <span>No file available</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap relative">
@@ -290,12 +218,6 @@ const Documents = ({
                             onClick={() => handleEditClick(item)}
                           >
                             <Edit size={16} />
-                          </div>
-                          <div
-                            className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-red-500"
-                            onClick={() => handleDeleteClick(item)}
-                          >
-                            <Trash size={16} />
                           </div>
                           <div
                             className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-gray-500"
@@ -320,12 +242,6 @@ const Documents = ({
               </tr>
             )}
           </tbody>
-          <DeleteModal
-            isOpen={isDeleteModalOpen}
-            document={documentToDelete}
-            onClose={() => setDeleteModalOpen(false)}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
         </table>
       </div>
       {EditmodalOpen && (
