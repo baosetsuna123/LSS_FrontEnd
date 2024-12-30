@@ -13,7 +13,12 @@ import {
 import { CalendarIcon, PlusCircle, X, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { fetchCreateClass, fetchSlots, fetchAllCourses } from "@/data/api";
+import {
+  fetchCreateClass,
+  fetchSlots,
+  fetchAllCourses,
+  fetchSystemParam,
+} from "@/data/api";
 
 import {
   Checkbox,
@@ -23,22 +28,24 @@ import {
   Select,
 } from "@mui/material";
 import toast from "react-hot-toast";
-const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
+const CreateClassForm = ({
+  toggleCreateClassForm,
+  setLessons,
+  setShowCreateClassForm,
+}) => {
   const [classDTO, setClassDTO] = useState({
     name: "",
     description: "",
     maxStudents: "",
     price: "",
     courseCode: "",
-    startDate: "",
-    endDate: "",
-    dayOfWeek: "",
     dateSlots: [],
   });
   const [currentDateSlot, setCurrentDateSlot] = useState({
     date: "",
     slotIds: [],
   });
+  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [slots, setSlots] = useState([]);
@@ -67,7 +74,55 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
       isMounted = false; // Cleanup function
     };
   }, [token]);
+  const formatWithCommas = (num) => {
+    if (!num) return "";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
   const [courses, setCourses] = useState([]);
+  const [minDateString, setMinDateString] = useState("");
+  useEffect(() => {
+    const fetchParam = async () => {
+      try {
+        const data = await fetchSystemParam(token);
+
+        const param = data.find((p) => p.name === "check_time_before_start");
+        console.log(param.value);
+        if (param) {
+          let baseDays = parseInt(param.value, 10); // Parse the value as an integer
+          if (isNaN(baseDays)) {
+            console.warn(
+              "The parameter 'check_time_before_start' value is not a valid number. Defaulting to 0."
+            );
+            baseDays = 0;
+          }
+          const today = new Date();
+          today.setDate(today.getDate() + baseDays + 2); // Add base days and 2 days buffer
+          const formattedMinDate = today.toISOString().split("T")[0];
+          setMinDateString(formattedMinDate); // Set the minimum date
+          console.log(minDateString);
+        } else {
+          console.warn(
+            "Parameter 'check_time_before_start' not found. Defaulting to 2 days from today."
+          );
+          const today = new Date();
+          today.setDate(today.getDate() + 2); // Default to 2 days buffer
+          const formattedMinDate = today.toISOString().split("T")[0];
+          setMinDateString(formattedMinDate); // Set the default minimum date
+        }
+      } catch (error) {
+        console.error("Error fetching parameters:", error);
+        toast.error(
+          "Failed to fetch system parameters. Defaulting to 2 days from today."
+        );
+        const today = new Date();
+        today.setDate(today.getDate() + 2); // Default to 2 days buffer
+        const formattedMinDate = today.toISOString().split("T")[0];
+        setMinDateString(formattedMinDate); // Set the default minimum date
+      }
+    };
+
+    fetchParam();
+  }, [token]);
   useEffect(() => {
     let isMounted = true; // Flag to track if the component is mounted
 
@@ -94,14 +149,24 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
   }, [token]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setClassDTO((prev) => ({ ...prev, [name]: value }));
+    setClassDTO((prevData) => ({ ...prevData, [name]: value }));
   };
+  const handleInput = (e) => {
+    let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
+    if (!isNaN(value) || value === "") {
+      setClassDTO((prevData) => ({ ...prevData, price: value })); // Update state with the raw number
+    }
+  };
   const handleDateSlotChange = (date) => {
-    setCurrentDateSlot((prev) => ({
-      ...prev,
-      date: format(date, "yyyy-MM-dd"),
-    }));
+    if (date instanceof Date && !isNaN(date)) {
+      setCurrentDateSlot((prev) => ({
+        ...prev,
+        date: format(date, "yyyy-MM-dd"), // Format the valid date
+      }));
+    } else {
+      console.error("Invalid date value:", date); // Log error if date is invalid
+    }
   };
 
   const addDateSlot = () => {
@@ -115,10 +180,21 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
   };
 
   const removeDateSlot = (index) => {
+    const dateToRemove = classDTO.dateSlots[index].date;
     setClassDTO((prev) => ({
       ...prev,
       dateSlots: prev.dateSlots.filter((_, i) => i !== index),
     }));
+    setCurrentDateSlot((prev) => ({
+      ...prev,
+      date: dateToRemove, // Restore date to the currentDateSlot for potential reuse
+    }));
+  };
+  const isDateDisabled = (date) => {
+    // Disable dates that have been added to dateSlots
+    return classDTO.dateSlots.some(
+      (slot) => new Date(slot.date).toDateString() === date.toDateString()
+    );
   };
 
   const handleImageChange = (e) => {
@@ -135,17 +211,57 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const requiredFields = [
+      "name",
+      "courseCode",
+      "maxStudents",
+      "price",
+      "description",
+    ];
+
+    for (const field of requiredFields) {
+      if (!classDTO[field]) {
+        toast.error(
+          `Please fill out the ${field
+            .replace(/([A-Z])/g, " $1")
+            .toLowerCase()}.`
+        );
+        return;
+      }
+    }
+    if (classDTO.maxStudents < 15 || classDTO.maxStudents > 30) {
+      toast.error("Max students must be between 15 and 30");
+      return;
+    }
+    if (classDTO.price < 100000 || classDTO.price > 500000) {
+      toast.error("Price must be between 100,000 and 500,000");
+      return;
+    }
+    if (!classDTO.courseCode) {
+      toast.error("Please enter a course code.");
+      return; // Stop the form submission if courseCode is not filled
+    }
+
+    // Validate dateSlots (make sure it's not empty)
+    if (classDTO.dateSlots.length === 0) {
+      toast.error("Please select at least one date slot.");
+      return; // Stop the form submission if no dateSlots are selected
+    }
     try {
+      setLoading(true);
       const newClass = await fetchCreateClass(classDTO, image, token);
-      toggleCreateClassForm();
       setLessons((prevCategories) => {
         const updatedCategories = [...prevCategories, newClass];
         return updatedCategories;
       });
+      setShowCreateClassForm(false);
       toast.success("Class created successfully");
     } catch (error) {
       console.error("Error creating class:", error);
       toast.error("Error creating class");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -223,7 +339,7 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="">
+                <div className="md:col-span-2">
                   <Label
                     htmlFor="maxStudents"
                     className="text-sm font-medium text-gray-700"
@@ -234,13 +350,16 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
                     id="maxStudents"
                     name="maxStudents"
                     type="number"
+                    placeholder="Max Students (15 - 30)"
+                    min={15}
+                    max={30}
                     value={classDTO.maxStudents}
                     onChange={handleInputChange}
                     required
                     className="w-full"
                   />
                 </div>
-                <div className="">
+                <div className="md:col-span-1">
                   <Label
                     htmlFor="price"
                     className="text-sm font-medium text-gray-700"
@@ -250,14 +369,17 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
                   <Input
                     id="price"
                     name="price"
-                    type="number"
-                    value={classDTO.price}
-                    onChange={handleInputChange}
+                    type="text"
+                    placeholder="(100,000 đ - 500,000 đ)"
+                    value={formatWithCommas(classDTO.price)}
+                    onChange={handleInput}
                     required
+                    min={100000}
+                    max={500000}
                     className="w-full"
                   />
                 </div>
-                <div className="">
+                {/* <div className="">
                   <Label
                     htmlFor="dayOfWeek"
                     className="text-sm font-medium text-gray-700"
@@ -272,10 +394,10 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
                     required
                     className="w-full"
                   />
-                </div>
+                </div> */}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="">
                   <Label
                     htmlFor="startDate"
@@ -310,7 +432,7 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
                     className="w-full"
                   />
                 </div>
-              </div>
+              </div> */}
 
               <div className="">
                 <Label className="text-sm font-medium text-gray-700">
@@ -337,6 +459,11 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
+                        disabled={(date) => {
+                          const minDate = new Date(minDateString);
+                          minDate.setHours(0, 0, 0, 0); // Set time to midnight
+                          return date < minDate || isDateDisabled(date); // Disable dates before minDate or already selected
+                        }}
                         selected={
                           currentDateSlot.date
                             ? new Date(currentDateSlot.date)
@@ -495,9 +622,10 @@ const CreateClassForm = ({ toggleCreateClassForm, setLessons }) => {
 
           <Button
             type="submit"
+            disabled={loading}
             className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-md transition duration-300"
           >
-            Create Class
+            {loading ? "Creating..." : "Create Class"}
           </Button>
         </form>
       </div>

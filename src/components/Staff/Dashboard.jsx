@@ -582,6 +582,7 @@ export function Dashboard() {
               <All_Class
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
+                resetCurrentPage={resetCurrentPage}
                 setCurrentPage={setCurrentPage}
                 lessons={lessons}
                 setLessons={setLessons}
