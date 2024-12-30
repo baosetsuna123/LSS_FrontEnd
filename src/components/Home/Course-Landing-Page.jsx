@@ -4,7 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
-import { fetchMajorClassByStudent, fetchCommentsHome } from "@/data/api";
+import {
+  fetchMajorClassByStudent,
+  fetchCommentsHome,
+  fetchAverageTeacher,
+} from "@/data/api";
 import { useEffect, useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -129,6 +133,31 @@ export function CourseLandingPage() {
       description: "Become part of a vibrant learning community and network.",
     },
   ];
+  const [average, setAverage] = useState(0);
+  const token = sessionStorage.getItem("token");
+  useEffect(() => {
+    const fetchAverage = async (teacherName) => {
+      try {
+        const data = await fetchAverageTeacher(teacherName, token);
+        console.log(
+          `Fetched average for ${teacherName}:`,
+          data.averageFeedback
+        );
+        setAverage((prevAverages) => ({
+          ...prevAverages,
+          [teacherName]: data.averageFeedback, // Store average by teacherName
+        }));
+      } catch (error) {
+        console.error("Error fetching average rating:", error);
+      }
+    };
+    classes.forEach((course) => {
+      if (course.teacherName && !average[course.teacherName]) {
+        const data = fetchAverage(course.teacherName);
+        console.log(data);
+      }
+    });
+  }, [token, classes, average]);
   const [, setCurrentIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -139,6 +168,7 @@ export function CourseLandingPage() {
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
+
   return (
     <>
       <div className="w-full overflow-x-hidden">
@@ -291,7 +321,7 @@ export function CourseLandingPage() {
                                 {formatCurrency(course.price)}
                               </p>
                               <p className="text-lg font-medium text-gray-500 dark:text-gray-300">
-                                Created by {course.teacherName}
+                                {course.teacherName}
                               </p>
                             </div>
                             <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
@@ -385,9 +415,16 @@ export function CourseLandingPage() {
                                 {formatCurrency(course.price)}
                               </p>
                               <p className="text-lg  text-gray-500 dark:text-gray-300 font-medium">
-                                Created by {course.teacherName}
+                                {course.teacherName}
                               </p>
                             </div>
+                            {/* Display the average rating */}
+                            {average[course.teacherName] && (
+                              <p className="mt-2 text-lg text-yellow-500">
+                                Average Rating:{" "}
+                                {average[course.teacherName].toFixed(1)} ★
+                              </p>
+                            )}
                             <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
                               View Details
                             </Button>

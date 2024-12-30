@@ -15,7 +15,6 @@ import {
   AlertCircle,
   Users,
   UserCheck,
-  ChevronsLeftRightEllipsis,
 } from "lucide-react"; // Icon for the modal header
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -25,6 +24,7 @@ import toast from "react-hot-toast";
 import { useWallet } from "@/context/WalletContext";
 import defaults from "../../assets/default.jfif";
 import avatar from "../../assets/avatar.png";
+import { FaFileAlt } from "react-icons/fa";
 
 // Modal Component for Confirmation
 
@@ -57,8 +57,8 @@ export function ClassDetail() {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+      <div className="fixed inset-0 flex items-center w-auto justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg  w-auto">
           <div className="flex items-center mb-4">
             <AlertCircle className="h-6 w-6 text-red-500 dark:text-red-400 mr-2" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -123,18 +123,6 @@ export function ClassDetail() {
       </div>
     );
   }
-  const getDayOfWeek = (dayOfWeek) => {
-    const days = {
-      2: "Monday",
-      3: "Tuesday",
-      4: "Wednesday",
-      5: "Thursday",
-      6: "Friday",
-      7: "Saturday",
-      8: "Sunday",
-    };
-    return days[dayOfWeek] || "Unknown Day";
-  };
   const getSlotTime = (slotId) => {
     const slots = {
       1: "1 (7h00 - 9h15)",
@@ -144,6 +132,11 @@ export function ClassDetail() {
       5: "5 (17h45 - 20h00)",
     };
     return slots[slotId] || "Unknown Slot";
+  };
+  const handleNavigate = (documents) => {
+    navigate(`/class/${id}/documents`, {
+      state: { documents, classId: classDetail.classId },
+    });
   };
   const fetchClassDetail = async (id, token) => {
     try {
@@ -305,39 +298,96 @@ export function ClassDetail() {
                     {isEnrolled ? "Enrolled" : "Enroll Now"}
                   </Button>
                 </div>
+                {isEnrolled && (
+                  <div className="flex ml-20 items-center text-center justify-between mt-20">
+                    <button
+                      onClick={() => handleNavigate(classDetail?.documents)}
+                      className="text-2xl font-bold text-orange-600 dark:text-green-400 flex items-center"
+                    >
+                      <FaFileAlt className="mr-2" /> {/* Icon */}
+                      View Document
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="mt-10">
-              <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-                Description
-              </h3>
-              <p
-                className="text-gray-600 leading-relaxed dark:text-gray-300"
-                dangerouslySetInnerHTML={{
-                  __html: classDetail?.description?.replace(/\n/g, "<br />"),
-                }}
-              />
+            <div className="flex gap-6 mt-10">
+              {/* Description Card */}
+              <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600 w-full">
+                <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
+                  <CardTitle className="text-lg text-center">
+                    Description
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <p
+                    className="text-gray-600 leading-relaxed dark:text-gray-300"
+                    dangerouslySetInnerHTML={{
+                      __html: classDetail?.description?.replace(
+                        /\n/g,
+                        "<br />"
+                      ),
+                    }}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Schedule Details Card */}
+              <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600 w-full">
+                <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
+                  <CardTitle className="text-lg text-center">
+                    Schedule{" "}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="flex items-center mb-4">
+                    <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-700 dark:text-gray-300 font-semibold">
+                      Schedule:
+                    </span>
+                  </div>
+                  <table className="min-w-full table-auto">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2 border text-center ">Date</th>
+                        <th className="px-4 py-2 border text-center">Slots</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {classDetail?.dateSlots
+                        // Sort dateSlots by date in ascending order
+                        .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort dates in ascending order
+                        .map((slot, index) => (
+                          <tr key={index}>
+                            <td className="px-4 py-2 border whitespace-nowrap">
+                              {slot.date}
+                            </td>
+                            <td className="px-4 py-2 border whitespace-nowrap">
+                              {slot.slotIds
+                                // Sort slotIds in ascending order (to ensure slot 1 is first)
+                                .sort((a, b) => a - b)
+                                .map((slotId, idx) => (
+                                  <span key={idx}>
+                                    {getSlotTime(slotId)}
+                                    {idx < slot.slotIds.length - 1 && ", "}
+                                  </span>
+                                ))}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg">Lesson Details</CardTitle>
+                  <CardTitle className="text-lg text-center">Class </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
-                  <div className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Start Date: {classDetail?.startDate}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Day of Week: {getDayOfWeek(classDetail?.dayOfWeek)}
-                    </span>
-                  </div>
                   <div className="flex items-center">
                     <Code className="mr-2 h-5 w-5 text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">
@@ -351,12 +401,6 @@ export function ClassDetail() {
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <ChevronsLeftRightEllipsis className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300">
-                      Slot: {getSlotTime(classDetail?.slotId)}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
                     <UserCheck className="mr-2 h-5 w-5 text-blue-600" />
                     <span className="text-gray-700 dark:text-gray-300">
                       Students Joined: {classDetail?.students?.length || 0}
@@ -367,7 +411,7 @@ export function ClassDetail() {
 
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg">Tutor Details</CardTitle>
+                  <CardTitle className="text-lg text-center">Tutor </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">

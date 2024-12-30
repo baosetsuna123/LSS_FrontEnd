@@ -2,6 +2,8 @@ import { Edit, EllipsisVertical, Eye, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import CreateClassForm from "./CreateClassForm";
 import toast from "react-hot-toast";
+import { fetchUpdateClass } from "@/data/api";
+import defaults from "../../assets/default.jfif";
 
 const All_Class = ({
   currentPage,
@@ -30,14 +32,9 @@ const All_Class = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const [classDTO, setClassDTO] = useState({
-    name: "",
-    description: "",
-    maxStudents: "",
-    price: "",
-    courseCode: "",
-    dateSlots: [],
-  });
+
+  const [classShow, setClassShow] = useState(null);
+
   const handleButtonClick = (index) => {
     // Toggle dialog for the specific row
     setDialogOpen(dialogOpen === index ? null : index);
@@ -49,7 +46,7 @@ const All_Class = ({
   const token = sessionStorage.getItem("token");
   const handleDetailsClick = async (item) => {
     try {
-      const data = await getDocumentById(item.id, token);
+      const data = lessons.find((c) => c.classId === item.classId);
       setSelectedItem(data); // Set the fetched data to display in the modal
       setModalOpen(true); // Open the modal
     } catch (error) {
@@ -60,15 +57,38 @@ const All_Class = ({
   const closeModal = () => {
     setModalOpen(false); // Close the modal
   };
+  const [initialMaxStudents, setInitialMaxStudents] = useState(null);
+
   const handleEditClick = (item) => {
+    setClassShow(item);
     setSelectedItem(item); // Set the selected item
-    setClassDTO({
-      title: item.title || "",
-      content: item.content || "",
-      file: item.filePath || null, // Reset file input
-    });
-    console.log(item.filePath);
+
+    setInitialMaxStudents(item.maxStudents);
     setEditModalOpen(true); // Open the modal
+  };
+  const [maxStudentsError, setMaxStudentsError] = useState("");
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+
+    // Update the state for all fields
+    setSelectedItem((prev) => ({ ...prev, [name]: value }));
+    if (name === "price") {
+      const newPrice = Number(value);
+      setSelectedItem((prev) => ({ ...prev, price: newPrice }));
+    }
+    if (name === "maxStudents") {
+      const newMaxStudents = Number(value);
+
+      if (newMaxStudents && newMaxStudents < initialMaxStudents) {
+        setMaxStudentsError(
+          "Max Students cannot be less than the current number of students"
+        );
+      } else {
+        setMaxStudentsError(""); // Clear error when the value is valid
+      }
+    }
   };
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -81,15 +101,42 @@ const All_Class = ({
     setSelectedItem(null); // Clear selected item
   };
   const [loading, setLoading] = useState(false); // State for loading button
-  const handleUpdate = async () => {
+  const handleUpdate = async (updatedClass) => {
+    if (updatedClass.price < 100000 || updatedClass.price > 500000) {
+      toast.error("Price must be between 100,000 and 500,000");
+      return; // Exit early if price is invalid
+    }
+
+    // If there's a maxStudents error, show the toast and return
+    if (maxStudentsError) {
+      toast.error(maxStudentsError);
+      return;
+    }
+    if (updatedClass.maxStudents > 10) {
+      toast.error("Max students must be less than or equal to 10");
+      return; // Exit early if maxStudents is less than 10
+    }
+    if (updatedClass.maxStudents < classShow.maxStudents) {
+      toast.error(
+        `Max students cannot be less than the current number of students (${classShow.maxStudents})`
+      );
+      return; // Exit early if maxStudents is invalid
+    }
+    console.log(updatedClass, classShow);
     try {
       setLoading(true);
+
       // Call the updateDocument API
-      const updatedDocument = await updateDocument(selectedItem.id, token);
+      const updatedClassData = await fetchUpdateClass({
+        data: { ...updatedClass },
+        token,
+      });
       toast.success("Document updated successfully"); // Show success message
-      setDocuments((prevDocuments) =>
+      setLessons((prevDocuments) =>
         prevDocuments.map((doc) =>
-          doc.id === selectedItem.id ? { ...doc, ...updatedDocument } : doc
+          doc.classId === selectedItem.classId
+            ? { ...doc, ...updatedClassData }
+            : doc
         )
       );
       handleCloseModal(); // Close the modal after successful update
@@ -100,13 +147,12 @@ const All_Class = ({
       setLoading(false); // Reset loading
     }
   };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setClassDTO({
-      ...classDTO,
-      [name]: value,
-    });
+
+  const handleCancel = () => {
+    setEditModalOpen(false);
+    setSelectedItem(null);
   };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -139,58 +185,184 @@ const All_Class = ({
           setShowCreateClassForm={setShowCreateClassForm}
         />
       )}
-      {EditmodalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20">
-          <div className="bg-white p-6 rounded-md w-96">
-            <h2 className="text-xl font-semibold mb-4">Edit Class</h2>
-            <div className="mb-4">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={classDTO.title}
-                onChange={handleChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Content
-              </label>
-              <textarea
-                id="content"
-                name="content"
-                value={classDTO.content}
-                onChange={handleChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                rows="4"
-              />
-            </div>
-            <div className="flex justify-between mt-4">
-              {/* Update Button */}
-              <button
-                onClick={handleUpdate}
-                disabled={loading}
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-auto"
-              >
-                {loading ? "Updating..." : "Update"}
-              </button>
+      {EditmodalOpen && selectedItem && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 flex items-center justify-center overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
+            <h3 className="text-2xl text-center font-bold mb-4 text-gray-800 dark:text-white">
+              Edit Class Information
+            </h3>
 
-              {/* Close Button */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Class Name Field */}
+              <div className="col-span-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Class Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  value={selectedItem.name}
+                  onChange={handleInputChange}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+              </div>
+
+              {/* Course Field */}
+              <div className="col-span-1">
+                <label
+                  htmlFor="course"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Course
+                </label>
+                <input
+                  name="course"
+                  value={selectedItem.courseCode || ""}
+                  onChange={handleInputChange}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+              </div>
+
+              {/* Status Field */}
+              <div className="col-span-1">
+                <label
+                  htmlFor="course-status"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Status
+                </label>
+                <span
+                  className={`font-semibold
+          ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
+          ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
+          ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
+          ${selectedItem?.status === "ONGOING" ? "text-brown-500" : ""}
+        `}
+                >
+                  {selectedItem?.status}
+                </span>
+              </div>
+
+              {/* Max Students Field */}
+              <div className="col-span-1">
+                <label
+                  htmlFor="maxStudents"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Number of Students
+                </label>
+                <input
+                  type="number"
+                  id="maxStudents"
+                  name="maxStudents"
+                  value={selectedItem.maxStudents}
+                  onChange={handleInputChange}
+                  placeholder={`Current number of students is ${selectedItem.maxStudents}`}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+                {maxStudentsError && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {maxStudentsError}
+                  </p>
+                )}
+              </div>
+
+              {/* Price Field */}
+              <div className="col-span-1">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Price
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={selectedItem.price}
+                  onChange={handleInputChange}
+                  min="100000"
+                  max="500000"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+                <span className="text-sm text-gray-500 mt-1 block">
+                  {formatCurrency(selectedItem.price)}
+                </span>
+              </div>
+              <div className="col-span-1" title={selectedItem.description}>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Description
+                </label>
+                {selectedItem?.description
+                  ? selectedItem.description.length > 8
+                    ? `${selectedItem.description.slice(0, 20)}...`
+                    : selectedItem.description
+                  : "No description"}
+              </div>
+            </div>
+
+            <div className="col-span-12">
+              <table className="min-w-full table-auto">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border">Date</th>
+                    <th className="px-4 py-2 border">Slot</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedItem?.dateSlots?.map((slot, index) => (
+                    <tr key={index}>
+                      <td className="px-4 py-2 border text-center">
+                        {slot.date}
+                      </td>
+                      <td className="px-4 py-2 border text-center">
+                        {slot.slotIds
+                          .sort((a, b) => a - b) // Sort slotIds in ascending order
+                          .map((slotId) => {
+                            // Define time ranges for each slotId
+                            const timeRanges = {
+                              1: "7h00 - 9h15",
+                              2: "9h30 - 11h45",
+                              3: "12h30 - 14h45",
+                              4: "15h00 - 17h15",
+                              5: "17h45 - 20h00",
+                            };
+
+                            return `Slot ${slotId} (${
+                              timeRanges[slotId] || "No time available"
+                            })`;
+                          })
+                          .join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex justify-between space-x-2 mt-6">
               <button
-                onClick={handleCloseModal}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md w-auto"
+                onClick={() => handleUpdate(selectedItem)}
+                disabled={loading}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
               >
-                Close
+                {loading ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={() => {
+                  handleCancel();
+                }}
+                className="px-4 py-2  bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+              >
+                Cancel
               </button>
             </div>
           </div>
@@ -199,25 +371,103 @@ const All_Class = ({
       {modalOpen && selectedItem && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20">
           <div className="bg-white p-6 rounded-md w-auto">
-            <h2 className="text-xl font-semibold mb-4">Class Details</h2>
-            <div className="mb-2">
-              <strong>ID:</strong> {selectedItem.id}
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pb-6 border-b">
+              Class Details
+            </h2>
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-4">
+                <strong>Name:</strong> {selectedItem?.name}
+              </div>
+              <div className="col-span-4">
+                <strong>Max Students:</strong> {selectedItem?.maxStudents}
+              </div>
+              <div className="col-span-4">
+                <strong>Price:</strong> {selectedItem?.price.toLocaleString()}{" "}
+                VND
+              </div>
+              <div className="col-span-4">
+                <strong>Course Code:</strong> {selectedItem?.courseCode}
+              </div>
+              <div className="col-span-4" title={selectedItem.description}>
+                <strong>Description:</strong>{" "}
+                {selectedItem?.description
+                  ? selectedItem.description.length > 8
+                    ? `${selectedItem.description.slice(0, 8)}...`
+                    : selectedItem.description
+                  : "No description"}
+              </div>
+              <div className="col-span-4">
+                <strong>Status: </strong>
+                <span
+                  className={`font-semibold
+      ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
+      ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
+      ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
+      ${selectedItem?.status === "ONGOING" ? "text-brown-500" : ""}
+    `}
+                >
+                  {selectedItem?.status}
+                </span>
+              </div>
+              <div className="col-span-12">
+                <table className="min-w-full table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 border">Date</th>
+                      <th className="px-4 py-2 border">Slot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedItem?.dateSlots?.map((slot, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2 border text-center">
+                          {slot.date}
+                        </td>
+                        <td className="px-4 py-2 border text-center">
+                          {slot.slotIds
+                            .sort((a, b) => a - b) // Sort slotIds in ascending order
+                            .map((slotId) => {
+                              // Define time ranges for each slotId
+                              const timeRanges = {
+                                1: "7h00 - 9h15",
+                                2: "9h30 - 11h45",
+                                3: "12h30 - 14h45",
+                                4: "15h00 - 17h15",
+                                5: "17h45 - 20h00",
+                              };
+
+                              return `Slot ${slotId} (${
+                                timeRanges[slotId] || "No time available"
+                              })`;
+                            })
+                            .join(", ")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div className="mb-2">
-              <strong>Course Code:</strong> {selectedItem.courseCode}
+            {/* Image as the last centered item */}
+            <div className="flex justify-center mt-6">
+              <div className="flex items-center space-x-2">
+                <strong>Image:</strong>
+                <img
+                  src={selectedItem?.imageUrl || defaults} // Use default if imageUrl is not provided
+                  alt={selectedItem?.name || "Default Image"} // Provide a fallback alt text
+                  className="mt-0 max-w-[100px] h-auto rounded"
+                />
+              </div>
             </div>
-            <div className="mb-2">
-              <strong>Title:</strong> {selectedItem.title}
+
+            <div className="flex items-center justify-center mt-4">
+              <button
+                onClick={closeModal}
+                className="mt-4 bg-gray-200 border text-[#333] px-4 py-2 rounded-lg transition duration-200 hover:bg-red-600 hover:text-white"
+              >
+                Close
+              </button>
             </div>
-            <div className="mb-2 whitespace-nowrap">
-              <strong>Content:</strong> {selectedItem.content}
-            </div>
-            <button
-              onClick={closeModal}
-              className="mt-4 px-4 py-2 text-center mx-auto block bg-blue-500 hover:bg-blue-600 text-white rounded-md"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}

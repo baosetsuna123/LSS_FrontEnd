@@ -230,8 +230,8 @@ const CreateClassForm = ({
         return;
       }
     }
-    if (classDTO.maxStudents < 15 || classDTO.maxStudents > 30) {
-      toast.error("Max students must be between 15 and 30");
+    if (classDTO.maxStudents < 5 || classDTO.maxStudents > 10) {
+      toast.error("Max students must be between 5 and 10");
       return;
     }
     if (classDTO.price < 100000 || classDTO.price > 500000) {
@@ -350,9 +350,9 @@ const CreateClassForm = ({
                     id="maxStudents"
                     name="maxStudents"
                     type="number"
-                    placeholder="Max Students (15 - 30)"
-                    min={15}
-                    max={30}
+                    placeholder="Max Students (5 - 10)"
+                    min={5}
+                    max={10}
                     value={classDTO.maxStudents}
                     onChange={handleInputChange}
                     required

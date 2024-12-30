@@ -52,6 +52,7 @@ import { SendApplicationTeacher } from "./components/Teacher/SendApplicationTeac
 import { ApplicationManagementTeacher } from "./components/Teacher/ViewApplicationTeacher";
 import VerifyOtpRegister from "./components/Auth/Verify-Otp-Register";
 import VerifyOtpForgot from "./components/Auth/Verify-Otp-Forgot";
+import Documents from "./components/Student/Documents";
 
 function App() {
   return (
@@ -215,6 +216,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ClassDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/class/:id/documents"
+            element={
+              <ProtectedRoute>
+                <Documents />
               </ProtectedRoute>
             }
           />
