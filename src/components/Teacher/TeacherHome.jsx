@@ -2,53 +2,28 @@ import {
   fetchClassbyteacher,
   fetchCoursesService,
   fetchSlots,
-  fetchCreateClass,
-  fetchCourseByMajor,
   fetchSystemParam,
   getClassesWithoutTeacher,
 } from "@/data/api";
 import { useState, useEffect, useRef } from "react";
-import Modal from "react-modal";
 import toast from "react-hot-toast";
 import ShowDetailTimeTable from "./ShowDetailTimeTable";
-import { FaSpinner } from "react-icons/fa";
 import YearSelector from "./YearSelector";
-import {
-  Book,
-  Calendar,
-  DollarSign,
-  FileText,
-  Info,
-  Link,
-  UploadCloud,
-  Users,
-} from "lucide-react";
+
 import ModalRegisterClass from "./ModalRegisterClass";
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+
 
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
   const [slots, setSlots] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [minDateString, setMinDateString] = useState("");
+
   const [classesWithout, setClassesWithout] = useState([]);
-  const [image, setImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+
   const [showDetail, setShowDetail] = useState(false);
   const [infoClass, setInfoClass] = useState(null);
   const [classes, setClasses] = useState([]);
-  const [dayOfWeek, setDayOfWeek] = useState(0);
-  const [date, setDate] = useState(null);
-  const [classesCreate, setClassCreate] = useState([]);
-  const [selectedSlots, setSelectedSlots] = useState([]);
-  const [courseCodes, setCourseCodes] = useState([]);
+
   const token = sessionStorage.getItem("token");
   const [selectedWeekData, setSelectedWeekData] = useState({
     week: null,
@@ -63,7 +38,6 @@ function TeacherHome() {
         const data = await fetchSystemParam(token);
 
         const param = data.find((p) => p.name === "check_time_before_start");
-        console.log(param.value);
         if (param) {
           let baseDays = parseInt(param.value, 10); // Parse the value as an integer
           if (isNaN(baseDays)) {
@@ -74,16 +48,12 @@ function TeacherHome() {
           }
           const today = new Date();
           today.setDate(today.getDate() + baseDays + 2); // Add base days and 2 days buffer
-          const formattedMinDate = today.toISOString().split("T")[0];
-          setMinDateString(formattedMinDate); // Set the minimum date
         } else {
           console.warn(
             "Parameter 'check_time_before_start' not found. Defaulting to 2 days from today."
           );
           const today = new Date();
           today.setDate(today.getDate() + 2); // Default to 2 days buffer
-          const formattedMinDate = today.toISOString().split("T")[0];
-          setMinDateString(formattedMinDate); // Set the default minimum date
         }
       } catch (error) {
         console.error("Error fetching parameters:", error);
@@ -92,69 +62,27 @@ function TeacherHome() {
         );
         const today = new Date();
         today.setDate(today.getDate() + 2); // Default to 2 days buffer
-        const formattedMinDate = today.toISOString().split("T")[0];
-        setMinDateString(formattedMinDate); // Set the default minimum date
       }
     };
 
     fetchParam();
   }, [token]);
 
-  useEffect(() => {
-    const fetchCousesMajor = async () => {
-      try {
-        const token = sessionStorage.getItem("token");
-        const data = await fetchCourseByMajor(token);
-        const codes = data.map((course) => course.courseCode);
-        setCourseCodes(codes);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-        toast.error("Failed to load categories");
-      }
-    };
-    fetchCousesMajor();
-  }, []);
+  const fetchClassesWithTeacher = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await getClassesWithoutTeacher(token);
+      setClassesWithout(res)
+    } catch {
+      toast.error("Failed server");
+    }
+  }
 
   useEffect(() => {
-    const fetchClassesWithTeacher = async () => {
-      try {
-        const token = sessionStorage.getItem("token");
-        const res = await getClassesWithoutTeacher(token);
-        setClassesWithout(res)
-      } catch {
-        toast.error("Failed server");
-      }
-    }
     fetchClassesWithTeacher();
   }, [])
 
-  const [classData, setClassData] = useState({
-    name: "",
-    code: "",
-    description: "",
-    status: "ACTIVE",
-    maxStudents: 0,
-    price: "",
-    slotId: "",
-    startDate: "",
-    courseCode: "",
-    dayOfWeek: "",
-  });
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setClassData({
-      name: "",
-      code: "",
-      description: "",
-      status: "ACTIVE",
-      maxStudents: 0,
-      price: "",
-      slotId: "",
-      startDate: "",
-      courseCode: "",
-      dayOfWeek: "",
-    });
-  };
+
   const days = [
     "Monday",
     "Tuesday",
@@ -164,47 +92,43 @@ function TeacherHome() {
     "Saturday",
     "Sunday",
   ];
-  const handleInput = (e) => {
-    let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
-    if (!isNaN(value) || value === "") {
-      setClassData((prevData) => ({ ...prevData, price: value })); // Update state with the raw number
-    }
-  };
-
-  // Format the input value with commas
-  const formatWithCommas = (num) => {
-    if (!num) return "";
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Convert num to string and add commas
-  };
   const [loading, setLoading] = useState(true);
   const [dataFetched, setDataFetched] = useState(false);
 
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
-      2: "Monday",
-      3: "Tuesday",
-      4: "Wednesday",
-      5: "Thursday",
-      6: "Friday",
-      7: "Saturday",
-      8: "Sunday",
+      0: "Sunday",
+      1: "Monday",
+      2: "Tuesday",
+      3: "Wednesday",
+      4: "Thursday",
+      5: "Friday",
+      6: "Saturday",
     };
+
     return classes.reduce((timetable, classItem) => {
-      const day = daysOfWeekMap[classItem.dayOfWeek];
-      if (!timetable[day]) {
-        timetable[day] = {};
-      }
-      timetable[day][classItem.slotId] = {
-        subject: classItem.courseName,
-        code: classItem.courseCode,
-        class: classItem.name,
-        room: classItem.location,
-      };
+      classItem.dateSlots.forEach((item) => {
+        const date = new Date(item.date);
+        const dayOfWeek = daysOfWeekMap[date.getDay()];
+
+        if (!timetable[dayOfWeek]) {
+          timetable[dayOfWeek] = {};
+        }
+        item.slotIds.forEach((slotId) => {
+          timetable[dayOfWeek][slotId] = {
+            subject: classItem.courseName,
+            code: classItem.courseCode,
+            class: classItem.name,
+            room: classItem.location,
+            dateSlots: classItem.dateSlots
+          };
+        });
+      });
+
       return timetable;
     }, {});
   };
-
   const handleWeekChange = (week, range) => {
     setSelectedWeekData((prev) => {
       if (prev.week === week && prev.range === range) {
@@ -239,20 +163,23 @@ function TeacherHome() {
     setLoading(true);
     try {
       const classes = await fetchClassbyteacher(token);
-      setClassCreate(classes);
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
       setDatesInTheWeek(getDatesInRange(startRange, endRange));
-      const filteredClasses = classes.filter((item) => {
-        const classStartDate = formatDateToYMD(new Date(item.startDate));
-        return (
-          classStartDate >= startRange &&
-          classStartDate <= endRange &&
-          ["ACTIVE", "ONGOING", "PENDING", "COMPLETED"].includes(item.status)
-        );
-      });
 
+      const filteredClasses = classes.filter((item) => {
+        const { dateSlots } = item;
+
+        const hasMatchingSlot = dateSlots.some(
+          (slot) =>
+            ["ACTIVE", "ONGOING", "PENDING", "COMPLETED"].includes(item.status) &&
+            slot.date >= startRange &&
+            slot.date <= endRange
+        );
+
+        return hasMatchingSlot;
+      });
       setClasses(filteredClasses);
       const courses = await fetchCoursesService(token);
       const updatedClasses = filteredClasses.map((classItem) => {
@@ -264,6 +191,7 @@ function TeacherHome() {
         }
         return classItem;
       });
+      console.log(updatedClasses)
       setTimetable(convertClassesToTimetable(updatedClasses));
     } catch (error) {
       console.log(error);
@@ -271,6 +199,7 @@ function TeacherHome() {
       setLoading(false);
     }
   };
+
 
   const fetchDropdownData = async () => {
     try {
@@ -283,11 +212,7 @@ function TeacherHome() {
       setDataFetched(false); // Stop loading when finished
     }
   };
-  // useEffect(() => {
-  //   if (slots.length > 0 && datesInTheWeek.length > 0) {
-  //     setLoading(false);
-  //   }
-  // }, [slots, datesInTheWeek, dataFetched]);
+
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -298,103 +223,7 @@ function TeacherHome() {
     fetchTimetable();
     fetchDropdownData();
   }, [selectedWeekData]);
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`Changing ${name} to ${value}`);
-    setClassData((prevData) => ({ ...prevData, [name]: value }));
-  };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    console.log(file); // Log the file object to ensure it's correctly selected
-    if (file) {
-      setImage(file); // Store the file object instead of just the name
-    } else {
-      setImage(null); // Reset when no file is selected
-    }
-  };
-
-  const handleCreateClass = async () => {
-    const requiredFields = [
-      "name",
-      "startDate",
-      "dayOfWeek",
-      "slotId",
-      "courseCode",
-      "maxStudents",
-      "price",
-      "description",
-    ];
-
-    for (const field of requiredFields) {
-      if (!classData[field]) {
-        toast.error(
-          `Please fill out the ${field
-            .replace(/([A-Z])/g, " $1")
-            .toLowerCase()}.`
-        );
-        return;
-      }
-    }
-
-    if (classData.maxStudents < 15 || classData.maxStudents > 30) {
-      return toast.error("Max students must be between 15 and 30");
-    }
-    if (classData.price < 100000 || classData.price > 500000) {
-      return toast.error("Price must be between 100,000 and 500,000");
-    }
-    try {
-      setIsLoading(true);
-      await fetchCreateClass(classData, image, token);
-      toast.success("Class created successfully");
-      setIsModalOpen(false);
-      setImage(null);
-      fetchTimetable();
-    } catch (error) {
-      if (error.message && error.message.includes("duplicate")) {
-        toast.error("Code is already in use");
-      } else if (
-        error.message &&
-        error.message.includes(
-          "A class with the same start date, teacher, slot, and day of the week already exists and is not canceled."
-        )
-      ) {
-        toast.error("A lesson with the same details already exists.");
-      } else {
-        toast.error(error.message || "Failed to create class");
-      }
-      console.log(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDateChange = async (e) => {
-    try {
-      const selectedDate = e.target.value;
-      const date = new Date(selectedDate);
-      console.log(date);
-      setDate(date);
-      const classList = classesCreate.filter(
-        (c) => c.startDate === formatDate(date) && c.status !== "CANCELED"
-      );
-      console.log(classList);
-      setSelectedSlots(classList.map((item) => item.slotId));
-
-      const jsDayOfWeek = date.getDay();
-      const dayOfWeekMapping = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 0: 8 };
-      const dayOfWeek = dayOfWeekMapping[jsDayOfWeek];
-      setDayOfWeek(dayOfWeek - 2);
-
-      setClassData((prevData) => ({
-        ...prevData,
-        startDate: formatDateToYMD(date),
-        dayOfWeek,
-      }));
-    } catch (error) {
-      console.error("Error handling date change:", error);
-    }
-  };
 
   const handleShowDetail = (lesson) => {
     // Ensure `classes` exists and is an array
@@ -412,38 +241,52 @@ function TeacherHome() {
     }
   };
 
-  const handleShowRegister = () => {
-    setShowModalRegister(true);
-  }
-
+  const convertDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: '2-digit', month: '2-digit' };
+    return date.toLocaleDateString('en-GB', options);
+  };
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
-    if (lesson) {
-      return (
-        <div
-          className="p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer inline-block"
-          onClick={() => handleShowDetail(lesson)}
-        >
-          <p className="font-bold text-base text-blue-800 whitespace-nowrap">
-            {lesson.class}
-          </p>
-          <p className="text-sm text-gray-600 whitespace-nowrap">
-            Course: {lesson.code}
-          </p>
-          {lesson.room && (
-            <button
-              onClick={() => window.open(lesson.room, "_blank")}
-              className="mt-3 whitespace-nowrap inline-flex items-center text-xs font-semibold text-white bg-gray-600 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 py-1 px-3"
-            >
-              Meet URL
-            </button>
-          )}
-        </div>
-      );
+
+    if (lesson && lesson.dateSlots) {
+      const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].indexOf(day);
+      const currentDayFormatted = datesInTheWeek[dayIndex];
+
+      const matchingSlot = lesson.dateSlots.some(item => convertDate(item.date) === currentDayFormatted);
+
+      if (matchingSlot) {
+        return (
+          <div
+            className="p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-md transition-transform transform hover:scale-105 cursor-pointer inline-block"
+            onClick={() => handleShowDetail(lesson)}
+          >
+            <p className="font-bold text-base text-blue-800 whitespace-nowrap">
+              {lesson.class}
+            </p>
+            <p className="text-sm text-gray-600 whitespace-nowrap">
+              Course: {lesson.code}
+            </p>
+            {lesson.room && (
+              <button
+                onClick={() => window.open(lesson.room, "_blank")}
+                className="mt-3 whitespace-nowrap inline-flex items-center text-xs font-semibold text-white bg-gray-600 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 py-1 px-3"
+              >
+                Meet URL
+              </button>
+            )}
+          </div>
+        );
+      }
     }
+
     return null;
   };
 
+  const handleCloseRegister = () => {
+    fetchClassesWithTeacher();
+    setShowModalRegister(false);
+  }
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
@@ -504,190 +347,10 @@ function TeacherHome() {
           </table>
         </>
       </div>
-      {/* <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => handleModalClose()}
-        contentLabel="Create Class"
-        className="bg-white p-4 rounded-lg shadow-lg max-w-5xl min-w-[40rem] mx-auto"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      >
-        <h2 className="text-xl text-center font-bold mb-4 text-gray-800">
-          Create Lesson
-        </h2>
-        <div className="grid grid-cols-2 gap-4 py-2 relative">
-          <div className="relative flex items-center">
-            <Book name="book" className="mr-2 text-gray-600" />
-            <input
-              type="text"
-              name="name"
-              placeholder="Lesson Name"
-              onChange={handleInputChange}
-              required
-              className="border p-2  rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center">
-            <Calendar name="calendar" className="mr-2 text-gray-600" />
-            <input
-              type="date"
-              min={minDateString}
-              onChange={handleDateChange}
-              required
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center">
-            <FileText name="clock" className="mr-2 text-gray-600" />
-            <input
-              type="text"
-              name="dayOfWeek"
-              disabled
-              value={
-                [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday",
-                ][dayOfWeek]
-              }
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center">
-            <Users name="clock" className="mr-2 text-gray-600" />
-            <select
-              name="slotId"
-              onChange={handleInputChange}
-              disabled={!date}
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            >
-              <option value="">Select Slot</option>
-              {slots.map((slot) => (
-                <option
-                  key={slot.slotId}
-                  value={slot.slotId}
-                  disabled={selectedSlots.some((item) => item === slot.slotId)}
-                >
-                  {`${slot.period} (${slot.start} - ${slot.end})`}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="relative flex items-center">
-            <Book name="code" className="mr-2 text-gray-600" />
-            <select
-              name="courseCode"
-              onChange={handleInputChange}
-              className="border p-2  rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            >
-              <option value="">Select Course</option>
-              {courseCodes.map((courseCode) => (
-                <option key={courseCode} value={courseCode}>
-                  {courseCode}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="relative flex items-center">
-            <Users name="users" className="mr-2 text-gray-600" />
-            <input
-              type="number"
-              name="maxStudents"
-              placeholder="Max Students (15-30)"
-              min={15}
-              max={30}
-              onChange={handleInputChange}
-              required
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center">
-            <DollarSign name="dollar-sign" className="mr-2 text-gray-600" />
-            <input
-              type="text"
-              name="price"
-              placeholder="Price (100,000 - 500,000)"
-              min={100000}
-              max={500000}
-              value={formatWithCommas(classData.price)}
-              onChange={handleInput}
-              required
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center w-full">
-            <Link name="link" className="mr-2 text-gray-600" />
-            <input
-              type="text"
-              name="location"
-              placeholder="Meeting URL"
-              onChange={handleInputChange}
-              required
-              className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative flex items-center col-span-2 ">
-            <Info name="link" className="mr-2 text-gray-600" />
-            <textarea
-              name="description"
-              placeholder="Description"
-              onChange={handleInputChange}
-              className="border p-2 rounded-lg  col-span-2 h-24 w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-            />
-          </div>
-          <div className="relative col-span-2">
-            <div className="flex items-center gap-4">
-              <UploadCloud name="upload" className="text-gray-600" />
-              <button
-                type="button"
-                onClick={() => document.getElementById("fileInput").click()}
-                className="p-2 border border-gray-300 rounded-lg bg-gray-200 hover:bg-gray-300"
-              >
-                Choose Image
-              </button>
-              <input
-                id="fileInput"
-                onChange={handleFileChange}
-                accept="image/*"
-                type="file"
-                className="hidden"
-              />
-              <span className="text-gray-900 truncate overflow-hidden w-1/2">
-                {image ? `Selected Image: ${image.name}` : "No image selected"}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-6 justify-center">
-          <button
-            onClick={handleCreateClass}
-            disabled={isLoading}
-            className="mt-4 bg-blue-600 text-white px-5 py-1 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <FaSpinner className="animate-spin mr-2" />
-                <span>Creating...</span>
-              </div>
-            ) : (
-              "Create"
-            )}
-          </button>
-          <button
-            onClick={() => setIsModalOpen(false)}
-            className="mt-4 bg-white text-gray-800 border border-gray-300 px-5 py-1 rounded-lg hover:bg-gray-100 transition duration-200 shadow-md"
-          >
-            Cancel
-          </button>
-        </div>
-      </Modal> */}
       <ModalRegisterClass
         data={classesWithout}
-        setOpen={setShowModalRegister}
         open={showModalRegister}
+        handleClose={handleCloseRegister}
       />
       <ShowDetailTimeTable
         isOpen={showDetail}

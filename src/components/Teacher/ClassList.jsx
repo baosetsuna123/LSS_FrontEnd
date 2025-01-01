@@ -128,7 +128,7 @@ function ClassList() {
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Lesson List
+        Class List
       </h2>
       <div className="mb-6 flex justify-between items-center">
         <input
@@ -161,7 +161,7 @@ function ClassList() {
             <table className="min-w-full bg-white">
               <thead>
                 <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-2 text-center">Lesson Name</th>
+                  <th className="py-3 px-2 text-center">Class Name</th>
                   <th className="py-3 px-2 text-center">Subject</th>
                   <th className="py-3 px-2 text-center">Students</th>
                   <th className="py-3 px-2 text-center">Schedule</th>
@@ -182,25 +182,23 @@ function ClassList() {
                     <td className="py-3 px-6 text-left">{cls.courseName}</td>
                     <td className="py-3 px-6 text-center">{cls.maxStudents}</td>
                     <td className="py-3 px-6 text-center whitespace-nowrap">
-                      {`${formatDate(cls.startDate)} (${
-                        dayOfWeekMap[cls.dayOfWeek] || "Unknown"
-                      })`}
+                      {`${formatDate(cls.startDate)} (${dayOfWeekMap[cls.dayOfWeek] || "Unknown"
+                        })`}
                     </td>
                     <td className="py-3 px-6 text-center">
                       <span
-                        className={`py-1 px-3 rounded-full text-xs font-bold ${
-                          cls.status === "PENDING"
-                            ? "bg-yellow-200 text-yellow-600"
-                            : cls.status === "ACTIVE"
+                        className={`py-1 px-3 rounded-full text-xs font-bold ${cls.status === "PENDING"
+                          ? "bg-yellow-200 text-yellow-600"
+                          : cls.status === "ACTIVE"
                             ? "bg-purple-200 text-purple-600"
                             : cls.status === "ONGOING"
-                            ? "bg-blue-200 text-blue-600"
-                            : cls.status === "CANCELED"
-                            ? "bg-red-200 text-red-600"
-                            : cls.status === "COMPLETED"
-                            ? "bg-green-200 text-green-600"
-                            : ""
-                        }`}
+                              ? "bg-blue-200 text-blue-600"
+                              : cls.status === "CANCELED"
+                                ? "bg-red-200 text-red-600"
+                                : cls.status === "COMPLETED"
+                                  ? "bg-green-200 text-green-600"
+                                  : ""
+                          }`}
                       >
                         {cls.status}
                       </span>
@@ -235,11 +233,10 @@ function ClassList() {
                 <button
                   key={i + 1}
                   onClick={() => paginate(i + 1)}
-                  className={`mx-1 px-3 py-1 rounded ${
-                    currentPage === i + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
+                  className={`mx-1 px-3 py-1 rounded ${currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
                 >
                   {i + 1}
                 </button>
@@ -282,16 +279,14 @@ function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
             </p>
             <p className="text-sm text-gray-700 mb-2">
               <strong>Schedule:</strong>{" "}
-              {`${formatDate(cls.startDate)} (${
-                dayOfWeekMap[cls.dayOfWeek] || "Unknown"
-              })`}
+              {`${formatDate(cls.startDate)} (${dayOfWeekMap[cls.dayOfWeek] || "Unknown"
+                })`}
             </p>
             <p className="text-sm text-gray-700 mb-2">
               <strong>Status:</strong>{" "}
               <span
                 className={`
-                  ${
-                    cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
+                  ${cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
                   }
                   ${cls.status === "PENDING" ? "font-bold text-yellow-500" : ""}
                   ${cls.status === "CANCELED" ? "font-bold text-red-500" : ""}

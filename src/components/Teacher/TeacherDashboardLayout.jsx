@@ -65,7 +65,7 @@ function TeacherDashboardLayout() {
     },
     {
       path: "/teacher/class-list",
-      label: "View Lesson List",
+      label: "View Class List",
       icon: FaList,
     },
     {
@@ -94,9 +94,8 @@ function TeacherDashboardLayout() {
     <div className="flex h-full">
       {/* Sidebar */}
       <aside
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-gray-900 text-white shadow-md transition-all duration-300 ease-in-out min-h-screen`}
+        className={`${isSidebarOpen ? "w-64" : "w-20"
+          } bg-gray-900 text-white shadow-md transition-all duration-300 ease-in-out min-h-screen`}
       >
         <div className="p-4 flex justify-between items-center border-b border-gray-700">
           {isSidebarOpen && (
@@ -116,11 +115,10 @@ function TeacherDashboardLayout() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center py-3 px-4 ${
-                location.pathname === item.path
+              className={`flex items-center py-3 px-4 ${location.pathname === item.path
                   ? "bg-gray-800 text-blue-400"
                   : "text-gray-300 hover:bg-gray-800 hover:text-white"
-              } transition-colors duration-200`}
+                } transition-colors duration-200`}
             >
               <item.icon
                 className={`${isSidebarOpen ? "mr-4" : "mx-auto"} text-xl`}

@@ -2,7 +2,6 @@ import {
   cancelClass,
   fetchClassbyteacher,
   fetchCoursesService,
-  fetchSlots,
   updateLocationClass,
 } from "@/data/api";
 import { X } from "lucide-react";
@@ -18,7 +17,7 @@ import {
 import { AlertTriangle } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import toast from "react-hot-toast";
-import { FaClock, FaPencilAlt, FaSearch } from "react-icons/fa";
+import { FaPencilAlt, FaSearch } from "react-icons/fa";
 import { Button } from "../ui/button";
 
 function UpdateSchedule() {
@@ -27,8 +26,6 @@ function UpdateSchedule() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [, setCourses] = useState([]);
-  const [slots, setSlots] = useState([]);
-  const [classShow, setClassShow] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const result = localStorage.getItem("result");
@@ -46,15 +43,6 @@ function UpdateSchedule() {
     }
   }
 
-  const daysOfWeek = [
-    { value: 2, name: "Monday" },
-    { value: 3, name: "Tuesday" },
-    { value: 4, name: "Wednesday" },
-    { value: 5, name: "Thursday" },
-    { value: 6, name: "Friday" },
-    { value: 7, name: "Saturday" },
-    { value: 8, name: "Sunday" },
-  ];
 
   const fetchClasses = useCallback(async () => {
     try {
@@ -122,24 +110,14 @@ function UpdateSchedule() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  const fetchSlotList = async () => {
-    try {
-      const res = await fetchSlots(token);
-      setSlots(res);
-    } catch (error) {
-      console.error("Error when fetching data:", error);
-    }
-  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount);
   };
-  useEffect(() => {
-    fetchSlotList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+
 
   const [initialMaxStudents, setInitialMaxStudents] = useState(null);
   const handleDelete = async (cls) => {
@@ -147,7 +125,6 @@ function UpdateSchedule() {
     setSelectedClassId(cls.classId);
   };
   const handleEdit = (classInfo) => {
-    setClassShow(classInfo);
     setEditingClass({ ...classInfo });
     console.log(classInfo);
     setInitialMaxStudents(classInfo.maxStudents);
@@ -180,45 +157,24 @@ function UpdateSchedule() {
   };
 
   const handleSave = async (updatedClass) => {
-    console.log(updatedClass);
-    // Validate price range inside handleSave
-    if (updatedClass.price < 100000 || updatedClass.price > 500000) {
-      toast.error("Price must be between 100,000 and 500,000");
-      return; // Exit early if price is invalid
-    }
-
-    // If there's a maxStudents error, show the toast and return
-    if (maxStudentsError) {
-      toast.error(maxStudentsError);
-      return;
-    }
-
     try {
-      // Check if maxStudents is less than the current number of students
-      if (updatedClass.maxStudents < classShow.maxStudents) {
-        toast.error(
-          `Max students cannot be less than the current number of students (${classShow.maxStudents})`
-        );
-        return; // Exit early if maxStudents is invalid
+      if (!updatedClass.location) {
+        toast.error("Please enter a Lesson Room Link")
+        return;
       }
       setSaving(true);
-      // Proceed with saving the updated class
-      // await fetchUpdateClass({ data: { ...updatedClass }, token });
       await updateLocationClass(
         token,
         updatedClass.classId,
         updatedClass.location
       );
 
-      // Fetch the updated data after saving
       fetchCourses();
       fetchClasses();
 
-      // Close the popup and reset editing class state
       setIsPopupOpen(false);
       setEditingClass(null);
 
-      // Show success toast
       toast.success("Update Class Successfully!");
     } catch (error) {
       console.error(error);
@@ -239,7 +195,7 @@ function UpdateSchedule() {
   return (
     <div className="max-w-6xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-2xl">
       <h2 className="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
-        Update Lesson Information
+        Update Class Information
       </h2>
       <div className="mb-6 relative">
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -292,19 +248,7 @@ function UpdateSchedule() {
                       </span>
                     )}
                   </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Start date:{" "}
-                    {new Date(cls.startDate).toLocaleDateString("en-GB")}
-                  </p>
-                  <p className="mt-2 text-gray-700 dark:text-gray-200">
-                    <span className="font-medium">
-                      {daysOfWeek.find(
-                        (day) => day.value === Number(cls.dayOfWeek)
-                      )?.name || "Unknown"}
-                      :
-                    </span>{" "}
-                    {cls.slotStart} - {cls.slotEnd}
-                  </p>
+
                 </div>
                 <div className="flex justify-end gap-x-5">
                   <button
@@ -330,7 +274,7 @@ function UpdateSchedule() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
             <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-              Edit Lesson Information
+              Edit Class Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -338,7 +282,7 @@ function UpdateSchedule() {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Lesson Name
+                  Class Name
                 </label>
                 <input
                   id="name"
@@ -377,6 +321,7 @@ function UpdateSchedule() {
                   name="maxStudents"
                   value={editingClass.maxStudents}
                   onChange={handleInputChange}
+                  disabled
                   placeholder={`Current number of students is ${editingClass.maxStudents}`}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
@@ -402,54 +347,6 @@ function UpdateSchedule() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
               </div>
-
-              <div>
-                <label
-                  htmlFor="dayofWeek"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Day of the Week
-                </label>
-                <input
-                  name="dayOfWeek"
-                  value={(() => {
-                    const dayMapping = {
-                      2: "Monday",
-                      3: "Tuesday",
-                      4: "Wednesday",
-                      5: "Thursday",
-                      6: "Friday",
-                      7: "Saturday",
-                      8: "Sunday",
-                    };
-                    return dayMapping[editingClass.dayOfWeek] || "Invalid Day"; // Fallback if day not found
-                  })()}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="slotId"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Lesson Time
-                </label>
-                <div className="relative">
-                  <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <div className="mt-1 block w-full pl-10 rounded-md border border-gray-300 bg-gray-100 shadow-sm text-gray-700">
-                    {(() => {
-                      const slot = slots.find(
-                        (slot) => slot.slotId === editingClass.slotId
-                      );
-                      return slot
-                        ? `Slot ${slot.slotId} (${slot.start} - ${slot.end})`
-                        : "Slot not found";
-                    })()}
-                  </div>
-                </div>
-              </div>
               <div>
                 <label
                   htmlFor="price"
@@ -465,6 +362,7 @@ function UpdateSchedule() {
                   onChange={handleInputChange}
                   min="100000"
                   max="500000"
+                  disabled
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
                 <span className="text-sm text-gray-500 mt-1 block">
@@ -513,9 +411,8 @@ function UpdateSchedule() {
                                 5: "17h45 - 20h00",
                               };
 
-                              return `Slot ${slotId} (${
-                                timeRanges[slotId] || "No time available"
-                              })`;
+                              return `Slot ${slotId} (${timeRanges[slotId] || "No time available"
+                                })`;
                             })
                             .join(", ")}
                         </td>

@@ -1,25 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, Chip, Modal, Button } from "@mui/material";
 import { joinClassTeacher } from "@/data/api";
 import toast from "react-hot-toast";
 
-const ModalRegisterClass = ({ data, open, setOpen }) => {
+const ModalRegisterClass = ({ data, open, handleClose }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleRowSelection = (ids) => {
     setSelectedRows(ids);
-    console.log("Selected Row IDs: ", ids);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseRegister = () => {
+    handleClose();
   };
 
   const handleSave = async () => {
     try {
       const token = sessionStorage.getItem("token");
-
+      if (selectedRows.length === 0) {
+        toast.error('please select at least one class');
+        return;
+      }
       await Promise.all(
         selectedRows.map(async (row) => {
           const res = await joinClassTeacher(token, row);
@@ -27,8 +29,9 @@ const ModalRegisterClass = ({ data, open, setOpen }) => {
         })
       );
       toast.success("All selected classes have been successfully joined!");
-    } catch (error) {
-      toast.error("An error occurred while joining classes. Please try again.");
+      handleCloseRegister();
+    } catch {
+      toast.error("Teacher already has a class scheduled on the same date and slot.");
     }
   };
 
@@ -105,7 +108,7 @@ const ModalRegisterClass = ({ data, open, setOpen }) => {
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      onClose={handleCloseRegister}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >

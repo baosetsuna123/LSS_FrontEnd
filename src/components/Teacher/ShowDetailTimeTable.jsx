@@ -11,7 +11,7 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
       overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
     >
       <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pb-6 border-b">
-        Lesson Details
+        Class Details
       </h2>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-4">
@@ -26,35 +26,9 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
         <div className="col-span-4">
           <strong>Teacher:</strong> {data?.teacherName}
         </div>
-        <div className="col-span-4">
-          <strong>Start Date:</strong>{" "}
-          {new Date(data?.startDate).toLocaleDateString()}
-        </div>
+
         <div className="col-span-4">
           <strong>Course Code:</strong> {data?.courseCode}
-        </div>
-        <div className="col-span-4">
-          <strong>Day of Week:</strong>{" "}
-          {(() => {
-            switch (Number(data?.dayOfWeek)) {
-              case 2:
-                return "Monday";
-              case 3:
-                return "Tuesday";
-              case 4:
-                return "Wednesday";
-              case 5:
-                return "Thursday";
-              case 6:
-                return "Friday";
-              case 7:
-                return "Saturday";
-              case 8:
-                return "Sunday";
-              default:
-                return "Invalid day";
-            }
-          })()}
         </div>
 
         <div className="col-span-4 flex items-center gap-5">

@@ -47,55 +47,46 @@ const MyClass = () => {
     };
     fetchAllSlots();
   }, [token, selectedWeekData]);
-  // useEffect(() => {
-  //   if (slots.length > 0 && datesInTheWeek.length > 0) {
-  //     setLoading(false);
-  //   }
-  // }, [slots, datesInTheWeek, dataFetched]);
+
+
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
-      2: "Monday",
-      3: "Tuesday",
-      4: "Wednesday",
-      5: "Thursday",
-      6: "Friday",
-      7: "Saturday",
-      8: "Sunday",
+      0: "Sunday",
+      1: "Monday",
+      2: "Tuesday",
+      3: "Wednesday",
+      4: "Thursday",
+      5: "Friday",
+      6: "Saturday",
     };
 
-    return classes.reduce((timetable, contentItem, index) => {
-      if (!contentItem || !contentItem.classDTO || !contentItem.orderDTO) {
-        console.log(
-          `Missing or undefined classDTO/orderDTO at index ${index}`,
-          contentItem
-        );
-        return timetable; // Skip this entry if classDTO or orderDTO is missing
-      }
-      const classItem = contentItem.classDTO;
-      const orderItem = contentItem.orderDTO;
+    return classes.reduce((timetable, item) => {
+      const { classDTO, orderDTO } = item;
+      classDTO.dateSlots.forEach((item) => {
+        const date = new Date(item.date);
+        const dayOfWeek = daysOfWeekMap[date.getDay()];
 
-      if (classItem && classItem.dayOfWeek && classItem.slotId) {
-        const day = daysOfWeekMap[classItem.dayOfWeek];
-        if (!timetable[day]) {
-          timetable[day] = {};
+        if (!timetable[dayOfWeek]) {
+          timetable[dayOfWeek] = {};
         }
-
-        timetable[day][classItem.slotId] = {
-          subject: classItem.name,
-          code: classItem.courseCode,
-          class: classItem.code,
-          teacherName: classItem.teacherName,
-          room: classItem.location,
-          id: classItem.classId,
-          orderId: orderItem.orderId, // Get orderId from orderDTO
-          orderStatus: orderItem.status, // Get status from orderDTO
-        };
-      }
+        item.slotIds.forEach((slotId) => {
+          timetable[dayOfWeek][slotId] = {
+            subject: classDTO.name,
+            code: classDTO.courseCode,
+            class: classDTO.code,
+            teacherName: classDTO.teacherName,
+            room: classDTO.location,
+            dateSlots: classDTO.dateSlots,
+            id: classDTO.classId,
+            orderId: orderDTO.orderId, // Get orderId from orderDTO
+            orderStatus: orderDTO.status,
+          };
+        });
+      });
 
       return timetable;
     }, {});
   };
-
   const { submittedFeedbackOrderIds } = useFeedback();
   console.log("submittedFeedbackOrderIds:", submittedFeedbackOrderIds);
 
@@ -118,37 +109,49 @@ const MyClass = () => {
     navigate(`/class/${id}`);
   };
 
+  const formatDateToYMD = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+
+
   const fetchTimetable = async () => {
     try {
-      setLoading(true); // Set loading to true before fetching timetable data
-      const classes = await fetchOrderClasses(token);
+      setLoading(true);
+      const res = await fetchOrderClasses(token);
+      const classes = res.data.content
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
-      const startRange = new Date(startRangeStr);
-      const endRange = new Date(endRangeStr);
+      const startRange = formatDateToYMD(new Date(startRangeStr));
+      const endRange = formatDateToYMD(new Date(endRangeStr));
       setDatesInTheWeek(getDatesInRange(startRange, endRange)); // Set dates in the week
 
-      const filteredClasses = classes.data.content.filter((item) => {
-        const classStartDate = new Date(item.classDTO.startDate);
-        return classStartDate >= startRange && classStartDate <= endRange;
+      const filteredClasses = classes.filter((item) => {
+        const { dateSlots } = item.classDTO;
+
+        const hasMatchingSlot = dateSlots.some(
+          (slot) =>
+            slot.date >= startRange &&
+            slot.date <= endRange
+        );
+
+        return hasMatchingSlot;
       });
 
       const courses = await fetchCoursesService(token); // Fetch courses
 
-      const updatedClasses = filteredClasses.map((contentItem) => {
-        const classItem = contentItem.classDTO;
+      const updatedClasses = filteredClasses.map((classItem) => {
         const matchedCourse = courses.find(
-          (course) => course.courseCode === classItem.courseCode
+          (c) => c.courseCode === classItem.classDTO.courseCode
         );
-
-        return {
-          ...contentItem,
-          classDTO: {
-            ...classItem,
-            courseName: matchedCourse ? matchedCourse.name : null,
-          },
-        };
+        if (matchedCourse) {
+          return { ...classItem, courseName: matchedCourse.name };
+        }
+        return classItem;
       });
-
+      console.log(updatedClasses)
       setTimetable(convertClassesToTimetable(updatedClasses)); // Set timetable
     } catch (error) {
       console.error("Error fetching timetable:", error);
@@ -156,6 +159,8 @@ const MyClass = () => {
       setLoading(false); // Set loading to false after timetable data is fetched
     }
   };
+
+  console.log(timetable)
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -166,65 +171,77 @@ const MyClass = () => {
     fetchTimetable();
   }, [selectedWeekData]);
 
+  const convertDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: '2-digit', month: '2-digit' };
+    return date.toLocaleDateString('en-GB', options);
+  };
+
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
     if (lesson && lesson.orderStatus === "CANCELLED") {
-      return <div className="min-h-[80px]"></div>; // Empty cell for cancelled classes
+      return <div className="min-h-[80px]"></div>;
     }
-    if (lesson) {
-      const lessonStatus = lesson.orderStatus; // Use status from orderDTO
-      return (
-        <div className="p-3 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-          <div className="flex flex-col h-full">
-            <div className="flex-grow">
-              <div className="flex justify-center">
-                <h3
-                  className="font-bold text-xl text-center whitespace-nowrap text-gray-800 cursor-pointer hover:text-blue-600 transition-colors duration-200 mb-2"
-                  onClick={() => handleClick(lesson.id)}
-                >
-                  {lesson.subject}
-                </h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-1 whitespace-nowrap">
-                <span className="font-semibold">Course:</span> {lesson.code}
-              </p>
-              <p className="text-sm text-gray-600 mb-4 whitespace-nowrap">
-                <span className="font-semibold">Tutor:</span>{" "}
-                {lesson.teacherName}
-              </p>
-            </div>
+    if (lesson && lesson.dateSlots) {
+      const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].indexOf(day);
+      const currentDayFormatted = datesInTheWeek[dayIndex];
 
-            <div className="mt-auto">
-              {lessonStatus === "COMPLETED" &&
-              !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-                <button
-                  key={lesson.orderId}
-                  onClick={() => navigate(`/feedback/${lesson.orderId}`)}
-                  className="w-full text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-2 px-4"
-                >
-                  Feedback
-                </button>
-              ) : lesson.room && lessonStatus === "ONGOING" ? (
-                <button
-                  onClick={() => window.open(lesson.room, "_blank")}
-                  className="w-full text-sm font-semibold whitespace-nowrap text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-2 px-4"
-                >
-                  Join Meeting
-                </button>
-              ) : lessonStatus === "COMPLETED" &&
-                submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
-                <div className="w-full text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-2 px-4 text-center">
-                  Ended
+      const matchingSlot = lesson.dateSlots.some(item => convertDate(item.date) === currentDayFormatted);
+      if (matchingSlot) {
+        const lessonStatus = lesson.orderStatus;
+        return (
+          <div className="p-3 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+            <div className="flex flex-col h-full">
+              <div className="flex-grow">
+                <div className="flex justify-center">
+                  <h3
+                    className="font-bold text-xl text-center whitespace-nowrap text-gray-800 cursor-pointer hover:text-blue-600 transition-colors duration-200 mb-2"
+                    onClick={() => handleClick(lesson.id)}
+                  >
+                    {lesson.subject}
+                  </h3>
                 </div>
-              ) : (
-                <div className="w-full text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full py-2 px-4 text-center">
-                  {lessonStatus || "Upcoming"}
-                </div>
-              )}
+                <p className="text-sm text-gray-600 mb-1 whitespace-nowrap">
+                  <span className="font-semibold">Course:</span> {lesson.code}
+                </p>
+                <p className="text-sm text-gray-600 mb-4 whitespace-nowrap">
+                  <span className="font-semibold">Tutor:</span>{" "}
+                  {lesson.teacherName}
+                </p>
+              </div>
+
+              <div className="mt-auto">
+                {lessonStatus === "COMPLETED" &&
+                  !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                  <button
+                    key={lesson.orderId}
+                    onClick={() => navigate(`/feedback/${lesson.orderId}`)}
+                    className="w-full text-sm font-semibold text-white bg-green-600 rounded-full hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 py-2 px-4"
+                  >
+                    Feedback
+                  </button>
+                ) : lesson.room && lessonStatus === "ONGOING" ? (
+                  <button
+                    onClick={() => window.open(lesson.room, "_blank")}
+                    className="w-full text-sm font-semibold whitespace-nowrap text-white bg-blue-600 rounded-full hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 py-2 px-4"
+                  >
+                    Join Meeting
+                  </button>
+                ) : lessonStatus === "COMPLETED" &&
+                  submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                  <div className="w-full text-sm font-semibold text-gray-700 bg-gray-200 rounded-full py-2 px-4 text-center">
+                    Ended
+                  </div>
+                ) : (
+                  <div className="w-full text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full py-2 px-4 text-center">
+                    {lessonStatus || "Upcoming"}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      );
+        );
+      }
     }
 
     return <div className="min-h-[80px]"></div>;
