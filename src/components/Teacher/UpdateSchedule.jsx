@@ -3,6 +3,7 @@ import {
   fetchCoursesService,
   fetchSlots,
   fetchUpdateClass,
+  updateLocationClass,
 } from "@/data/api";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -175,7 +176,8 @@ function UpdateSchedule() {
       }
       setSaving(true);
       // Proceed with saving the updated class
-      await fetchUpdateClass({ data: { ...updatedClass }, token });
+      // await fetchUpdateClass({ data: { ...updatedClass }, token });
+      await updateLocationClass(token, updatedClass.classId, updatedClass.location)
 
       // Fetch the updated data after saving
       fetchCourses();
@@ -290,164 +292,198 @@ function UpdateSchedule() {
             <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
               Edit Lesson Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Lesson Name
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    value={editingClass.name}
-                    onChange={handleInputChange}
-                    disabled
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="course"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Subject
-                  </label>
-                  <input
-                    name="course"
-                    value={editingClass.courseCode || ""}
-                    onChange={handleInputChange}
-                    disabled
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="maxStudents"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Number of Students
-                  </label>
-                  <input
-                    type="number"
-                    id="maxStudents"
-                    name="maxStudents"
-                    value={editingClass.maxStudents}
-                    onChange={handleInputChange}
-                    placeholder={`Current number of students is ${editingClass.maxStudents}`}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                  {maxStudentsError && (
-                    <p className="text-red-500 mt-1 text-sm">
-                      {maxStudentsError}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="teacher"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Tutor
-                  </label>
-                  <input
-                    id="teacher"
-                    name="teacher"
-                    value={editingClass.teacherName}
-                    onChange={handleInputChange}
-                    disabled
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Lesson Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  value={editingClass.name}
+                  onChange={handleInputChange}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="location"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Lesson Room Link
-                  </label>
-                  <input
-                    id="location"
-                    name="location"
-                    value={editingClass.location}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="dayofWeek"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Day of the Week
-                  </label>
-                  <input
-                    name="dayOfWeek"
-                    value={(() => {
-                      const dayMapping = {
-                        2: "Monday",
-                        3: "Tuesday",
-                        4: "Wednesday",
-                        5: "Thursday",
-                        6: "Friday",
-                        7: "Saturday",
-                        8: "Sunday",
-                      };
-                      return (
-                        dayMapping[editingClass.dayOfWeek] || "Invalid Day"
-                      ); // Fallback if day not found
+              <div>
+                <label
+                  htmlFor="course"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Subject
+                </label>
+                <input
+                  name="course"
+                  value={editingClass.courseCode || ""}
+                  onChange={handleInputChange}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="maxStudents"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Number of Students
+                </label>
+                <input
+                  type="number"
+                  id="maxStudents"
+                  name="maxStudents"
+                  value={editingClass.maxStudents}
+                  onChange={handleInputChange}
+                  placeholder={`Current number of students is ${editingClass.maxStudents}`}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+                {maxStudentsError && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {maxStudentsError}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label
+                  htmlFor="teacher"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Tutor
+                </label>
+                <input
+                  id="teacher"
+                  name="teacher"
+                  value={editingClass.teacherName}
+                  onChange={handleInputChange}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="dayofWeek"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Day of the Week
+                </label>
+                <input
+                  name="dayOfWeek"
+                  value={(() => {
+                    const dayMapping = {
+                      2: "Monday",
+                      3: "Tuesday",
+                      4: "Wednesday",
+                      5: "Thursday",
+                      6: "Friday",
+                      7: "Saturday",
+                      8: "Sunday",
+                    };
+                    return (
+                      dayMapping[editingClass.dayOfWeek] || "Invalid Day"
+                    ); // Fallback if day not found
+                  })()}
+                  disabled
+                  className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="slotId"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Lesson Time
+                </label>
+                <div className="relative">
+                  <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <div className="mt-1 block w-full pl-10 rounded-md border border-gray-300 bg-gray-100 shadow-sm text-gray-700">
+                    {(() => {
+                      const slot = slots.find(
+                        (slot) => slot.slotId === editingClass.slotId
+                      );
+                      return slot
+                        ? `Slot ${slot.slotId} (${slot.start} - ${slot.end})`
+                        : "Slot not found";
                     })()}
-                    disabled
-                    className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                    readOnly
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="slotId"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Lesson Time
-                  </label>
-                  <div className="relative">
-                    <FaClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <div className="mt-1 block w-full pl-10 rounded-md border border-gray-300 bg-gray-100 shadow-sm text-gray-700">
-                      {(() => {
-                        const slot = slots.find(
-                          (slot) => slot.slotId === editingClass.slotId
-                        );
-                        return slot
-                          ? `Slot ${slot.slotId} (${slot.start} - ${slot.end})`
-                          : "Slot not found";
-                      })()}
-                    </div>
                   </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor="price"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={editingClass.price}
-                    onChange={handleInputChange}
-                    min="100000"
-                    max="500000"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                  <span className="text-sm text-gray-500 mt-1 block">
-                    {formatCurrency(editingClass.price)}
-                  </span>
-                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Price
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={editingClass.price}
+                  onChange={handleInputChange}
+                  min="100000"
+                  max="500000"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+                <span className="text-sm text-gray-500 mt-1 block">
+                  {formatCurrency(editingClass.price)}
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Lesson Room Link
+                </label>
+                <input
+                  id="location"
+                  name="location"
+                  value={editingClass.location}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div className="md:col-span-3">
+                <table className="min-w-full table-auto">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 border">Date</th>
+                      <th className="px-4 py-2 border">Slot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {editingClass?.dateSlots?.map((slot, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2 border text-center">
+                          {slot.date}
+                        </td>
+                        <td className="px-4 py-2 border text-center">
+                          {slot.slotIds
+                            .sort((a, b) => a - b) // Sort slotIds in ascending order
+                            .map((slotId) => {
+                              // Define time ranges for each slotId
+                              const timeRanges = {
+                                1: "7h00 - 9h15",
+                                2: "9h30 - 11h45",
+                                3: "12h30 - 14h45",
+                                4: "15h00 - 17h15",
+                                5: "17h45 - 20h00",
+                              };
+
+                              return `Slot ${slotId} (${timeRanges[slotId] || "No time available"
+                                })`;
+                            })
+                            .join(", ")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">

@@ -1752,3 +1752,38 @@ export const getTotalCourses = async (token) => {
     throw error;
   }
 };
+
+export const getClassesWithoutTeacher = async (token) => {
+  try {
+    const response = await api.get(`/classes/without-teacher`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching total classes:", error);
+    throw error;
+  }
+};
+
+export const joinClassTeacher = async (token, id) => {
+  const response = await api.post(`/classes/${id}/joinByTeacher`, {}, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const updateLocationClass = async (token, id, location) => {
+  const response = await api.put(`/classes/${id}/location`, {
+    location: location
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+

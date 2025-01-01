@@ -5,6 +5,7 @@ import {
   fetchCreateClass,
   fetchCourseByMajor,
   fetchSystemParam,
+  getClassesWithoutTeacher,
 } from "@/data/api";
 import { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
@@ -22,6 +23,7 @@ import {
   UploadCloud,
   Users,
 } from "lucide-react";
+import ModalRegisterClass from "./ModalRegisterClass";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -36,6 +38,7 @@ function TeacherHome() {
   const [slots, setSlots] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [minDateString, setMinDateString] = useState("");
+  const [classesWithout, setClassesWithout] = useState([]);
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -51,6 +54,7 @@ function TeacherHome() {
     week: null,
     range: "",
   });
+  const [showModalRegister, setShowModalRegister] = useState(false);
 
   const [datesInTheWeek, setDatesInTheWeek] = useState([]);
   useEffect(() => {
@@ -110,6 +114,20 @@ function TeacherHome() {
     };
     fetchCousesMajor();
   }, []);
+
+  useEffect(() => {
+    const fetchClassesWithTeacher = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+        const res = await getClassesWithoutTeacher(token);
+        setClassesWithout(res)
+      } catch {
+        toast.error("Failed server");
+      }
+    }
+    fetchClassesWithTeacher();
+  }, [])
+
   const [classData, setClassData] = useState({
     name: "",
     code: "",
@@ -394,6 +412,10 @@ function TeacherHome() {
     }
   };
 
+  const handleShowRegister = () => {
+    setShowModalRegister(true);
+  }
+
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
     if (lesson) {
@@ -427,10 +449,10 @@ function TeacherHome() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-gray-800">Timetable</h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setShowModalRegister(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
         >
-          Create a Lesson
+          Register for class
         </button>
       </div>
       <YearSelector onWeekChange={handleWeekChange} />
@@ -482,7 +504,7 @@ function TeacherHome() {
           </table>
         </>
       </div>
-      <Modal
+      {/* <Modal
         isOpen={isModalOpen}
         onRequestClose={() => handleModalClose()}
         contentLabel="Create Class"
@@ -661,8 +683,12 @@ function TeacherHome() {
             Cancel
           </button>
         </div>
-      </Modal>
-
+      </Modal> */}
+      <ModalRegisterClass
+        data={classesWithout}
+        setOpen={setShowModalRegister}
+        open={showModalRegister}
+      />
       <ShowDetailTimeTable
         isOpen={showDetail}
         setIsOpen={setShowDetail}
