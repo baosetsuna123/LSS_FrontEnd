@@ -39,35 +39,35 @@ function ClassList() {
     }
   }
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [classesRes, coursesRes] = await Promise.all([
-          fetchClassbyteacher(token),
-          fetchCoursesService(token),
-        ]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [classesRes, coursesRes] = await Promise.all([
+        fetchClassbyteacher(token),
+        fetchCoursesService(token),
+      ]);
 
-        const newClasses = classesRes.map((classItem) => {
-          const course = coursesRes.find(
-            (course) => course.courseCode === classItem.courseCode
-          );
-          return {
-            ...classItem,
-            courseName: course ? course.name : "Undefined course",
-          };
-        });
-        const sortedData = newClasses.sort(
-          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+      const newClasses = classesRes.map((classItem) => {
+        const course = coursesRes.find(
+          (course) => course.courseCode === classItem.courseCode
         );
-        setClasses(sortedData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        return {
+          ...classItem,
+          courseName: course ? course.name : "Undefined course",
+        };
+      });
+      const sortedData = newClasses.sort(
+        (a, b) => new Date(b.startDate) - new Date(a.startDate)
+      );
+      setClasses(sortedData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [token]);
 

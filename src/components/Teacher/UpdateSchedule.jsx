@@ -1,26 +1,41 @@
 import {
+  cancelClass,
   fetchClassbyteacher,
   fetchCoursesService,
   fetchSlots,
-  fetchUpdateClass,
   updateLocationClass,
 } from "@/data/api";
-import { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { AlertTriangle } from "lucide-react";
+import { Checkbox } from "../ui/checkbox";
 import toast from "react-hot-toast";
 import { FaClock, FaPencilAlt, FaSearch } from "react-icons/fa";
+import { Button } from "../ui/button";
 
 function UpdateSchedule() {
   const [classes, setClasses] = useState([]);
-  const [classesUpdated, setClassesUpdated] = useState([]);
   const [editingClass, setEditingClass] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const [, setCourses] = useState([]);
   const [slots, setSlots] = useState([]);
   const [classShow, setClassShow] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const result = localStorage.getItem("result");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState(null);
   let token;
   if (result) {
     try {
@@ -41,7 +56,7 @@ function UpdateSchedule() {
     { value: 8, name: "Sunday" },
   ];
 
-  const fetchClasses = async () => {
+  const fetchClasses = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetchClassbyteacher(token);
@@ -54,17 +69,44 @@ function UpdateSchedule() {
         (a, b) => new Date(b.startDate) - new Date(a.startDate)
       );
       setClasses(sortedData);
-      console.log(filteredClasses);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
+  }, [token]);
+  const handleConfirmCancellation = async () => {
+    if (!agreeToTerms) {
+      toast.error("Please agree to the terms before proceeding.");
+      return;
+    }
+    console.log(selectedClassId);
+    setIsSubmitting(true);
+    try {
+      await cancelClass(selectedClassId, token);
+      toast.success("Cancellation request submitted successfully!");
+      setClasses((prevClasses) => {
+        console.log(prevClasses);
+        const updatedClasses = prevClasses.filter(
+          (classItem) => classItem.classId !== selectedClassId
+        );
+        console.log("Updated classes:", updatedClasses);
+        return updatedClasses;
+      });
+      setShowModal(false);
+    } catch (error) {
+      console.error(
+        "An error occurred while submitting the cancellation:",
+        error
+      );
+      toast.error("An error occurred while submitting the cancellation.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
   useEffect(() => {
     fetchClasses();
-  }, [token]);
+  }, [fetchClasses]);
 
   const fetchCourses = async () => {
     try {
@@ -99,26 +141,11 @@ function UpdateSchedule() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  useEffect(() => {
-    if (classes.length > 0 && courses.length > 0 && slots.length > 0) {
-      const newClasses = classes.map((classItem) => {
-        const course = courses.find(
-          (course) => course.courseCode === classItem.courseCode
-        );
-        const slot = slots.find((slot) => slot.slotId === classItem.slotId);
-        return {
-          ...classItem,
-          courseName: course ? course.name : "Course not specified",
-          slotStart: slot ? slot.start : "Time not specified",
-          slotEnd: slot ? slot.end : "Time not specified",
-        };
-      });
-
-      setClassesUpdated(newClasses);
-    }
-  }, [classes, courses, slots]);
   const [initialMaxStudents, setInitialMaxStudents] = useState(null);
-
+  const handleDelete = async (cls) => {
+    setShowModal(true);
+    setSelectedClassId(cls.classId);
+  };
   const handleEdit = (classInfo) => {
     setClassShow(classInfo);
     setEditingClass({ ...classInfo });
@@ -177,7 +204,11 @@ function UpdateSchedule() {
       setSaving(true);
       // Proceed with saving the updated class
       // await fetchUpdateClass({ data: { ...updatedClass }, token });
-      await updateLocationClass(token, updatedClass.classId, updatedClass.location)
+      await updateLocationClass(
+        token,
+        updatedClass.classId,
+        updatedClass.location
+      );
 
       // Fetch the updated data after saving
       fetchCourses();
@@ -201,10 +232,8 @@ function UpdateSchedule() {
     setIsPopupOpen(false);
     setEditingClass(null);
   };
-  const filteredClasses = classesUpdated.filter(
-    (cls) =>
-      cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cls.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClasses = classes.filter((cls) =>
+    cls.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -226,11 +255,15 @@ function UpdateSchedule() {
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
         </div>
+      ) : filteredClasses.length === 0 ? (
+        <div className="flex justify-center items-center h-40">
+          <p className="text-red-500 font-bold text-lg">No data available</p>
+        </div>
       ) : (
         <ul className="space-y-6">
           {filteredClasses.map((cls) => (
             <li
-              key={cls.id}
+              key={cls.classId}
               className="border border-gray-200 dark:border-gray-700 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-700"
             >
               <div className="flex justify-between items-start">
@@ -259,7 +292,6 @@ function UpdateSchedule() {
                       </span>
                     )}
                   </p>
-
                   <p className="text-gray-600 dark:text-gray-300">
                     Start date:{" "}
                     {new Date(cls.startDate).toLocaleDateString("en-GB")}
@@ -274,12 +306,20 @@ function UpdateSchedule() {
                     {cls.slotStart} - {cls.slotEnd}
                   </p>
                 </div>
-                <button
-                  onClick={() => handleEdit(cls)}
-                  className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
-                >
-                  <FaPencilAlt className="w-4 h-4" />
-                </button>
+                <div className="flex justify-end gap-x-5">
+                  <button
+                    onClick={() => handleEdit(cls)}
+                    className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
+                  >
+                    <FaPencilAlt className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(cls)}
+                    className="p-2 bg-red-500 font-extrabold text-white rounded-full hover:bg-red-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </li>
           ))}
@@ -382,9 +422,7 @@ function UpdateSchedule() {
                       7: "Saturday",
                       8: "Sunday",
                     };
-                    return (
-                      dayMapping[editingClass.dayOfWeek] || "Invalid Day"
-                    ); // Fallback if day not found
+                    return dayMapping[editingClass.dayOfWeek] || "Invalid Day"; // Fallback if day not found
                   })()}
                   disabled
                   className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
@@ -475,8 +513,9 @@ function UpdateSchedule() {
                                 5: "17h45 - 20h00",
                               };
 
-                              return `Slot ${slotId} (${timeRanges[slotId] || "No time available"
-                                })`;
+                              return `Slot ${slotId} (${
+                                timeRanges[slotId] || "No time available"
+                              })`;
                             })
                             .join(", ")}
                         </td>
@@ -507,6 +546,63 @@ function UpdateSchedule() {
           </div>
         </div>
       )}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-500">
+              <AlertTriangle className="h-6 w-6" />
+              Cancellation Policy
+            </DialogTitle>
+            <DialogDescription>
+              Please read our cancellation policy carefully before proceeding.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-500 mb-4">
+              By cancelling this class, you agree to the following terms:
+            </p>
+            <ul className="list-disc pl-5 text-sm text-gray-500 space-y-2">
+              <li>
+                Your salary will be reduced by 10% for this cancelled class.
+              </li>
+              <li>
+                This reduction will also apply to your next completed lessons.
+              </li>
+            </ul>
+            <div className="flex items-center space-x-2 mt-4">
+              <Checkbox
+                id="terms"
+                checked={agreeToTerms}
+                onCheckedChange={setAgreeToTerms}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I agree to the cancellation policy
+              </label>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmCancellation}
+              disabled={!agreeToTerms || isSubmitting}
+            >
+              {isSubmitting ? "Processing..." : "Agree & Cancel"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="ml-2"
+              onClick={() => setShowModal(false)}
+            >
+              Decline
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,12 +1,4 @@
 import { fetchAllCategories, fetchInfoTeacher } from "@/data/api";
-import {
-  Checkbox,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  Select,
-} from "@mui/material";
 import profile from "../../assets/profilebg.jfif";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -97,10 +89,6 @@ const ProfileTeacher = () => {
   // Handle avatar file selection
 
   // Handle category selection
-  const handleCategoryChange = (event) => {
-    const { value } = event.target;
-    setCategoryIds(value);
-  };
 
   const [loading, setLoading] = useState(false); // State to track loading
   const { updateUserProfile } = useAvatar();
@@ -288,49 +276,29 @@ const ProfileTeacher = () => {
 
           {/* Major Select */}
           <div className="mb-4 flex items-center">
-            <InputLabel
-              id="category-label"
-              className="text-xl font-semibold text-gray-800 w-1/4"
+            <label
+              htmlFor="category-label"
+              className="font-semibold text-gray-800 w-1/4"
             >
-              Your Major:
-            </InputLabel>
-            <FormControl variant="outlined" className="flex-1" disabled>
-              <Select
-                labelId="category-label"
-                multiple
-                value={categoryIds} // Ensure this is an array
-                onChange={handleCategoryChange}
-                renderValue={(selected) => {
-                  const selectedNames = allCategories
+              Your Major
+            </label>
+            <p id="category-label" className="flex-1 ml-1 text-gray-600">
+              {categoryIds.length > 0
+                ? allCategories
                     .filter((category) =>
-                      selected.includes(category.categoryId)
+                      categoryIds.includes(category.categoryId)
                     )
-                    .map((category) => category.name);
-                  return selectedNames.join(", ");
-                }}
-                displayEmpty
-              >
-                {allCategories.map((category) => (
-                  <MenuItem
-                    key={category.categoryId}
-                    value={category.categoryId}
-                  >
-                    <Checkbox
-                      checked={categoryIds.includes(category.categoryId)}
-                    />
-                    <ListItemText primary={category.name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                    .map((category) => category.name)
+                    .join(", ")
+                : "No categories selected"}
+            </p>
           </div>
-          <div className="mb-4 flex items-center">
+
+          <div className="mb-4 flex items-center gap-x-[0.4rem]">
             <label className="text-gray-700 font-semibold w-1/4">
               Violation Point
             </label>
-            <div className="w-3/4 p-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-800">
-              {info.violation}
-            </div>
+            <p className="w-2/4  text-gray-800">{info.violation}</p>
           </div>
 
           <div className="mt-4">

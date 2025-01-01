@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaChalkboardTeacher,
   FaCalendarAlt,
-  FaBan,
   // FaDoorOpen,
   FaList,
   FaBars,
@@ -63,11 +62,6 @@ function TeacherDashboardLayout() {
       path: "/teacher/update-schedule",
       label: "Update Schedule",
       icon: FaCalendarAlt,
-    },
-    {
-      path: "/teacher/cancel-request",
-      label: "Send Lesson Cancellation Request",
-      icon: FaBan,
     },
     {
       path: "/teacher/class-list",

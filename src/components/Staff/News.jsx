@@ -309,18 +309,20 @@ const News = ({
                 formats={formats}
               />
             </div>
-            <button
-              onClick={handleUpdateSubmit}
-              className="px-4 py-2 mr-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
-            >
-              Save Changes
-            </button>
-            <button
-              onClick={handleModalClose}
-              className="px-4 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md"
-            >
-              Cancel
-            </button>
+            <div className="flex justify-between">
+              <button
+                onClick={handleUpdateSubmit}
+                className="px-4 py-2 mr-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={handleModalClose}
+                className="px-4 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -352,18 +354,20 @@ const News = ({
                 className="mb-4"
               />
             </div>
-            <button
-              onClick={handleCreateSubmit}
-              className="px-4 py-2 mr-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
-            >
-              Create
-            </button>
-            <button
-              onClick={handleCreateModalClose}
-              className="px-4 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md"
-            >
-              Cancel
-            </button>
+            <div className="flex justify-between">
+              <button
+                onClick={handleCreateSubmit}
+                className="px-4 py-2 mr-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+              >
+                Create
+              </button>
+              <button
+                onClick={handleCreateModalClose}
+                className="px-4 py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -192,9 +192,6 @@ export function MyOrders() {
                   Order ID
                 </TableHead>
                 <TableHead className="text-gray-900 dark:text-white pl-10">
-                  Start Date
-                </TableHead>
-                <TableHead className="text-gray-900 dark:text-white pl-10">
                   Lesson Name
                 </TableHead>
                 <TableHead className="text-right text-gray-900 dark:text-white">
@@ -213,9 +210,6 @@ export function MyOrders() {
                 <TableRow key={order.orderDetailId}>
                   <TableCell className="font-medium text-gray-900 dark:text-white pl-7">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
-                  </TableCell>
-                  <TableCell className="text-gray-900 dark:text-white pl-10">
-                    {new Date(order.classDTO.startDate).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-gray-900 dark:text-white pl-10">
                     {order.classDTO.name}
