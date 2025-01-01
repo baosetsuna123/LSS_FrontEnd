@@ -48,7 +48,7 @@ export function ViewAllClasses() {
     );
     setFilteredClasses(sortedData);
     console.log(filtered);
-    setCurrentPage(1);
+    // setCurrentPage(1);
   }, [searchTerm, maxPrice, selectedCourseCodes, contextClasses]);
 
   useEffect(() => {
