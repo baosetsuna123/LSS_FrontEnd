@@ -38,20 +38,31 @@ const DetailClasses = ({ token }) => {
 
   const getClasses = async () => {
     try {
-      const res = await fetchClasses(token);
-      const fetchedSlots = await fetchSlots(token);
-      const data = res
-        .filter((item) =>
-          fetchedSlots.some((slot) => slot.slotId === item.slotId)
-        )
-        .map((item) => ({
-          ...item,
-          slotInfo: fetchedSlots.find((slot) => slot.slotId === item.slotId),
-        }));
-      setClassData(data);
-      setFilteredData(res);
+      const res = await fetchClasses(token); // Fetching classes
+      console.log(res);
+      const fetchedSlots = await fetchSlots(token); // Fetching slots
+
+      // Map and filter classes with the updated fields
+      const data = res.map((item) => ({
+        ...item,
+        slotInfo: item.dateSlots
+          .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort dates
+          .map((slot) => ({
+            ...slot,
+            slotDetails: slot.slotIds
+              .sort((a, b) => a - b) // Sort slot IDs
+              .map((slotId) =>
+                fetchedSlots.find(
+                  (fetchedSlot) => fetchedSlot.slotId === slotId
+                )
+              ),
+          })),
+      }));
+
+      setClassData(data); // Update class data state
+      setFilteredData(data); // Update filtered data state
     } catch (error) {
-      console.log(error);
+      console.log(error); // Error handling
     }
   };
 
@@ -63,7 +74,7 @@ const DetailClasses = ({ token }) => {
   useEffect(() => {
     if (selectedWeek) {
       const filtered = classData.filter((classItem) => {
-        const classStartDate = new Date(classItem.startDate);
+        const classStartDate = new Date(classItem.createDate); // Use createDate field for filtering
         const weekStart = selectedWeek.start;
         const weekEnd = selectedWeek.end;
         return classStartDate >= weekStart && classStartDate <= weekEnd;
@@ -81,19 +92,6 @@ const DetailClasses = ({ token }) => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-  const getDayOfWeekString = (date) => {
-    const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const dayIndex = date.getDay();
-    return daysOfWeek[dayIndex];
   };
   const formatWithCommas = (num) => {
     if (!num) return "";
@@ -117,7 +115,7 @@ const DetailClasses = ({ token }) => {
         <Box sx={style}>
           <div className="flex flex-col gap-4 items-center w-full">
             <h1 className="uppercase tracking-wide text-2xl font-semibold mx-auto">
-              Lesson List
+              Class List
             </h1>
 
             <YearWeekSelector
@@ -139,19 +137,22 @@ const DetailClasses = ({ token }) => {
                         Class ID
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        Lesson Name
+                        Class Name
                       </TableCell>
                       <TableCell>Tutor</TableCell>
-                      <TableCell>Period</TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        Day of the Week
-                      </TableCell>
+
                       <TableCell>Price</TableCell>
                       <TableCell className="whitespace-nowrap">
                         Max Students
                       </TableCell>
+                      <TableCell
+                        className="whitespace-nowrap"
+                        sx={{ textAlign: "center" }}
+                      >
+                        Status
+                      </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        Number of Students
+                        Students Joined
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -166,16 +167,43 @@ const DetailClasses = ({ token }) => {
                           <TableCell>{classItem.classId}</TableCell>
                           <TableCell>{classItem.name}</TableCell>
                           <TableCell>{classItem.teacherName}</TableCell>
-                          <TableCell>{classItem.slotInfo?.period}</TableCell>
-                          <TableCell>
-                            {getDayOfWeekString(new Date(classItem.startDate))}
-                          </TableCell>{" "}
                           {/* Day of the Week */}
                           <TableCell>
                             {formatWithCommas(classItem.price)}
                           </TableCell>
-                          <TableCell>{classItem.maxStudents}</TableCell>
+                          <TableCell sx={{ textAlign: "center" }}>
+                            {classItem.maxStudents}
+                          </TableCell>
                           <TableCell>
+                            <span
+                              style={{
+                                color:
+                                  classItem.status === "PENDING"
+                                    ? "#856404"
+                                    : classItem.status === "CANCELED"
+                                    ? "#721c24"
+                                    : classItem.status === "COMPLETED"
+                                    ? "#155724"
+                                    : "inherit",
+                                backgroundColor:
+                                  classItem.status === "PENDING"
+                                    ? "#fff3cd"
+                                    : classItem.status === "CANCELED"
+                                    ? "#f8d7da"
+                                    : classItem.status === "COMPLETED"
+                                    ? "#d4edda"
+                                    : "inherit",
+                                borderRadius: "4px",
+                                padding: "4px 8px",
+                                fontWeight: "500",
+                                display: "inline-block", // Ensures the background only wraps the content
+                              }}
+                            >
+                              {classItem.status}
+                            </span>
+                          </TableCell>
+
+                          <TableCell sx={{ textAlign: "center" }}>
                             {classItem.students ? classItem.students.length : 0}
                           </TableCell>
                         </TableRow>
@@ -230,7 +258,7 @@ export default function TotalClasses() {
   return (
     <div className=" h-full w-full bg-yellow-500 *:text-white shadow-lg py-2 rounded-lg px-4">
       <h1 className="font-semibold text-xl pb-4 tracking-wider ">
-        Total Lessons
+        Total Classes
       </h1>
       <div className="*:text-white text-3xl mt-2 font-semibold h-[40%] text-center ">
         <span>{totalClasses}</span>

@@ -84,6 +84,7 @@ const TotalOrdersAmountDetails = () => {
         dateEnd,
         token
       );
+      console.log(res);
       setAmount(res.totalOrderDTO.amount || 0);
       setTotalPrice(res.totalOrderDTO.totalPrice || 0);
       setOrderDetails(res.orderDetails);
@@ -231,6 +232,7 @@ export default function TotalOrdersAmount() {
   const getTotalOrdersAndAmount = async () => {
     try {
       const res = await getTotalOrders(token);
+      console.log(res);
       setTotalOrdersAndAmount(res);
     } catch (error) {
       console.log(error);

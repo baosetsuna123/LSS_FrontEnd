@@ -1,4 +1,17 @@
-import { Box, Button, Typography, Modal, Grid, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Modal,
+  Grid,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from "@mui/material";
 import defaults from "../../../assets/default.jfif";
 
 const ClassDetail = ({ data, open, setOpen }) => {
@@ -86,19 +99,46 @@ const ClassDetail = ({ data, open, setOpen }) => {
                 Schedule
               </Typography>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Start Date:</strong>{" "}
-                    {new Date(data?.startDate).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body1">
-                    <strong>Slot:</strong> {data?.slotId}
-                  </Typography>
+                <Grid item xs={12}>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Date</strong>
+                          </TableCell>
+                          <TableCell>
+                            <strong>Slots</strong>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {data?.dateSlots
+                          .sort((a, b) => {
+                            const dateComparison =
+                              new Date(a.date) - new Date(b.date);
+                            if (dateComparison !== 0) return dateComparison;
+                            return a.slotIds[0] - b.slotIds[0]; // Assuming slotIds are numbers
+                          })
+                          .map((slot) => (
+                            <TableRow key={slot.date}>
+                              <TableCell>
+                                {new Date(slot.date).toLocaleDateString(
+                                  "en-GB"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {slot.slotIds.sort((a, b) => a - b).join(", ")}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Grid>
               </Grid>
             </Paper>
+
             <Paper elevation={3} className="p-4 mt-4">
               <Typography variant="h6" gutterBottom className="font-semibold">
                 Description

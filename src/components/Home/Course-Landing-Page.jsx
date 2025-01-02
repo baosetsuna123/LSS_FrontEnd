@@ -324,6 +324,38 @@ export function CourseLandingPage() {
                                 {course.teacherName}
                               </p>
                             </div>
+                            {average[course.teacherName] && (
+                              <div className="flex justify-center mt-2 gap-x-2">
+                                {[...Array(6)].map((_, index) => {
+                                  const rating = average[course.teacherName];
+                                  const isFullStar =
+                                    index + 1 <= Math.floor(rating);
+                                  const isHalfStar =
+                                    index + 1 > Math.floor(rating) &&
+                                    index + 1 - 0.5 <= rating;
+
+                                  return (
+                                    <svg
+                                      key={index}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill={
+                                        isFullStar
+                                          ? "#fdd835"
+                                          : isHalfStar
+                                          ? "#fdd835"
+                                          : "none" // Softer yellow
+                                      }
+                                      stroke="#fbc02d" // Softer stroke
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-6 h-6"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  );
+                                })}
+                              </div>
+                            )}
                             <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
                               View Details
                             </Button>
@@ -420,11 +452,38 @@ export function CourseLandingPage() {
                             </div>
                             {/* Display the average rating */}
                             {average[course.teacherName] && (
-                              <p className="mt-2 text-lg text-yellow-500">
-                                Average Rating:{" "}
-                                {average[course.teacherName].toFixed(1)} ★
-                              </p>
+                              <div className="flex justify-center mt-2 gap-x-2">
+                                {[...Array(6)].map((_, index) => {
+                                  const rating = average[course.teacherName];
+                                  const isFullStar =
+                                    index + 1 <= Math.floor(rating);
+                                  const isHalfStar =
+                                    index + 1 > Math.floor(rating) &&
+                                    index + 1 - 0.5 <= rating;
+
+                                  return (
+                                    <svg
+                                      key={index}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill={
+                                        isFullStar
+                                          ? "#fdd835"
+                                          : isHalfStar
+                                          ? "#fdd835"
+                                          : "none" // Softer yellow
+                                      }
+                                      stroke="#fbc02d" // Softer stroke
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-6 h-6"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  );
+                                })}
+                              </div>
                             )}
+
                             <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
                               View Details
                             </Button>
