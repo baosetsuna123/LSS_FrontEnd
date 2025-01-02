@@ -308,12 +308,6 @@ export function MyOrders() {
                     Course: {orderDetails.classDTO.courseCode}
                   </p>
                   <p className="mb-2">
-                    StartDate:{" "}
-                    {new Date(
-                      orderDetails.classDTO.startDate
-                    ).toLocaleDateString()}
-                  </p>
-                  <p className="mb-2">
                     Price: {formatCurrency(orderDetails.price)}
                   </p>
                   <p className="mb-2">

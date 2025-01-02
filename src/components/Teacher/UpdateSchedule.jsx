@@ -43,7 +43,6 @@ function UpdateSchedule() {
     }
   }
 
-
   const fetchClasses = useCallback(async () => {
     try {
       setLoading(true);
@@ -110,14 +109,12 @@ function UpdateSchedule() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount);
   };
-
 
   const [initialMaxStudents, setInitialMaxStudents] = useState(null);
   const handleDelete = async (cls) => {
@@ -159,7 +156,7 @@ function UpdateSchedule() {
   const handleSave = async (updatedClass) => {
     try {
       if (!updatedClass.location) {
-        toast.error("Please enter a Lesson Room Link")
+        toast.error("Please enter a Lesson Room Link");
         return;
       }
       setSaving(true);
@@ -228,7 +225,10 @@ function UpdateSchedule() {
                     {cls.name}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Subject: {cls.courseName}
+                    CourseCode: {cls.courseCode}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Price: {cls.price}
                   </p>
                   <p className="text-gray-600 dark:text-gray-300">
                     Max students: {cls.maxStudents}
@@ -248,7 +248,6 @@ function UpdateSchedule() {
                       </span>
                     )}
                   </p>
-
                 </div>
                 <div className="flex justify-end gap-x-5">
                   <button
@@ -411,8 +410,9 @@ function UpdateSchedule() {
                                 5: "17h45 - 20h00",
                               };
 
-                              return `Slot ${slotId} (${timeRanges[slotId] || "No time available"
-                                })`;
+                              return `Slot ${slotId} (${
+                                timeRanges[slotId] || "No time available"
+                              })`;
                             })
                             .join(", ")}
                         </td>

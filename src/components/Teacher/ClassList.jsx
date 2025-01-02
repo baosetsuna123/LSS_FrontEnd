@@ -164,9 +164,7 @@ function ClassList() {
                   <th className="py-3 px-2 text-center">Class Name</th>
                   <th className="py-3 px-2 text-center">Subject</th>
                   <th className="py-3 px-2 text-center">Students</th>
-                  <th className="py-3 px-2 text-center">Schedule</th>
                   <th className="py-3 px-2 text-center">Status</th>
-                  <th className="py-3 px-2 text-center">Time</th>
                   <th className="py-3 px-2 text-center">Action</th>
                 </tr>
               </thead>
@@ -176,38 +174,32 @@ function ClassList() {
                     key={cls.id}
                     className="border-b border-gray-200 hover:bg-gray-100"
                   >
-                    <td className="py-3 px-6 text-left whitespace-nowrap">
+                    <td className="py-3 text-center px-6  whitespace-nowrap">
                       <span className="font-medium">{cls.name}</span>
                     </td>
-                    <td className="py-3 px-6 text-left">{cls.courseName}</td>
+                    <td className="py-3 px-6 text-center">{cls.courseName}</td>
                     <td className="py-3 px-6 text-center">{cls.maxStudents}</td>
-                    <td className="py-3 px-6 text-center whitespace-nowrap">
-                      {`${formatDate(cls.startDate)} (${dayOfWeekMap[cls.dayOfWeek] || "Unknown"
-                        })`}
-                    </td>
+
                     <td className="py-3 px-6 text-center">
                       <span
-                        className={`py-1 px-3 rounded-full text-xs font-bold ${cls.status === "PENDING"
-                          ? "bg-yellow-200 text-yellow-600"
-                          : cls.status === "ACTIVE"
+                        className={`py-1 px-3 rounded-full text-xs font-bold ${
+                          cls.status === "PENDING"
+                            ? "bg-yellow-200 text-yellow-600"
+                            : cls.status === "ACTIVE"
                             ? "bg-purple-200 text-purple-600"
                             : cls.status === "ONGOING"
-                              ? "bg-blue-200 text-blue-600"
-                              : cls.status === "CANCELED"
-                                ? "bg-red-200 text-red-600"
-                                : cls.status === "COMPLETED"
-                                  ? "bg-green-200 text-green-600"
-                                  : ""
-                          }`}
+                            ? "bg-blue-200 text-blue-600"
+                            : cls.status === "CANCELED"
+                            ? "bg-red-200 text-red-600"
+                            : cls.status === "COMPLETED"
+                            ? "bg-green-200 text-green-600"
+                            : ""
+                        }`}
                       >
                         {cls.status}
                       </span>
                     </td>
-                    <td className="py-3 px-6 text-center whitespace-nowrap">
-                      <span className="bg-blue-200 text-blue-800 rounded-full py-1 px-4 text-xs font-semibold">
-                        {slotTimeMap[cls.slotId] || "Unknown"}
-                      </span>
-                    </td>
+
                     <td className="py-3 px-6 text-center whitespace-nowrap">
                       <button
                         onClick={() => handleShowDetails(cls)}
@@ -233,10 +225,11 @@ function ClassList() {
                 <button
                   key={i + 1}
                   onClick={() => paginate(i + 1)}
-                  className={`mx-1 px-3 py-1 rounded ${currentPage === i + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                  className={`mx-1 px-3 py-1 rounded ${
+                    currentPage === i + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
                 >
                   {i + 1}
                 </button>
@@ -264,7 +257,7 @@ function ClassList() {
   );
 }
 
-function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
+function DetailsModal({ cls, onClose }) {
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
       <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
@@ -278,15 +271,11 @@ function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
               <strong>Students:</strong> {cls.maxStudents}
             </p>
             <p className="text-sm text-gray-700 mb-2">
-              <strong>Schedule:</strong>{" "}
-              {`${formatDate(cls.startDate)} (${dayOfWeekMap[cls.dayOfWeek] || "Unknown"
-                })`}
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
               <strong>Status:</strong>{" "}
               <span
                 className={`
-                  ${cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
+                  ${
+                    cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
                   }
                   ${cls.status === "PENDING" ? "font-bold text-yellow-500" : ""}
                   ${cls.status === "CANCELED" ? "font-bold text-red-500" : ""}
@@ -303,9 +292,6 @@ function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
             <p className="text-sm text-gray-700 mb-2">
               <strong>Teacher:</strong> {cls.teacherName}
             </p>
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Time:</strong> {slotTimeMap[cls.slotId] || "Unknown"}
-            </p>
             <p className="text-sm text-gray-700 mb-4">
               <strong>Location:</strong>
               <button
@@ -315,6 +301,44 @@ function DetailsModal({ cls, onClose, dayOfWeekMap, formatDate, slotTimeMap }) {
                 Meet URL
               </button>
             </p>
+            <div className="col-span-12">
+              <table className="min-w-full table-auto">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border text-center">Date</th>
+                    <th className="px-4 py-2 border text-center">Slot</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cls?.dateSlots?.map((slot, index) => (
+                    <tr key={index}>
+                      <td className="px-4 py-2 border text-center">
+                        {slot.date}
+                      </td>
+                      <td className="px-4 py-2 border text-center">
+                        {slot.slotIds
+                          .sort((a, b) => a - b) // Sort slotIds in ascending order
+                          .map((slotId) => {
+                            // Define time ranges for each slotId
+                            const timeRanges = {
+                              1: "7h00 - 9h15",
+                              2: "9h30 - 11h45",
+                              3: "12h30 - 14h45",
+                              4: "15h00 - 17h15",
+                              5: "17h45 - 20h00",
+                            };
+
+                            return `Slot ${slotId} (${
+                              timeRanges[slotId] || "No time available"
+                            })`;
+                          })
+                          .join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="mt-6">
             <button

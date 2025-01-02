@@ -30,20 +30,6 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
         <div className="col-span-4">
           <strong>Course Code:</strong> {data?.courseCode}
         </div>
-
-        <div className="col-span-4 flex items-center gap-5">
-          <strong>Lesson room:</strong>
-          {data?.location ? (
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-full"
-              onClick={() => window.open(data?.location, "_blank")}
-            >
-              Meet URL
-            </button>
-          ) : (
-            <p className="font-semibold text-red-600">No classrooms yet</p>
-          )}
-        </div>
         <div className="col-span-4">
           <strong>Description:</strong>{" "}
           {data?.description
@@ -60,7 +46,7 @@ const ShowDetailTimeTable = ({ isOpen, setIsOpen, data }) => {
           <img
             src={data?.imageUrl || defaults} // Use default if imageUrl is not provided
             alt={data?.name || "Default Image"} // Provide a fallback alt text
-            className="mt-2 max-w-[200px] h-auto rounded"
+            className="mt-2 max-w-[150px] h-auto rounded"
           />
         </div>
       </div>

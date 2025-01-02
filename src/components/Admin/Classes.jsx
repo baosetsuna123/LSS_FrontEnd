@@ -24,16 +24,6 @@ import {
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
-const formatDate = (dateString) => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
-
 const statusOptions = [
   "ALL",
   "COMPLETED",
@@ -169,7 +159,7 @@ const Classes = () => {
               <TableRow>
                 <TableHead className="w-[100px]">ID</TableHead>
                 <TableHead>Lesson Name</TableHead>
-                <TableHead>Start Date</TableHead>
+                <TableHead>CourseCode</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tutor Name</TableHead>
               </TableRow>
@@ -181,7 +171,7 @@ const Classes = () => {
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </TableCell>
                   <TableCell>{cls.name}</TableCell>
-                  <TableCell>{formatDate(cls.startDate)}</TableCell>
+                  <TableCell>{cls.courseCode}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full font-semibold text-sm ${

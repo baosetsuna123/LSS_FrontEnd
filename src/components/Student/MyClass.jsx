@@ -48,7 +48,6 @@ const MyClass = () => {
     fetchAllSlots();
   }, [token, selectedWeekData]);
 
-
   const convertClassesToTimetable = (classes) => {
     const daysOfWeekMap = {
       0: "Sunday",
@@ -117,12 +116,11 @@ const MyClass = () => {
     )}-${String(d.getDate()).padStart(2, "0")}`;
   };
 
-
   const fetchTimetable = async () => {
     try {
       setLoading(true);
       const res = await fetchOrderClasses(token);
-      const classes = res.data.content
+      const classes = res.data.content;
       const [startRangeStr, endRangeStr] = selectedWeekData.range.split(" To ");
       const startRange = formatDateToYMD(new Date(startRangeStr));
       const endRange = formatDateToYMD(new Date(endRangeStr));
@@ -132,9 +130,7 @@ const MyClass = () => {
         const { dateSlots } = item.classDTO;
 
         const hasMatchingSlot = dateSlots.some(
-          (slot) =>
-            slot.date >= startRange &&
-            slot.date <= endRange
+          (slot) => slot.date >= startRange && slot.date <= endRange
         );
 
         return hasMatchingSlot;
@@ -151,7 +147,7 @@ const MyClass = () => {
         }
         return classItem;
       });
-      console.log(updatedClasses)
+      console.log(updatedClasses);
       setTimetable(convertClassesToTimetable(updatedClasses)); // Set timetable
     } catch (error) {
       console.error("Error fetching timetable:", error);
@@ -160,7 +156,7 @@ const MyClass = () => {
     }
   };
 
-  console.log(timetable)
+  console.log(timetable);
 
   const didMount = useRef(false);
   useEffect(() => {
@@ -173,8 +169,8 @@ const MyClass = () => {
 
   const convertDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { day: '2-digit', month: '2-digit' };
-    return date.toLocaleDateString('en-GB', options);
+    const options = { day: "2-digit", month: "2-digit" };
+    return date.toLocaleDateString("en-GB", options);
   };
 
   const renderTimetableCell = (day, period) => {
@@ -183,12 +179,43 @@ const MyClass = () => {
       return <div className="min-h-[80px]"></div>;
     }
     if (lesson && lesson.dateSlots) {
-      const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].indexOf(day);
+      const dayIndex = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ].indexOf(day);
       const currentDayFormatted = datesInTheWeek[dayIndex];
 
-      const matchingSlot = lesson.dateSlots.some(item => convertDate(item.date) === currentDayFormatted);
+      // Sort the dateSlots
+      const sortedSlots = lesson.dateSlots.sort((a, b) => {
+        const dateComparison = new Date(a.date) - new Date(b.date);
+        if (dateComparison !== 0) return dateComparison;
+
+        // Sort the slotIds in descending order within each dateSlot
+        const maxSlotA = Math.max(...a.slotIds);
+        const maxSlotB = Math.max(...b.slotIds);
+        return maxSlotB - maxSlotA; // We want the highest slotId to appear first
+      });
+
+      // Find the last slot for that day
+      const lastSlot = sortedSlots[sortedSlots.length - 1];
+
+      // Get lesson status and the highest slot ID
+      const lessonStatus = lesson.orderStatus;
+      const highestSlotId = Math.max(...lastSlot.slotIds);
+      console.log(period, highestSlotId);
+      const isFinalSlot = Number(period) === Number(highestSlotId);
+      console.log(isFinalSlot);
+      // Check if the lesson is scheduled for the current day
+      const matchingSlot = lesson.dateSlots.some(
+        (item) => convertDate(item.date) === currentDayFormatted
+      );
+
       if (matchingSlot) {
-        const lessonStatus = lesson.orderStatus;
         return (
           <div className="p-3 bg-white h-full border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
             <div className="flex flex-col h-full">
@@ -211,8 +238,11 @@ const MyClass = () => {
               </div>
 
               <div className="mt-auto">
+                {/* Render feedback button only for the final slot of the day */}
                 {lessonStatus === "COMPLETED" &&
-                  !submittedFeedbackOrderIds.has(lesson.orderId.toString()) ? (
+                !submittedFeedbackOrderIds.has(lesson.orderId.toString()) &&
+                convertDate(lastSlot.date) === currentDayFormatted &&
+                isFinalSlot ? (
                   <button
                     key={lesson.orderId}
                     onClick={() => navigate(`/feedback/${lesson.orderId}`)}
@@ -233,6 +263,7 @@ const MyClass = () => {
                     Ended
                   </div>
                 ) : (
+                  // Show the lesson status only if it's not the final slot
                   <div className="w-full text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full py-2 px-4 text-center">
                     {lessonStatus || "Upcoming"}
                   </div>

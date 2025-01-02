@@ -19,7 +19,7 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
     try {
       const token = sessionStorage.getItem("token");
       if (selectedRows.length === 0) {
-        toast.error('please select at least one class');
+        toast.error("please select at least one class");
         return;
       }
       await Promise.all(
@@ -28,30 +28,66 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
           return res;
         })
       );
-      toast.success("All selected classes have been successfully joined!");
+      toast.success("You have registered the class successfully!");
       handleCloseRegister();
     } catch {
-      toast.error("Teacher already has a class scheduled on the same date and slot.");
+      toast.error(
+        "Teacher already has a class scheduled on the same date and slot."
+      );
     }
   };
 
-
   const columns = [
-    { field: "classId", headerName: "Class ID", width: 100 },
-    { field: "name", headerName: "Class Name", width: 200 },
-    { field: "code", headerName: "Class Code", width: 150 },
-    { field: "description", headerName: "Description", width: 250 },
+    {
+      field: "classId",
+      headerName: "Class ID",
+      width: 100,
+      headerAlign: "center", // Center-align header
+      align: "center", // Center-align content
+    },
+    {
+      field: "name",
+      headerName: "Class Name",
+      width: 200,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "courseCode",
+      headerName: "Course Code",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 250,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        // Truncate the description to 30 characters, adding "..." if it exceeds
+        const truncatedDescription =
+          params.value.length > 30
+            ? `${params.value.slice(0, 30)}...`
+            : params.value;
+        return truncatedDescription;
+      },
+    },
     {
       field: "status",
       headerName: "Status",
       width: 120,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => (
         <Chip
           label={params.value}
-          className={`${params.value === "PENDING"
-            ? "bg-orange-500 text-white"
-            : "bg-green-500 text-white"
-            }`}
+          style={{
+            backgroundColor: params.value === "PENDING" ? "#f59e0b" : "#10b981",
+            color: params.value === "PENDING" ? "#fef08a" : "white",
+            fontWeight: "bold",
+          }}
         />
       ),
     },
@@ -59,14 +95,16 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
       field: "price",
       headerName: "Price",
       width: 120,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) => `${params.value.toLocaleString()} VND`,
     },
-    { field: "startDate", headerName: "Start Date", width: 130 },
-    { field: "endDate", headerName: "End Date", width: 130 },
     {
       field: "documents",
       headerName: "Documents",
       width: 200,
+      headerAlign: "center",
+      align: "center",
       renderCell: (params) =>
         params.value && params.value.length > 0 ? (
           <div>
@@ -88,20 +126,46 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
     },
     {
       field: "dateSlots",
-      headerName: "Dates & Slots",
-      width: 250,
-      renderCell: (params) =>
-        params.value && params.value.length > 0 ? (
-          <div>
-            {params.value.map((slot, index) => (
-              <div key={index}>
-                Date: {slot.date}, Slots: {slot.slotIds.join(", ")}
-              </div>
-            ))}
-          </div>
-        ) : (
-          "No slots"
-        ),
+      headerName: "Dates & Slots (Date (SlotIDs))",
+      width: 450,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        if (params.value && params.value.length > 0) {
+          const sortedSlots = params.value.sort((a, b) => {
+            const dateComparison = new Date(a.date) - new Date(b.date);
+            if (dateComparison !== 0) return dateComparison;
+            return a.slotIds[0] - b.slotIds[0];
+          });
+
+          return (
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                overflowX: "auto",
+              }}
+            >
+              {sortedSlots.map((slot, index) => (
+                <div
+                  key={index}
+                  style={{
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    padding: "5px",
+                    textAlign: "center", // Center-align individual slot content
+                  }}
+                >
+                  {/* Format the date to dd/mm/yyyy */}
+                  {new Date(slot.date).toLocaleDateString("en-GB")} (
+                  {slot.slotIds.sort((a, b) => a - b).join(", ")})
+                </div>
+              ))}
+            </div>
+          );
+        }
+        return "No slots";
+      },
     },
   ];
 
