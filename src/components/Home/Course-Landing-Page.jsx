@@ -21,6 +21,39 @@ import "./Course-Landing-Page.css";
 export function CourseLandingPage() {
   const [majorClasses, setMajorClasses] = useState([]);
   const [loadingm, setLoadingm] = useState(false);
+  const [average, setAverage] = useState(0);
+  const token = sessionStorage.getItem("token");
+  const { classes, loading } = useClassContext();
+
+  useEffect(() => {
+    const fetchAverage = async (teacherName) => {
+      try {
+        const data = await fetchAverageTeacher(teacherName, token);
+        console.log(
+          `Fetched average for ${teacherName}:`,
+          data.averageFeedback
+        );
+        setAverage((prevAverages) => ({
+          ...prevAverages,
+          [teacherName]: data.averageFeedback, // Store average by teacherName
+        }));
+      } catch (error) {
+        console.error("Error fetching average rating:", error);
+      }
+    };
+
+    // Iterate through courses and fetch averages sequentially
+    const fetchAverages = async () => {
+      for (const course of classes) {
+        if (course.teacherName && !average[course.teacherName]) {
+          await fetchAverage(course.teacherName);
+        }
+      }
+    };
+
+    fetchAverages();
+  }, [token, classes]); // Avoid using average in the dependency array
+
   useEffect(() => {
     const fetchMajorClasses = async () => {
       try {
@@ -30,7 +63,7 @@ export function CourseLandingPage() {
         console.log(loadingm);
 
         const sortedClasses = classes.sort(
-          (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
+          (a, b) => a?.startDate - b?.startDate
         );
 
         setMajorClasses(sortedClasses);
@@ -84,15 +117,12 @@ export function CourseLandingPage() {
     },
   };
   const navigate = useNavigate();
-  const { classes, loading } = useClassContext();
   const [sortedClasses, setSortedClasses] = useState([]);
 
   useEffect(() => {
     if (classes && classes.length > 0) {
       // Sort the classes by the number of students in descending order
-      const sorted = [...classes].sort(
-        (a, b) => (b.students?.length || 0) - (a.students?.length || 0)
-      );
+      const sorted = [...classes].sort((a, b) => a?.startDate - b?.startDate);
       setSortedClasses(sorted);
     }
   }, [classes]);
@@ -133,31 +163,7 @@ export function CourseLandingPage() {
       description: "Become part of a vibrant learning community and network.",
     },
   ];
-  const [average, setAverage] = useState(0);
-  const token = sessionStorage.getItem("token");
-  useEffect(() => {
-    const fetchAverage = async (teacherName) => {
-      try {
-        const data = await fetchAverageTeacher(teacherName, token);
-        console.log(
-          `Fetched average for ${teacherName}:`,
-          data.averageFeedback
-        );
-        setAverage((prevAverages) => ({
-          ...prevAverages,
-          [teacherName]: data.averageFeedback, // Store average by teacherName
-        }));
-      } catch (error) {
-        console.error("Error fetching average rating:", error);
-      }
-    };
-    classes.forEach((course) => {
-      if (course.teacherName && !average[course.teacherName]) {
-        const data = fetchAverage(course.teacherName);
-        console.log(data);
-      }
-    });
-  }, [token, classes, average]);
+
   const [, setCurrentIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
