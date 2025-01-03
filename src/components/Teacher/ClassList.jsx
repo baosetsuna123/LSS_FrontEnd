@@ -10,6 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import {
+  FaUsers,
+  FaChalkboardTeacher,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaClock,
+} from "react-icons/fa";
 
 function ClassList() {
   const [classes, setClasses] = useState([]);
@@ -258,102 +265,145 @@ function ClassList() {
 }
 
 function DetailsModal({ cls, onClose }) {
+  const getStatusColor = (status) => {
+    const colors = {
+      COMPLETED: "bg-green-100 text-green-800",
+      PENDING: "bg-yellow-100 text-yellow-800",
+      CANCELED: "bg-red-100 text-red-800",
+      ONGOING: "bg-blue-100 text-blue-800",
+      ACTIVE: "bg-orange-100 text-orange-800",
+    };
+    return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const timeRanges = {
+    1: "7:00 - 9:15",
+    2: "9:30 - 11:45",
+    3: "12:30 - 14:45",
+    4: "15:00 - 17:15",
+    5: "17:45 - 20:00",
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-        <div className="text-center">
-          <h3 className="text-2xl font-semibold text-gray-900">{cls.name}</h3>
-          <div className="mt-4 text-left">
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Subject:</strong> {cls.courseName}
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Students:</strong> {cls.maxStudents}
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Status:</strong>{" "}
-              <span
-                className={`
-                  ${
-                    cls.status === "COMPLETED" ? "font-bold text-green-500" : ""
-                  }
-                  ${cls.status === "PENDING" ? "font-bold text-yellow-500" : ""}
-                  ${cls.status === "CANCELED" ? "font-bold text-red-500" : ""}
-                  ${cls.status === "ONGOING" ? "font-bold text-blue-500" : ""}
-                  ${cls.status === "ACTIVE" ? "font-bold text-orange-500" : ""}
-                `}
-              >
-                {cls.status}
-              </span>
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Students Joined:</strong> {cls.students.length}
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
-              <strong>Teacher:</strong> {cls.teacherName}
-            </p>
-            <p className="text-sm text-gray-700 mb-4">
-              <strong>Location:</strong>
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="text-center mb-6">
+          <h3 className="text-3xl font-bold text-gray-900">{cls.name}</h3>
+          <p className="text-lg text-gray-600 mt-2">{cls.courseName}</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <InfoItem
+            icon={<FaUsers />}
+            label="Max Students"
+            value={cls.maxStudents}
+          />
+          <InfoItem
+            icon={<FaUsers />}
+            label="Students Joined"
+            value={cls.students.length}
+          />
+          <InfoItem
+            icon={<FaChalkboardTeacher />}
+            label="Teacher"
+            value={cls.teacherName}
+          />
+          <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+            <FaMapMarkerAlt className="text-blue-500 mr-3 text-xl" />
+            <div>
+              <p className="text-sm font-semibold text-gray-700">Location</p>
               <button
                 onClick={() => window.open(cls.location, "_blank")}
-                className="ml-2 text-gray-700 bg-gray-200 py-1 px-3 rounded-md text-xs font-medium hover:bg-gray-300 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="text-blue-500 hover:text-blue-700 transition duration-200 text-sm font-medium"
               >
-                Meet URL
+                Open Meet URL
               </button>
-            </p>
-            <div className="col-span-12">
-              <table className="min-w-full table-auto">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border text-center">Date</th>
-                    <th className="px-4 py-2 border text-center">Slot</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cls?.dateSlots?.map((slot, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-2 border text-center">
-                        {slot.date}
-                      </td>
-                      <td className="px-4 py-2 border text-center">
-                        {slot.slotIds
-                          .sort((a, b) => a - b) // Sort slotIds in ascending order
-                          .map((slotId) => {
-                            // Define time ranges for each slotId
-                            const timeRanges = {
-                              1: "7h00 - 9h15",
-                              2: "9h30 - 11h45",
-                              3: "12h30 - 14h45",
-                              4: "15h00 - 17h15",
-                              5: "17h45 - 20h00",
-                            };
-
-                            return `Slot ${slotId} (${
-                              timeRanges[slotId] || "No time available"
-                            })`;
-                          })
-                          .join(", ")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
-          <div className="mt-6">
-            <button
-              onClick={onClose}
-              className="bg-blue-500 text-white py-2 px-4 rounded-lg w-full font-medium shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200"
-            >
-              Close
-            </button>
+        </div>
+
+        <div className="mb-6">
+          <div
+            className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+              cls.status
+            )}`}
+          >
+            {cls.status}
           </div>
+        </div>
+
+        <div className="mb-6">
+          <h4 className="text-lg font-semibold mb-3 flex items-center">
+            <FaCalendarAlt className="mr-2 text-blue-500" /> Class Schedule
+          </h4>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Slots
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {cls?.dateSlots?.map((slot, index) => (
+                  <tr
+                    key={index}
+                    className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                  >
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                      {slot.date}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-700">
+                      {slot.slotIds
+                        .sort((a, b) => a - b)
+                        .map((slotId, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center mb-1 last:mb-0"
+                          >
+                            <FaClock className="text-blue-500 mr-2" />
+                            <span>
+                              Slot {slotId}:{" "}
+                              {timeRanges[slotId] || "No time available"}
+                            </span>
+                          </div>
+                        ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={onClose}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-medium shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition duration-200 transform hover:scale-105"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
+function InfoItem({ icon, label, value }) {
+  return (
+    <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+      <div className="text-blue-500 mr-3 text-xl">{icon}</div>
+      <div>
+        <p className="text-sm font-semibold text-gray-700">{label}</p>
+        <p className="text-sm text-gray-600">{value}</p>
+      </div>
+    </div>
+  );
+}
 function StudentsListModal({ cls, onClose }) {
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">

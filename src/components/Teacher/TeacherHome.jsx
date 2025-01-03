@@ -12,8 +12,6 @@ import YearSelector from "./YearSelector";
 
 import ModalRegisterClass from "./ModalRegisterClass";
 
-
-
 function TeacherHome() {
   const [timetable, setTimetable] = useState({});
   const [slots, setSlots] = useState([]);
@@ -72,16 +70,15 @@ function TeacherHome() {
     try {
       const token = sessionStorage.getItem("token");
       const res = await getClassesWithoutTeacher(token);
-      setClassesWithout(res)
+      setClassesWithout(res);
     } catch {
       toast.error("Failed server");
     }
-  }
+  };
 
   useEffect(() => {
     fetchClassesWithTeacher();
-  }, [])
-
+  }, []);
 
   const days = [
     "Monday",
@@ -119,9 +116,10 @@ function TeacherHome() {
           timetable[dayOfWeek][slotId] = {
             subject: classItem.courseName,
             code: classItem.courseCode,
+            classId: classItem.classId,
             class: classItem.name,
             room: classItem.location,
-            dateSlots: classItem.dateSlots
+            dateSlots: classItem.dateSlots,
           };
         });
       });
@@ -173,7 +171,9 @@ function TeacherHome() {
 
         const hasMatchingSlot = dateSlots.some(
           (slot) =>
-            ["ACTIVE", "ONGOING", "PENDING", "COMPLETED"].includes(item.status) &&
+            ["ACTIVE", "ONGOING", "PENDING", "COMPLETED"].includes(
+              item.status
+            ) &&
             slot.date >= startRange &&
             slot.date <= endRange
         );
@@ -191,7 +191,7 @@ function TeacherHome() {
         }
         return classItem;
       });
-      console.log(updatedClasses)
+      console.log(updatedClasses);
       setTimetable(convertClassesToTimetable(updatedClasses));
     } catch (error) {
       console.log(error);
@@ -199,7 +199,6 @@ function TeacherHome() {
       setLoading(false);
     }
   };
-
 
   const fetchDropdownData = async () => {
     try {
@@ -213,7 +212,6 @@ function TeacherHome() {
     }
   };
 
-
   const didMount = useRef(false);
   useEffect(() => {
     if (!didMount.current) {
@@ -224,14 +222,13 @@ function TeacherHome() {
     fetchDropdownData();
   }, [selectedWeekData]);
 
-
   const handleShowDetail = (lesson) => {
     // Ensure `classes` exists and is an array
     if (!classes || !Array.isArray(classes)) {
       console.error("Classes array is not available or not an array.");
       return;
     }
-    const data = classes.find((c) => c.name === lesson.class);
+    const data = classes.find((c) => c.classId === lesson.classId);
     if (data) {
       setInfoClass(data);
       setShowDetail(true);
@@ -243,17 +240,27 @@ function TeacherHome() {
 
   const convertDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { day: '2-digit', month: '2-digit' };
-    return date.toLocaleDateString('en-GB', options);
+    const options = { day: "2-digit", month: "2-digit" };
+    return date.toLocaleDateString("en-GB", options);
   };
   const renderTimetableCell = (day, period) => {
     const lesson = timetable[day] && timetable[day][period];
 
     if (lesson && lesson.dateSlots) {
-      const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].indexOf(day);
+      const dayIndex = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ].indexOf(day);
       const currentDayFormatted = datesInTheWeek[dayIndex];
 
-      const matchingSlot = lesson.dateSlots.some(item => convertDate(item.date) === currentDayFormatted);
+      const matchingSlot = lesson.dateSlots.some(
+        (item) => convertDate(item.date) === currentDayFormatted
+      );
 
       if (matchingSlot) {
         return (
@@ -286,7 +293,7 @@ function TeacherHome() {
   const handleCloseRegister = () => {
     fetchClassesWithTeacher();
     setShowModalRegister(false);
-  }
+  };
   return (
     <div className="p-6 bg-gray-50 rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">

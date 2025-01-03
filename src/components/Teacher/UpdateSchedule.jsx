@@ -19,6 +19,7 @@ import { Checkbox } from "../ui/checkbox";
 import toast from "react-hot-toast";
 import { FaPencilAlt, FaSearch } from "react-icons/fa";
 import { Button } from "../ui/button";
+import EditClassPopup from "./EditClassPopup";
 
 function UpdateSchedule() {
   const [classes, setClasses] = useState([]);
@@ -269,180 +270,17 @@ function UpdateSchedule() {
         </ul>
       )}
 
-      {isPopupOpen && editingClass && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
-            <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-              Edit Class Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Class Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  value={editingClass.name}
-                  onChange={handleInputChange}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="course"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Subject
-                </label>
-                <input
-                  name="course"
-                  value={editingClass.courseCode || ""}
-                  onChange={handleInputChange}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="maxStudents"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Number of Students
-                </label>
-                <input
-                  type="number"
-                  id="maxStudents"
-                  name="maxStudents"
-                  value={editingClass.maxStudents}
-                  onChange={handleInputChange}
-                  disabled
-                  placeholder={`Current number of students is ${editingClass.maxStudents}`}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-                {maxStudentsError && (
-                  <p className="text-red-500 mt-1 text-sm">
-                    {maxStudentsError}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label
-                  htmlFor="teacher"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Tutor
-                </label>
-                <input
-                  id="teacher"
-                  name="teacher"
-                  value={editingClass.teacherName}
-                  onChange={handleInputChange}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Price
-                </label>
-                <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  value={editingClass.price}
-                  onChange={handleInputChange}
-                  min="100000"
-                  max="500000"
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-                <span className="text-sm text-gray-500 mt-1 block">
-                  {formatCurrency(editingClass.price)}
-                </span>
-              </div>
-              <div>
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Lesson Room Link
-                </label>
-                <input
-                  id="location"
-                  name="location"
-                  value={editingClass.location}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="md:col-span-3">
-                <table className="min-w-full table-auto">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2 border">Date</th>
-                      <th className="px-4 py-2 border">Slot</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {editingClass?.dateSlots?.map((slot, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-2 border text-center">
-                          {slot.date}
-                        </td>
-                        <td className="px-4 py-2 border text-center">
-                          {slot.slotIds
-                            .sort((a, b) => a - b) // Sort slotIds in ascending order
-                            .map((slotId) => {
-                              // Define time ranges for each slotId
-                              const timeRanges = {
-                                1: "7h00 - 9h15",
-                                2: "9h30 - 11h45",
-                                3: "12h30 - 14h45",
-                                4: "15h00 - 17h15",
-                                5: "17h45 - 20h00",
-                              };
-
-                              return `Slot ${slotId} (${
-                                timeRanges[slotId] || "No time available"
-                              })`;
-                            })
-                            .join(", ")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2 mt-6">
-              <button
-                onClick={() => handleSave(editingClass)}
-                disabled={saving}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              >
-                {saving ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={() => {
-                  handleCancel();
-                  setIsPopupOpen(false);
-                }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditClassPopup
+        isPopupOpen={isPopupOpen}
+        editingClass={editingClass}
+        handleInputChange={handleInputChange}
+        handleSave={handleSave}
+        handleCancel={handleCancel}
+        setIsPopupOpen={setIsPopupOpen}
+        saving={saving}
+        maxStudentsError={maxStudentsError}
+        formatCurrency={formatCurrency}
+      />
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

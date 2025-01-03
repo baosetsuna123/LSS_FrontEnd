@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Calendar,
   Clock,
   Code,
   Coins,
@@ -15,6 +14,9 @@ import {
   AlertCircle,
   Users,
   UserCheck,
+  TvMinimalPlay,
+  School,
+  BookA,
 } from "lucide-react"; // Icon for the modal header
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -25,6 +27,7 @@ import { useWallet } from "@/context/WalletContext";
 import defaults from "../../assets/default.jfif";
 import avatar from "../../assets/avatar.png";
 import { FaFileAlt } from "react-icons/fa";
+import EnhancedScheduleTable from "./EnhancedScheduleTable";
 
 // Modal Component for Confirmation
 
@@ -316,7 +319,8 @@ export function ClassDetail() {
               {/* Description Card */}
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600 w-full">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg text-center">
+                  <CardTitle className="text-lg text-center font-bold flex items-center justify-center">
+                    <TvMinimalPlay className="mr-2 h-6 w-6" />
                     Description
                   </CardTitle>
                 </CardHeader>
@@ -334,58 +338,19 @@ export function ClassDetail() {
               </Card>
 
               {/* Schedule Details Card */}
-              <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600 w-full">
-                <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg text-center">
-                    Schedule{" "}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="flex items-center mb-4">
-                    <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="text-gray-700 dark:text-gray-300 font-semibold">
-                      Schedule:
-                    </span>
-                  </div>
-                  <table className="min-w-full table-auto">
-                    <thead>
-                      <tr>
-                        <th className="px-4 py-2 border text-center ">Date</th>
-                        <th className="px-4 py-2 border text-center">Slots</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {classDetail?.dateSlots
-                        // Sort dateSlots by date in ascending order
-                        .sort((a, b) => new Date(a.date) - new Date(b.date)) // Sort dates in ascending order
-                        .map((slot, index) => (
-                          <tr key={index}>
-                            <td className="px-4 py-2 border whitespace-nowrap">
-                              {slot.date}
-                            </td>
-                            <td className="px-4 py-2 border whitespace-nowrap">
-                              {slot.slotIds
-                                // Sort slotIds in ascending order (to ensure slot 1 is first)
-                                .sort((a, b) => a - b)
-                                .map((slotId, idx) => (
-                                  <span key={idx}>
-                                    {getSlotTime(slotId)}
-                                    {idx < slot.slotIds.length - 1 && ", "}
-                                  </span>
-                                ))}
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </CardContent>
-              </Card>
+              <EnhancedScheduleTable
+                classDetail={classDetail}
+                getSlotTime={getSlotTime}
+              />
             </div>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg text-center">Class </CardTitle>
+                  <CardTitle className="text-lg text-center font-bold flex items-center justify-center">
+                    <School className="mr-2 h-6 w-6" />
+                    Class
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
@@ -411,7 +376,10 @@ export function ClassDetail() {
 
               <Card className="bg-gray-50 border border-gray-200 shadow-md dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader className="bg-blue-500 text-white rounded-t-lg p-4">
-                  <CardTitle className="text-lg text-center">Tutor </CardTitle>
+                  <CardTitle className="text-lg text-center flex items-center justify-center font-bold">
+                    <BookA className="mr-2 h-6 w-6" />
+                    Tutor
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center">
@@ -447,7 +415,7 @@ export function ClassDetail() {
           <CardFooter className="flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <Clock className="mr-2 h-5 w-5 text-blue-600" />
-              <span>Duration: 2 hours 15 minutes</span>
+              <span>Duration: 2 hours 15 minutes / Slot</span>
             </div>
             <div className="flex items-center text-gray-700 dark:text-gray-300">
               <Coins className="mr-2 h-5 w-5 text-blue-600" />
