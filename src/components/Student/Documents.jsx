@@ -26,6 +26,13 @@ const Documents = () => {
       // You might want to show an error message to the user here
     }
   };
+  const isImage = (filePath) =>
+    [".jpg", ".jpeg", ".png"].some((ext) => filePath.endsWith(ext));
+
+  const isPDF = (filePath) => filePath.endsWith(".pdf");
+
+  const isDocx = (filePath) => filePath.endsWith(".docx");
+
   return (
     <>
       <section className="w-full dark:text-white py-4 bg-gray-100 text-gray-100 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-900 ">
@@ -44,23 +51,28 @@ const Documents = () => {
         </div>
       </section>
       <div className="container mx-auto px-4 py-8 w-full">
+        {/* Header */}
         <h1 className="text-3xl font-bold mb-6 text-center">Documents</h1>
+
+        {/* Documents Grid */}
         <div className="flex flex-wrap justify-between gap-6">
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="flex flex-col justify-between w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
+              className="flex flex-col w-full max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
             >
               {/* Document Header */}
-              <div className="bg-gray-100 dark:bg-gray-700 p-4">
+              <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  <span className="truncate text-center">{doc.title}</span>
+                  <FileText className="h-5 w-5" aria-hidden="true" />
+                  <span className="truncate text-center text-lg font-medium">
+                    {doc.title}
+                  </span>
                 </div>
               </div>
 
               {/* Content Section */}
-              <div className="flex-1 p-4">
+              <div className="p-4">
                 <p className="text-sm text-gray-600 text-center dark:text-gray-400 mb-2">
                   Course Code: {doc.courseCode}
                 </p>
@@ -69,34 +81,30 @@ const Documents = () => {
                 </p>
               </div>
 
-              {/* PDF Embed */}
+              {/* File Display Section */}
               <div className="flex-1 flex justify-center items-center p-4">
-                {/* Check file type and render accordingly */}
-                {doc.filePath.endsWith(".pdf") ? (
+                {isPDF(doc.filePath) ? (
                   <embed
-                    src={doc.filePath}
+                    src={doc.filePath.replace("http://", "https://")}
                     type="application/pdf"
                     width="100%"
                     height="400px"
                     className="border border-gray-300 rounded"
                     style={{ border: "none" }}
+                    aria-label="PDF Document"
                   />
-                ) : doc.filePath.endsWith(".jpg") ||
-                  doc.filePath.endsWith(".jpeg") ||
-                  doc.filePath.endsWith(".png") ? (
+                ) : isImage(doc.filePath) ? (
                   <img
-                    src={doc.filePath}
-                    alt={doc.title}
-                    width="100%"
-                    height="400px"
+                    src={doc.filePath.replace("http://", "https://")}
+                    alt={`Preview of ${doc.title}`}
                     className="object-cover border border-gray-300 rounded"
+                    style={{ maxHeight: "400px", width: "100%" }}
                   />
-                ) : doc.filePath.endsWith(".docx") ? (
-                  <div className="p-4">
-                    {/* Use a library like mammoth.js or render DOCX content */}
+                ) : isDocx(doc.filePath) ? (
+                  <div className="text-center p-4">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      DOCX files are not directly rendered here. Please download
-                      to view.
+                      DOCX files are not directly rendered. Please download to
+                      view.
                     </p>
                     <Button
                       variant="outline"
@@ -116,28 +124,31 @@ const Documents = () => {
                 )}
               </div>
 
-              {/* Footer with buttons */}
-              <div className="p-4 flex justify-between items-center">
-                <div className="flex justify-between items-center w-full gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleDownload(doc.filePath, `${doc.title}.pdf`)
-                    }
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(doc.filePath, "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View
-                  </Button>
-                </div>
+              {/* Footer with Buttons */}
+              <div className="p-4 flex justify-between items-center border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    handleDownload(doc.filePath, `${doc.title}.pdf`)
+                  }
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    window.open(
+                      doc.filePath.replace("http://", "https://"),
+                      "_blank"
+                    )
+                  }
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View
+                </Button>
               </div>
             </div>
           ))}
