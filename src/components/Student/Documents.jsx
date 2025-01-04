@@ -55,11 +55,11 @@ const Documents = () => {
         <h1 className="text-3xl font-bold mb-6 text-center">Documents</h1>
 
         {/* Documents Grid */}
-        <div className="flex flex-wrap justify-between gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="flex flex-col w-full max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
+              className="flex flex-col w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
             >
               {/* Document Header */}
               <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-t-lg">
