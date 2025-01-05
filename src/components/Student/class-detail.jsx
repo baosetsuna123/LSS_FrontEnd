@@ -302,14 +302,24 @@ export function ClassDetail() {
                   </Button>
                 </div>
                 {isEnrolled && (
-                  <div className="flex ml-20 items-center text-center justify-between mt-20">
-                    <button
-                      onClick={() => handleNavigate(classDetail?.documents)}
-                      className="text-2xl font-bold text-orange-600 dark:text-green-400 flex items-center"
-                    >
-                      <FaFileAlt className="mr-2" /> {/* Icon */}
-                      View Document
-                    </button>
+                  <div
+                    className="flex ml-20 items-center text-center justify-between mt-48"
+                    style={{ marginTop: "40px" }}
+                  >
+                    {classDetail?.documents?.[0]?.title &&
+                    classDetail?.documents?.[0]?.filePath ? (
+                      <button
+                        onClick={() => handleNavigate(classDetail?.documents)}
+                        className="text-2xl font-bold  bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600  dark:text-green-400 flex items-center  dark:hover:text-green-500 transition-colors duration-300"
+                      >
+                        <FaFileAlt className="mr-2" /> {/* Icon */}
+                        {classDetail.documents[0].title}
+                      </button>
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        No document available
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
