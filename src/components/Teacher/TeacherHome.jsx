@@ -358,6 +358,7 @@ function TeacherHome() {
         data={classesWithout}
         open={showModalRegister}
         handleClose={handleCloseRegister}
+        fetchTimetable={fetchTimetable}
       />
       <ShowDetailTimeTable
         isOpen={showDetail}

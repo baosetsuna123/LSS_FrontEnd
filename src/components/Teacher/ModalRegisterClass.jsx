@@ -4,15 +4,77 @@ import { Box, Typography, Chip, Modal, Button } from "@mui/material";
 import { joinClassTeacher } from "@/data/api";
 import toast from "react-hot-toast";
 
-const ModalRegisterClass = ({ data, open, handleClose }) => {
+const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const handleRowSelection = (ids) => {
-    setSelectedRows(ids);
+  const isRowSelectable = (params) => {
+    const newRowDateSlots = params.row.dateSlots;
+
+    console.log("Checking row for selection:", params.row);
+    console.log("Currently selected rows:", selectedRows);
+
+    // Check if this row conflicts with any already selected row
+    for (const selectedRowId of selectedRows) {
+      // Skip checking against itself
+      if (selectedRowId === params.row.classId) {
+        continue;
+      }
+
+      const selectedRow = data.find((item) => item.classId === selectedRowId);
+
+      if (!selectedRow) {
+        console.log(`Selected row with ID ${selectedRowId} not found in data.`);
+        continue;
+      }
+
+      console.log("Comparing with selected row:", selectedRow);
+
+      // Compare dateSlots of the new row with the already selected rows
+      for (const { date, slotIds } of newRowDateSlots) {
+        for (const slotId of slotIds) {
+          const conflictExists = selectedRow.dateSlots.some(
+            (slot) => slot.date === date && slot.slotIds.includes(slotId)
+          );
+
+          if (conflictExists) {
+            console.log(
+              `Conflict found! Row ${params.row.classId} conflicts with selected row ${selectedRowId} on date ${date} and slot ${slotId}.`
+            );
+            return false; // Row is not selectable
+          }
+        }
+      }
+    }
+
+    console.log(`Row ${params.row.classId} is selectable.`);
+    return true; // Row is selectable
+  };
+
+  const handleRowSelection = (newSelectedRowIds) => {
+    console.log("Newly selected row IDs:", newSelectedRowIds);
+
+    // Filter new row IDs by checking if each is selectable
+    const validRowIds = newSelectedRowIds.filter((rowId) => {
+      const row = data.find((item) => item.classId === rowId);
+      if (!row) {
+        console.warn(`Row with ID ${rowId} not found in data.`);
+        return false;
+      }
+
+      const selectable = isRowSelectable({ row });
+      if (!selectable) {
+        toast.error(`Cannot select row ${rowId} due to conflicts.`);
+      }
+      return selectable;
+    });
+
+    console.log("Row selection changed. Valid selected rows:", validRowIds);
+    setSelectedRows(validRowIds); // Only update with valid rows
   };
 
   const handleCloseRegister = () => {
     handleClose();
+    setSelectedRows([]); // Clear selected rows
   };
 
   const handleSave = async () => {
@@ -30,6 +92,7 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
       );
       toast.success("You have registered the class successfully!");
       handleCloseRegister();
+      fetchTimetable();
     } catch {
       toast.error(
         "Teacher already has a class scheduled on the same date and slot."
@@ -207,6 +270,7 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
             rows={data}
             columns={columns}
             checkboxSelection
+            isRowSelectable={isRowSelectable}
             onRowSelectionModelChange={handleRowSelection}
             getRowId={(row) => row.classId}
             className="!text-sm *:cursor-pointer"
@@ -216,7 +280,7 @@ const ModalRegisterClass = ({ data, open, handleClose }) => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={handleClose}
+            onClick={handleCloseRegister}
             sx={{ mt: 2 }}
           >
             Close
