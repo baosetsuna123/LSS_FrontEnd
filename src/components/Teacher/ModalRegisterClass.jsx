@@ -9,27 +9,15 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
 
   const isRowSelectable = (params) => {
     const newRowDateSlots = params.row.dateSlots;
-
-    console.log("Checking row for selection:", params.row);
-    console.log("Currently selected rows:", selectedRows);
-
-    // Check if this row conflicts with any already selected row
     for (const selectedRowId of selectedRows) {
-      // Skip checking against itself
       if (selectedRowId === params.row.classId) {
         continue;
       }
-
       const selectedRow = data.find((item) => item.classId === selectedRowId);
 
       if (!selectedRow) {
-        console.log(`Selected row with ID ${selectedRowId} not found in data.`);
         continue;
       }
-
-      console.log("Comparing with selected row:", selectedRow);
-
-      // Compare dateSlots of the new row with the already selected rows
       for (const { date, slotIds } of newRowDateSlots) {
         for (const slotId of slotIds) {
           const conflictExists = selectedRow.dateSlots.some(
@@ -37,27 +25,20 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
           );
 
           if (conflictExists) {
-            console.log(
-              `Conflict found! Row ${params.row.classId} conflicts with selected row ${selectedRowId} on date ${date} and slot ${slotId}.`
-            );
             return false; // Row is not selectable
           }
         }
       }
     }
 
-    console.log(`Row ${params.row.classId} is selectable.`);
     return true; // Row is selectable
   };
 
   const handleRowSelection = (newSelectedRowIds) => {
-    console.log("Newly selected row IDs:", newSelectedRowIds);
-
     // Filter new row IDs by checking if each is selectable
     const validRowIds = newSelectedRowIds.filter((rowId) => {
       const row = data.find((item) => item.classId === rowId);
       if (!row) {
-        console.warn(`Row with ID ${rowId} not found in data.`);
         return false;
       }
 
@@ -68,7 +49,6 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
       return selectable;
     });
 
-    console.log("Row selection changed. Valid selected rows:", validRowIds);
     setSelectedRows(validRowIds); // Only update with valid rows
   };
 
