@@ -4,11 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useNavigate } from "react-router-dom";
 import { useClassContext } from "@/context/ClassContext";
 import { useAuth } from "@/context/AuthContext";
-import {
-  fetchMajorClassByStudent,
-  fetchCommentsHome,
-  fetchAverageTeacher,
-} from "@/data/api";
+import { fetchMajorClassByStudent, fetchCommentsHome } from "@/data/api";
 import { useEffect, useRef, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -26,48 +22,17 @@ export function CourseLandingPage() {
   const { classes, loading } = useClassContext();
 
   useEffect(() => {
-    const fetchAverage = async (teacherName) => {
-      try {
-        const data = await fetchAverageTeacher(teacherName, token);
-        console.log(
-          `Fetched average for ${teacherName}:`,
-          data.averageFeedback
-        );
-        setAverage((prevAverages) => ({
-          ...prevAverages,
-          [teacherName]: data.averageFeedback, // Store average by teacherName
-        }));
-      } catch (error) {
-        console.error("Error fetching average rating:", error);
-      }
-    };
-
-    // Iterate through courses and fetch averages sequentially
-    const fetchAverages = async () => {
-      for (const course of classes) {
-        if (course.teacherName && !average[course.teacherName]) {
-          await fetchAverage(course.teacherName);
-        }
-      }
-    };
-
-    fetchAverages();
-  }, [token, classes]); // Avoid using average in the dependency array
-
-  useEffect(() => {
     const fetchMajorClasses = async () => {
       try {
         const token = sessionStorage.getItem("token");
         setLoadingm(true);
         const classes = await fetchMajorClassByStudent(token);
-        console.log(loadingm);
 
         const sortedClasses = classes.sort(
           (a, b) => a?.startDate - b?.startDate
         );
 
         setMajorClasses(sortedClasses);
-        console.log(sortedClasses);
       } catch (error) {
         console.error("Error fetching major classes:", error);
       } finally {
@@ -77,9 +42,6 @@ export function CourseLandingPage() {
 
     fetchMajorClasses();
   }, []);
-  useEffect(() => {
-    console.log("Loadingm changed:", loadingm);
-  }, [loadingm]);
   const [comments, setComments] = useState([]);
   const [loadingc, setLoadingc] = useState(false);
   useEffect(() => {
@@ -88,7 +50,6 @@ export function CourseLandingPage() {
         setLoadingc(true);
         const data = await fetchCommentsHome();
         setComments(data);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching major classes:", error);
       } finally {
@@ -174,7 +135,43 @@ export function CourseLandingPage() {
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
+  useEffect(() => {
+    const fetchAverages = async () => {
+      try {
+        const feedbackAverages = sortedClasses
+          .filter(
+            (course) =>
+              course.status === "PENDING" || course.status === "ACTIVE"
+          )
+          .map((course) => course.teacherFeedback || null); // Use null if teacherFeedback is undefined
 
+        setAverage(feedbackAverages); // Update state with the feedback averages
+      } catch (error) {
+        console.error("Error fetching average feedback:", error);
+      }
+    };
+
+    fetchAverages();
+  }, [token, sortedClasses]);
+  const [averageMajor, setAverageMajor] = useState(0);
+  useEffect(() => {
+    const fetchAveragesMajor = async () => {
+      try {
+        const feedbackAverages = majorClasses
+          .filter(
+            (course) =>
+              course.status === "PENDING" || course.status === "ACTIVE"
+          )
+          .map((course) => course.teacherFeedback || null); // Use null if teacherFeedback is undefined
+
+        setAverageMajor(feedbackAverages); // Update state with the feedback averages
+      } catch (error) {
+        console.error("Error fetching average feedback:", error);
+      }
+    };
+
+    fetchAveragesMajor();
+  }, [token, majorClasses]);
   return (
     <>
       <div className="w-full overflow-x-hidden">
@@ -300,74 +297,105 @@ export function CourseLandingPage() {
                           course.status === "PENDING" ||
                           course.status === "ACTIVE"
                       )
-                      .map((course, index) => (
-                        <Card
-                          key={index}
-                          onClick={() => handleClassClick(course.classId)}
-                          className="transition-transform transform hover:scale-105 mx-2"
-                        >
-                          <img
-                            src={course.imageUrl || defaults}
-                            alt={course.name}
-                            className="w-full h-[200px] object-cover rounded-t-lg"
-                          />
-                          <CardHeader>
-                            <div className="flex justify-between items-center">
-                              <CardTitle className="text-xl font-semibold">
-                                {course.name}
-                              </CardTitle>
-                              <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                                {course.courseCode}
-                              </p>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="flex justify-between items-center">
-                              <p className="text-2xl font-bold">
-                                {formatCurrency(course.price)}
-                              </p>
-                              <p className="text-lg font-medium text-gray-500 dark:text-gray-300">
-                                {course.teacherName}
-                              </p>
-                            </div>
-                            {average[course.teacherName] && (
-                              <div className="flex justify-center mt-2 gap-x-2">
-                                {[...Array(6)].map((_, index) => {
-                                  const rating = average[course.teacherName];
-                                  const isFullStar =
-                                    index + 1 <= Math.floor(rating);
-                                  const isHalfStar =
-                                    index + 1 > Math.floor(rating) &&
-                                    index + 1 - 0.5 <= rating;
+                      .map((course, index) => {
+                        const rating = averageMajor[index]; // Get the average rating for the current class
+                        if (!rating) return null; // Skip rendering if no rating is available
 
-                                  return (
+                        const fullStars = Math.floor(rating); // Number of full stars
+                        const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Either 1 half star or none
+                        const emptyStars = Math.max(
+                          6 - fullStars - halfStar,
+                          0
+                        ); // Ensure non-negative
+
+                        return (
+                          <Card
+                            key={index}
+                            onClick={() => handleClassClick(course.classId)}
+                            className="transition-transform transform hover:scale-105 mx-2"
+                          >
+                            <img
+                              src={course.imageUrl || defaults}
+                              alt={course.name}
+                              className="w-full h-[200px] object-cover rounded-t-lg"
+                            />
+                            <CardHeader>
+                              <div className="flex justify-between items-center">
+                                <CardTitle className="text-xl font-semibold">
+                                  {course.name}
+                                </CardTitle>
+                                <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                                  {course.courseCode}
+                                </p>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex justify-between items-center">
+                                <p className="text-2xl font-bold">
+                                  {formatCurrency(course.price)}
+                                </p>
+                                <p className="text-lg text-gray-500 dark:text-gray-300 font-medium">
+                                  {course.teacherName}
+                                </p>
+                              </div>
+
+                              {/* Display the average rating */}
+                              <div className="mt-4">
+                                <div className="flex justify-center mt-2 gap-x-2">
+                                  {/* Render full stars */}
+                                  {[...Array(fullStars)].map((_, i) => (
                                     <svg
-                                      key={index}
+                                      key={`full-${i}`}
                                       xmlns="http://www.w3.org/2000/svg"
-                                      fill={
-                                        isFullStar
-                                          ? "#fdd835"
-                                          : isHalfStar
-                                          ? "#fdd835"
-                                          : "none" // Softer yellow
-                                      }
-                                      stroke="#fbc02d" // Softer stroke
+                                      fill="#fdd835"
+                                      stroke="#fbc02d"
                                       strokeWidth="2"
                                       viewBox="0 0 24 24"
-                                      className="w-6 h-6"
+                                      className="w-4 h-4"
                                     >
                                       <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
                                     </svg>
-                                  );
-                                })}
+                                  ))}
+
+                                  {/* Render half star if applicable */}
+                                  {halfStar === 1 && (
+                                    <svg
+                                      key="half-star"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="#fdd835"
+                                      stroke="#fbc02d"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-4 h-4"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  )}
+
+                                  {/* Render empty stars */}
+                                  {[...Array(emptyStars)].map((_, i) => (
+                                    <svg
+                                      key={`empty-${i}`}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      stroke="#fbc02d"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-4 h-4"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  ))}
+                                </div>
                               </div>
-                            )}
-                            <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+
+                              <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
+                                View Details
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                   </Carousel>
                 )}
                 <div className="flex justify-center mt-8">
@@ -426,76 +454,105 @@ export function CourseLandingPage() {
                           course.status === "PENDING" ||
                           course.status === "ACTIVE"
                       )
-                      .map((course, index) => (
-                        <Card
-                          key={index}
-                          onClick={() => handleClassClick(course.classId)}
-                          className="transition-transform transform hover:scale-105 mx-2"
-                        >
-                          <img
-                            src={course.imageUrl || defaults}
-                            alt={course.name}
-                            className="w-full h-[200px] object-cover rounded-t-lg"
-                          />
-                          <CardHeader>
-                            <div className="flex justify-between items-center">
-                              <CardTitle className="text-xl font-semibold">
-                                {course.name}
-                              </CardTitle>
-                              <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
-                                {course.courseCode}
-                              </p>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="flex justify-between items-center">
-                              <p className="text-2xl font-bold">
-                                {formatCurrency(course.price)}
-                              </p>
-                              <p className="text-lg  text-gray-500 dark:text-gray-300 font-medium">
-                                {course.teacherName}
-                              </p>
-                            </div>
-                            {/* Display the average rating */}
-                            {average[course.teacherName] && (
-                              <div className="flex justify-center mt-2 gap-x-2">
-                                {[...Array(6)].map((_, index) => {
-                                  const rating = average[course.teacherName];
-                                  const isFullStar =
-                                    index + 1 <= Math.floor(rating);
-                                  const isHalfStar =
-                                    index + 1 > Math.floor(rating) &&
-                                    index + 1 - 0.5 <= rating;
+                      .map((course, index) => {
+                        const rating = average[index]; // Get the average rating for the current class
+                        if (!rating) return null; // Skip rendering if no rating is available
 
-                                  return (
+                        const fullStars = Math.floor(rating); // Number of full stars
+                        const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Either 1 half star or none
+                        const emptyStars = Math.max(
+                          6 - fullStars - halfStar,
+                          0
+                        ); // Ensure non-negative
+
+                        return (
+                          <Card
+                            key={index}
+                            onClick={() => handleClassClick(course.classId)}
+                            className="transition-transform transform hover:scale-105 mx-2"
+                          >
+                            <img
+                              src={course.imageUrl || defaults}
+                              alt={course.name}
+                              className="w-full h-[200px] object-cover rounded-t-lg"
+                            />
+                            <CardHeader>
+                              <div className="flex justify-between items-center">
+                                <CardTitle className="text-xl font-semibold">
+                                  {course.name}
+                                </CardTitle>
+                                <p className="text-lg font-semibold text-blue-500 hover:text-blue-700 transition duration-300">
+                                  {course.courseCode}
+                                </p>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex justify-between items-center">
+                                <p className="text-2xl font-bold">
+                                  {formatCurrency(course.price)}
+                                </p>
+                                <p className="text-lg text-gray-500 dark:text-gray-300 font-medium">
+                                  {course.teacherName}
+                                </p>
+                              </div>
+
+                              {/* Display the average rating */}
+                              <div className="mt-4">
+                                <div className="flex justify-center mt-2 gap-x-2">
+                                  {/* Render full stars */}
+                                  {[...Array(fullStars)].map((_, i) => (
                                     <svg
-                                      key={index}
+                                      key={`full-${i}`}
                                       xmlns="http://www.w3.org/2000/svg"
-                                      fill={
-                                        isFullStar
-                                          ? "#fdd835"
-                                          : isHalfStar
-                                          ? "#fdd835"
-                                          : "none" // Softer yellow
-                                      }
-                                      stroke="#fbc02d" // Softer stroke
+                                      fill="#fdd835"
+                                      stroke="#fbc02d"
                                       strokeWidth="2"
                                       viewBox="0 0 24 24"
-                                      className="w-6 h-6"
+                                      className="w-4 h-4"
                                     >
                                       <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
                                     </svg>
-                                  );
-                                })}
-                              </div>
-                            )}
+                                  ))}
 
-                            <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+                                  {/* Render half star if applicable */}
+                                  {halfStar === 1 && (
+                                    <svg
+                                      key="half-star"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="#fdd835"
+                                      stroke="#fbc02d"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-4 h-4"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  )}
+
+                                  {/* Render empty stars */}
+                                  {[...Array(emptyStars)].map((_, i) => (
+                                    <svg
+                                      key={`empty-${i}`}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      stroke="#fbc02d"
+                                      strokeWidth="2"
+                                      viewBox="0 0 24 24"
+                                      className="w-4 h-4"
+                                    >
+                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                    </svg>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
+                                View Details
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                   </Carousel>
                 )}
                 <div className="flex justify-center mt-8">

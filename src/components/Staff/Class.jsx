@@ -117,9 +117,6 @@ const ClassLayout = ({
                 CourseCode
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
-                StartDate
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
                 Price
               </th>
             </tr>
@@ -142,11 +139,6 @@ const ClassLayout = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {app.courseCode || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {app.startDate
-                      ? new Date(app.startDate).toLocaleDateString("en-GB")
-                      : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {formatCurrency(app.price) || "N/A"}

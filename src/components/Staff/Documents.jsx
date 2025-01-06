@@ -184,11 +184,13 @@ const Documents = ({
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                      title={item.content}
+                      title={item.content || "N/A"} // Show "N/A" as the title if content is null
                     >
-                      {item.content.length > 20
-                        ? `${item.content.slice(0, 20) + "..."}` // Strip HTML and then truncate
-                        : item.content}
+                      {item.content
+                        ? item.content.length > 20
+                          ? `${item.content.slice(0, 20) + "..."}`
+                          : item.content
+                        : "N/A"}{" "}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {item.filePath ? (
