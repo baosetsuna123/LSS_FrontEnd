@@ -1,4 +1,19 @@
-import { Edit, EllipsisVertical, Eye, Plus, Search } from "lucide-react";
+import {
+  Book,
+  Calendar,
+  Clock,
+  DollarSign,
+  Edit,
+  EllipsisVertical,
+  Eye,
+  FileText,
+  ImageIcon,
+  Info,
+  Plus,
+  Search,
+  Users,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import CreateClassForm from "./CreateClassForm";
 import toast from "react-hot-toast";
@@ -186,85 +201,120 @@ const All_Class = ({
         />
       )}
       {EditmodalOpen && selectedItem && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 flex items-center justify-center overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl m-4">
-            <h3 className="text-2xl text-center font-bold mb-4 text-gray-800 dark:text-white">
-              Edit Class Information
-            </h3>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-3xl m-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Edit Class Information
+              </h3>
+              <button
+                onClick={handleCancel}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                aria-label="Close modal"
+              >
+                <X size={24} />
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Class Name Field */}
               <div className="col-span-1">
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Class Name
                 </label>
-                <input
-                  id="name"
-                  name="name"
-                  value={selectedItem.name}
-                  onChange={handleInputChange}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
+                <div className="relative">
+                  <Book
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    id="name"
+                    name="name"
+                    value={selectedItem.name}
+                    onChange={handleInputChange}
+                    disabled
+                    className="pl-10 block w-full rounded-md border-gray-300 bg-gray-100 dark:bg-gray-700 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:text-white"
+                  />
+                </div>
               </div>
 
               {/* Course Field */}
               <div className="col-span-1">
                 <label
                   htmlFor="course"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Course
                 </label>
-                <input
-                  name="course"
-                  value={selectedItem.courseCode || ""}
-                  onChange={handleInputChange}
-                  disabled
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
+                <div className="relative">
+                  <Book
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    name="course"
+                    value={selectedItem.courseCode || ""}
+                    onChange={handleInputChange}
+                    disabled
+                    className="pl-10 block w-full rounded-md border-gray-300 bg-gray-100 dark:bg-gray-700 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:text-white"
+                  />
+                </div>
               </div>
 
               {/* Status Field */}
               <div className="col-span-1">
                 <label
                   htmlFor="course-status"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Status
                 </label>
-                <span
-                  className={`font-semibold
-          ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
-          ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
-          ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
-          ${selectedItem?.status === "ONGOING" ? "text-brown-500" : ""}
-        `}
-                >
-                  {selectedItem?.status}
-                </span>
+                <div className="relative">
+                  <Info
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <span
+                    className={`pl-10 inline-block w-full py-2 px-3 rounded-md border border-gray-300 dark:border-gray-600 font-semibold
+                ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
+                ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
+                ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
+                ${selectedItem?.status === "ONGOING" ? "text-orange-500" : ""}
+                ${selectedItem?.status === "CANCELED" ? "text-red-500" : ""}
+
+              `}
+                  >
+                    {selectedItem?.status}
+                  </span>
+                </div>
               </div>
 
               {/* Max Students Field */}
               <div className="col-span-1">
                 <label
                   htmlFor="maxStudents"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Number of Students
                 </label>
-                <input
-                  type="number"
-                  id="maxStudents"
-                  name="maxStudents"
-                  value={selectedItem.maxStudents}
-                  onChange={handleInputChange}
-                  placeholder={`Current number of students is ${selectedItem.maxStudents}`}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
+                <div className="relative">
+                  <Users
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="number"
+                    id="maxStudents"
+                    name="maxStudents"
+                    value={selectedItem.maxStudents}
+                    onChange={handleInputChange}
+                    placeholder={`Current number of students is ${selectedItem.maxStudents}`}
+                    className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
                 {maxStudentsError && (
                   <p className="text-red-500 mt-1 text-sm">
                     {maxStudentsError}
@@ -276,158 +326,91 @@ const All_Class = ({
               <div className="col-span-1">
                 <label
                   htmlFor="price"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Price
                 </label>
-                <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  value={selectedItem.price}
-                  onChange={handleInputChange}
-                  min="100000"
-                  max="500000"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                />
-                <span className="text-sm text-gray-500 mt-1 block">
+                <div className="relative">
+                  <DollarSign
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={selectedItem.price}
+                    onChange={handleInputChange}
+                    min="100000"
+                    max="500000"
+                    className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 block">
                   {formatCurrency(selectedItem.price)}
                 </span>
               </div>
-              <div className="col-span-1" title={selectedItem.description}>
+
+              {/* Description Field */}
+              <div className="col-span-2" title={selectedItem.description}>
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Description
                 </label>
-                {selectedItem?.description
-                  ? selectedItem.description.length > 8
-                    ? `${selectedItem.description.slice(0, 20)}...`
-                    : selectedItem.description
-                  : "No description"}
+                <div className="relative">
+                  <Info
+                    className="absolute left-3 top-3 text-gray-400"
+                    size={18}
+                  />
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={selectedItem.description}
+                    onChange={handleInputChange}
+                    rows={3}
+                    className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="col-span-12">
-              <table className="min-w-full table-auto">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border">Date</th>
-                    <th className="px-4 py-2 border">Slot</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedItem?.dateSlots?.map((slot, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-2 border text-center">
-                        {slot.date}
-                      </td>
-                      <td className="px-4 py-2 border text-center">
-                        {slot.slotIds
-                          .sort((a, b) => a - b) // Sort slotIds in ascending order
-                          .map((slotId) => {
-                            // Define time ranges for each slotId
-                            const timeRanges = {
-                              1: "7h00 - 9h15",
-                              2: "9h30 - 11h45",
-                              3: "12h30 - 14h45",
-                              4: "15h00 - 17h15",
-                              5: "17h45 - 20h00",
-                            };
-
-                            return `Slot ${slotId} (${
-                              timeRanges[slotId] || "No time available"
-                            })`;
-                          })
-                          .join(", ")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex justify-between space-x-2 mt-6">
-              <button
-                onClick={() => handleUpdate(selectedItem)}
-                disabled={loading}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-              >
-                {loading ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={() => {
-                  handleCancel();
-                }}
-                className="px-4 py-2  bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {modalOpen && selectedItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20">
-          <div className="bg-white p-6 rounded-md w-auto">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center pb-6 border-b">
-              Class Details
-            </h2>
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-4">
-                <strong>Name:</strong> {selectedItem?.name}
-              </div>
-              <div className="col-span-4">
-                <strong>Max Students:</strong> {selectedItem?.maxStudents}
-              </div>
-              <div className="col-span-4">
-                <strong>Price:</strong> {selectedItem?.price.toLocaleString()}{" "}
-                VND
-              </div>
-              <div className="col-span-4">
-                <strong>Course Code:</strong> {selectedItem?.courseCode}
-              </div>
-              <div className="col-span-4" title={selectedItem.description}>
-                <strong>Description:</strong>{" "}
-                {selectedItem?.description
-                  ? selectedItem.description.length > 8
-                    ? `${selectedItem.description.slice(0, 8)}...`
-                    : selectedItem.description
-                  : "No description"}
-              </div>
-              <div className="col-span-4">
-                <strong>Status: </strong>
-                <span
-                  className={`font-semibold
-      ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
-      ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
-      ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
-      ${selectedItem?.status === "ONGOING" ? "text-brown-500" : ""}
-    `}
-                >
-                  {selectedItem?.status}
-                </span>
-              </div>
-              <div className="col-span-12">
-                <table className="min-w-full table-auto">
+            {/* Date Slots Table */}
+            <div className="mt-6">
+              <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Class Schedule
+              </h4>
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-auto border-collapse">
                   <thead>
-                    <tr>
-                      <th className="px-4 py-2 border">Date</th>
-                      <th className="px-4 py-2 border">Slot</th>
+                    <tr className="bg-gray-100 dark:bg-gray-700">
+                      <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Slot
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {selectedItem?.dateSlots?.map((slot, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-2 border text-center">
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0
+                            ? "bg-white dark:bg-gray-800"
+                            : "bg-gray-50 dark:bg-gray-900"
+                        }
+                      >
+                        <td className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
+                          <Calendar className="inline-block mr-2" size={16} />
                           {slot.date}
                         </td>
-                        <td className="px-4 py-2 border text-center">
+                        <td className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                           {slot.slotIds
-                            .sort((a, b) => a - b) // Sort slotIds in ascending order
+                            .sort((a, b) => a - b)
                             .map((slotId) => {
-                              // Define time ranges for each slotId
                               const timeRanges = {
                                 1: "7h00 - 9h15",
                                 2: "9h30 - 11h45",
@@ -435,12 +418,19 @@ const All_Class = ({
                                 4: "15h00 - 17h15",
                                 5: "17h45 - 20h00",
                               };
-
-                              return `Slot ${slotId} (${
-                                timeRanges[slotId] || "No time available"
-                              })`;
-                            })
-                            .join(", ")}
+                              return (
+                                <div
+                                  key={slotId}
+                                  className="flex items-center mb-1 last:mb-0"
+                                >
+                                  <Clock className="mr-2" size={16} />
+                                  <span>
+                                    Slot {slotId} (
+                                    {timeRanges[slotId] || "No time available"})
+                                  </span>
+                                </div>
+                              );
+                            })}
                         </td>
                       </tr>
                     ))}
@@ -448,23 +438,275 @@ const All_Class = ({
                 </table>
               </div>
             </div>
-            {/* Image as the last centered item */}
-            <div className="flex justify-center mt-6">
+
+            <div className="flex justify-between space-x-3 mt-6">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors flex items-center"
+              >
+                <X size={18} className="mr-2" />
+                Cancel
+              </button>
+              <button
+                onClick={() => handleUpdate(selectedItem)}
+                disabled={loading}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                    Save
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalOpen && selectedItem && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Class Details
+              </h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                aria-label="Close modal"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="flex items-center space-x-2">
-                <strong>Image:</strong>
+                <Book className="text-gray-400" size={20} />
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Name
+                  </strong>
+                  <span className="text-gray-800 dark:text-white">
+                    {selectedItem?.name}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Users className="text-gray-400" size={20} />
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Max Students
+                  </strong>
+                  <span className="text-gray-800 dark:text-white">
+                    {selectedItem?.maxStudents}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <DollarSign className="text-gray-400" size={20} />
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Price
+                  </strong>
+                  <span className="text-gray-800 dark:text-white">
+                    {selectedItem?.price.toLocaleString()} VND
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Book className="text-gray-400" size={20} />
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Course Code
+                  </strong>
+                  <span className="text-gray-800 dark:text-white">
+                    {selectedItem?.courseCode}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <FileText className="text-gray-400" size={20} />
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Description
+                  </strong>
+                  <span
+                    className="text-gray-800 dark:text-white"
+                    title={selectedItem.description}
+                  >
+                    {selectedItem?.description
+                      ? selectedItem.description.length > 30
+                        ? `${selectedItem.description.slice(0, 30)}...`
+                        : selectedItem.description
+                      : "No description"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <div className="text-gray-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"
+                      clipRule="evenodd"
+                    />
+                    <path
+                      fillRule="evenodd"
+                      d="M10 4a1 1 0 011 1v4.586l2.707 2.707a1 1 0 01-1.414 1.414l-3-3A1 1 0 019 10V5a1 1 0 011-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <strong className="block text-sm text-gray-500 dark:text-gray-400">
+                    Status
+                  </strong>
+                  <span
+                    className={`font-semibold
+              ${selectedItem?.status === "PENDING" ? "text-yellow-500" : ""}
+              ${selectedItem?.status === "COMPLETED" ? "text-green-500" : ""}
+              ${selectedItem?.status === "ACTIVE" ? "text-blue-500" : ""}
+              ${selectedItem?.status === "ONGOING" ? "text-orange-500" : ""}
+              ${selectedItem?.status === "CANCELED" ? "text-red-500" : ""}
+            `}
+                  >
+                    {selectedItem?.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white flex items-center">
+                <Calendar className="mr-2 text-gray-400" size={20} />
+                Class Schedule
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-auto border-collapse">
+                  <thead className="bg-gray-100 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-4 py-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                        Slot
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800">
+                    {selectedItem?.dateSlots?.map((slot, index) => (
+                      <tr
+                        key={index}
+                        className={
+                          index % 2 === 0 ? "bg-gray-50 dark:bg-gray-900" : ""
+                        }
+                      >
+                        <td className="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                          {slot.date}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300">
+                          {slot.slotIds
+                            .sort((a, b) => a - b)
+                            .map((slotId) => {
+                              const timeRanges = {
+                                1: "7h00 - 9h15",
+                                2: "9h30 - 11h45",
+                                3: "12h30 - 14h45",
+                                4: "15h00 - 17h15",
+                                5: "17h45 - 20h00",
+                              };
+                              return (
+                                <div
+                                  key={slotId}
+                                  className="flex items-center justify-center text-center mb-1 last:mb-0"
+                                >
+                                  <Clock
+                                    className="mr-2 text-gray-400 text-center"
+                                    size={16}
+                                  />
+                                  <span>
+                                    Slot {slotId} (
+                                    {timeRanges[slotId] || "No time available"})
+                                  </span>
+                                </div>
+                              );
+                            })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="flex justify-center items-center mb-6">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white flex items-center justify-center">
+                  <ImageIcon className="mr-2 text-gray-400" size={20} />
+                  Class Image
+                </h3>
                 <img
-                  src={selectedItem?.imageUrl || defaults} // Use default if imageUrl is not provided
-                  alt={selectedItem?.name || "Default Image"} // Provide a fallback alt text
-                  className="mt-0 max-w-[100px] h-auto rounded"
+                  src={selectedItem?.imageUrl || defaults}
+                  alt={selectedItem?.name || "Default Image"}
+                  className="max-w-[100px] h-auto rounded-lg shadow-md"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-center mt-4">
+            <div className="flex justify-center">
               <button
                 onClick={closeModal}
-                className="mt-4 bg-gray-200 border text-[#333] px-4 py-2 rounded-lg transition duration-200 hover:bg-red-600 hover:text-white"
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg transition duration-200 hover:bg-red-600 hover:text-white flex items-center"
               >
+                <X size={20} className="mr-2" />
                 Close
               </button>
             </div>

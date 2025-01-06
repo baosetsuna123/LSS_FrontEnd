@@ -9,7 +9,27 @@ import {
   updateDocument,
 } from "@/data/api";
 import { toast } from "react-hot-toast";
-import { AlertTriangle, Edit3, FileText, Search, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  AlignLeft,
+  BookOpen,
+  Check,
+  ChevronDown,
+  Edit2,
+  Edit3,
+  FileText,
+  FolderOpen,
+  Hash,
+  Image,
+  Loader,
+  PlusCircle,
+  Save,
+  Search,
+  Trash2,
+  Type,
+  Upload,
+  X,
+} from "lucide-react";
 
 export default function CourseLayout({
   currentPage,
@@ -448,14 +468,14 @@ export default function CourseLayout({
             )}
             <form
               onSubmit={handleCreateDocument}
-              className="bg-white rounded-lg shadow-md p-6 w-full"
+              className="bg-white rounded-lg shadow-md p-6 w-full max-w-2xl mx-auto"
             >
-              <h2 className="text-2xl font-semibold text-center">
+              <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
                 Create Document for Course
               </h2>
 
               {/* Document Form Fields */}
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <div>
                   <label
                     htmlFor="title"
@@ -463,15 +483,21 @@ export default function CourseLayout({
                   >
                     Title
                   </label>
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    value={documentData.title}
-                    onChange={handleChangeDoc}
-                    placeholder="Enter Document Title"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="relative">
+                    <Type
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      type="text"
+                      name="title"
+                      id="title"
+                      value={documentData.title}
+                      onChange={handleChangeDoc}
+                      placeholder="Enter Document Title"
+                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -481,15 +507,21 @@ export default function CourseLayout({
                   >
                     Content
                   </label>
-                  <textarea
-                    name="content"
-                    id="content"
-                    value={documentData.content}
-                    onChange={handleChangeDoc}
-                    placeholder="Enter Document Content"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="4"
-                  />
+                  <div className="relative">
+                    <AlignLeft
+                      className="absolute left-3 top-3 text-gray-400"
+                      size={18}
+                    />
+                    <textarea
+                      name="content"
+                      id="content"
+                      value={documentData.content}
+                      onChange={handleChangeDoc}
+                      placeholder="Enter Document Content"
+                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows="6"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -499,30 +531,48 @@ export default function CourseLayout({
                   >
                     Upload Document
                   </label>
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
+                  <div className="relative">
+                    <Upload
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      type="file"
+                      id="document"
+                      onChange={(e) => setFile(e.target.files[0])}
+                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-2 mt-4">
+              <div className="flex justify-between space-x-3 mt-6">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition duration-200 flex items-center"
+                  onClick={() => setShowConfirm(true)}
+                >
+                  <X size={18} className="mr-2" />
+                  Cancel
+                </button>
                 <button
                   type="submit"
-                  className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 ${
+                  className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 flex items-center ${
                     isLoadingDocument ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={isLoadingDocument}
                 >
-                  {isLoadingDocument ? "Processing..." : "Create Document"}
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
-                  onClick={() => setShowConfirm(true)}
-                >
-                  Cancel
+                  {isLoadingDocument ? (
+                    <>
+                      <FileText size={18} className="mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Check size={18} className="mr-2" />
+                      Create Document
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -531,8 +581,8 @@ export default function CourseLayout({
       )}
 
       {isFormVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+          <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl overflow-y-auto max-h-[90vh]">
             {/* Status bar logic */}
             {!isEditing && (isFormVisible || isDocumentVisible) && (
               <div className="mb-6">
@@ -566,294 +616,392 @@ export default function CourseLayout({
 
             <form
               onSubmit={isEditing ? handleSaveUpdateCourse : handleCreateCourse}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
                   <label
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700"
                     htmlFor="courseCode"
                   >
                     Course Code
                   </label>
-                  <input
-                    type="text"
-                    name="courseCode"
-                    id="courseCode"
-                    value={courseDTO.courseCode}
-                    onChange={handleChange}
-                    placeholder="Enter Course Code"
-                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isEditing}
-                  />
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                      <Hash size={18} />
+                    </span>
+                    <input
+                      type="text"
+                      name="courseCode"
+                      id="courseCode"
+                      value={courseDTO.courseCode}
+                      onChange={handleChange}
+                      placeholder="Enter Course Code"
+                      className="pl-10 border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={isEditing}
+                    />
+                  </div>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <label
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700"
                     htmlFor="name"
                   >
                     Name
                   </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    value={courseDTO.name}
-                    onChange={handleChange}
-                    placeholder="Enter Course Name"
-                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                      <BookOpen size={18} />
+                    </span>
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      value={courseDTO.name}
+                      onChange={handleChange}
+                      placeholder="Enter Course Name"
+                      className="pl-10 border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 space-y-2">
                   <label
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700"
                     htmlFor="description"
                   >
                     Description
                   </label>
-                  <textarea
-                    name="description"
-                    id="description"
-                    value={courseDTO.description}
-                    onChange={handleChange}
-                    placeholder="Enter Course Description"
-                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={3}
-                  />
+                  <div className="relative">
+                    <span className="absolute top-3 left-3 text-gray-500">
+                      <AlignLeft size={18} />
+                    </span>
+                    <textarea
+                      name="description"
+                      id="description"
+                      value={courseDTO.description}
+                      onChange={handleChange}
+                      placeholder="Enter Course Description"
+                      className="pl-10 border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={4}
+                    />
+                  </div>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <label
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700"
                     htmlFor="categoryId"
                   >
                     Category
                   </label>
-                  <select
-                    name="categoryId"
-                    id="categoryId"
-                    value={courseDTO.categoryId}
-                    onChange={handleChange}
-                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option
-                        key={category.categoryId}
-                        value={category.categoryId}
-                      >
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                      <FolderOpen size={18} />
+                    </span>
+                    <select
+                      name="categoryId"
+                      id="categoryId"
+                      value={courseDTO.categoryId}
+                      onChange={handleChange}
+                      className="pl-10 border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((category) => (
+                        <option
+                          key={category.categoryId}
+                          value={category.categoryId}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                      <ChevronDown size={18} />
+                    </span>
+                  </div>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <label
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700"
                     htmlFor="image"
                   >
                     Course Image
                   </label>
-                  <input
-                    type="file"
-                    onChange={handleImageChange}
-                    className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                      <Image size={18} />
+                    </span>
+                    <input
+                      type="file"
+                      id="image"
+                      onChange={handleImageChange}
+                      className="pl-10 border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-between space-x-2">
+              <div className="flex justify-between space-x-2 pt-4">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition duration-200 flex items-center"
                   onClick={() => setIsFormVisible(false)}
                 >
+                  <X size={18} className="mr-2" />
                   Cancel
                 </button>
                 {isEditing && (
                   <button
                     type="button"
-                    className="px-4 py-2  text-white bg-green-500 rounded-md hover:bg-green-600 transition duration-200"
+                    className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 transition duration-200 flex items-center"
                     onClick={() => handleEditClick(courseDTO.courseCode)}
                   >
+                    <Edit2 size={18} className="mr-2" />
                     Edit Document
                   </button>
                 )}
                 <button
                   type="submit"
-                  className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ${
+                  className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 flex items-center ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={isLoading}
                 >
-                  {isLoading
-                    ? "Processing..."
-                    : isEditing
-                    ? "Update Course"
-                    : "Create Course"}
+                  {isLoading ? (
+                    <>
+                      <Loader size={18} className="mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : isEditing ? (
+                    <>
+                      <Save size={18} className="mr-2" />
+                      Update Course
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle size={18} className="mr-2" />
+                      Create Course
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       {EditmodalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20">
-          <div className="bg-white p-6 rounded-md w-96">
-            <h2 className="text-xl font-semibold mb-4">Edit Document</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20 p-4">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">
+                Edit Document
+              </h2>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
 
             {/* Title Field */}
             <div className="mb-4">
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Title
               </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleDocChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
+              <div className="relative">
+                <Type
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleDocChange}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
             </div>
 
             {/* Content Field */}
             <div className="mb-4">
               <label
                 htmlFor="content"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 Content
               </label>
-              <textarea
-                id="content"
-                name="content"
-                value={formData.content}
-                onChange={handleDocChange}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                rows="4"
-              />
+              <div className="relative">
+                <AlignLeft
+                  className="absolute left-3 top-3 text-gray-400"
+                  size={18}
+                />
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleDocChange}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows="6"
+                />
+              </div>
             </div>
 
-            {/* File Field */}
-            {/* Show Current File Preview (if no new file is selected) */}
-            {selectedItem && selectedItem.filePath && !formData.file && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Current File
-                </label>
-                <div className="mt-2">
-                  {selectedItem.filePath.endsWith(".pdf") ? (
-                    // For PDF files, use an embed tag to show a preview
-                    <embed
-                      src={selectedItem.filePath}
-                      type="application/pdf"
-                      width="100%"
-                      height="120px"
-                    />
-                  ) : selectedItem.filePath.endsWith(".docx") ||
-                    selectedItem.filePath.endsWith(".doc") ? (
-                    // For Word files, display an icon
-                    <div className="text-center text-gray-500">
-                      <span>Unsupported File Type</span>
-                    </div>
-                  ) : selectedItem.filePath.endsWith(".jpg") ||
-                    selectedItem.filePath.endsWith(".jpeg") ||
-                    selectedItem.filePath.endsWith(".png") ? (
-                    // For Image files (JPG, JPEG, PNG), show an image preview
+            {/* File Preview */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                File Preview
+              </label>
+              <div className="mt-2 border border-gray-200 rounded-md p-4 bg-gray-50">
+                {formData.file ? (
+                  typeof formData.file === "string" ? (
+                    // Handle file path string (current file)
+                    formData.file.toLowerCase().endsWith(".pdf") ? (
+                      <div className="flex items-center justify-center">
+                        <FileText size={48} className="text-red-500" />
+                        <span className="ml-2 text-sm text-gray-600">
+                          PDF Document
+                        </span>
+                      </div>
+                    ) : formData.file.toLowerCase().endsWith(".docx") ||
+                      formData.file.toLowerCase().endsWith(".doc") ? (
+                      <div className="flex items-center justify-center">
+                        <FileText size={48} className="text-blue-500" />
+                        <span className="ml-2 text-sm text-gray-600">
+                          Word Document
+                        </span>
+                      </div>
+                    ) : formData.file.toLowerCase().endsWith(".jpg") ||
+                      formData.file.toLowerCase().endsWith(".jpeg") ||
+                      formData.file.toLowerCase().endsWith(".png") ? (
+                      <img
+                        src={formData.file}
+                        alt="File Preview"
+                        className="w-full h-auto max-h-32 object-contain mx-auto"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <FileText size={48} className="text-gray-400" />
+                        <span className="ml-2 text-sm text-gray-600">
+                          Unsupported File Type
+                        </span>
+                      </div>
+                    )
+                  ) : // Handle File object (newly selected file)
+                  formData.file.type.startsWith("image/") ? (
                     <img
-                      src={selectedItem.filePath}
+                      src={URL.createObjectURL(formData.file)}
                       alt="File Preview"
-                      className="w-full h-auto max-w-[60px] mx-auto object-contain"
-                    />
-                  ) : (
-                    <div className="text-center text-gray-500">
-                      <span>Unsupported File Type</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Show Preview of the Selected File (if file is selected) */}
-            {formData.file && formData.file instanceof File && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Selected File
-                </label>
-                <div className="mt-2">
-                  {formData.file.type.startsWith("image/") ? (
-                    <img
-                      src={URL.createObjectURL(formData.file)} // Create object URL for the selected file
-                      alt="File Preview"
-                      className="w-full h-auto max-w-[150px] mx-auto object-contain"
+                      className="w-full h-auto max-h-32 object-contain mx-auto"
                     />
                   ) : formData.file.type === "application/pdf" ? (
-                    <embed
-                      src={URL.createObjectURL(formData.file)}
-                      type="application/pdf"
-                      width="100%"
-                      height="120px"
-                    />
+                    <div className="flex items-center justify-center">
+                      <FileText size={48} className="text-red-500" />
+                      <span className="ml-2 text-sm text-gray-600">
+                        PDF Document
+                      </span>
+                    </div>
                   ) : formData.file.type === "application/msword" ||
                     formData.file.type ===
                       "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
-                    <div className="flex justify-center items-center">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Microsoft_Office_Word_2013_logo.svg/1200px-Microsoft_Office_Word_2013_logo.svg.png"
-                        alt="Word Document"
-                        className="w-12 h-12 object-contain"
-                      />
+                    <div className="flex items-center justify-center">
+                      <FileText size={48} className="text-blue-500" />
+                      <span className="ml-2 text-sm text-gray-600">
+                        Word Document
+                      </span>
                     </div>
                   ) : (
-                    <div className="text-center text-gray-500">
-                      <span>Unsupported File Type</span>
+                    <div className="flex items-center justify-center">
+                      <FileText size={48} className="text-gray-400" />
+                      <span className="ml-2 text-sm text-gray-600">
+                        Unsupported File Type
+                      </span>
                     </div>
-                  )}
-                </div>
+                  )
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <Upload size={48} className="text-gray-400" />
+                    <span className="ml-2 text-sm text-gray-600">
+                      No file selected
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-
-            {/* File Input */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Upload File
-              </label>
-              <input
-                type="file"
-                name="file"
-                onChange={handleFileChange}
-                className="mt-2 w-full border border-gray-300 p-2 rounded-md"
-              />
             </div>
 
             {/* File Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Upload File
+              </label>
+              <div className="relative">
+                <Upload
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="file"
+                  name="file"
+                  onChange={handleFileChange}
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+            </div>
 
-            {/* Loading/Error */}
-
-            {/* Update Button */}
-            <div className="flex justify-between mt-4">
-              {/* Update Button */}
+            {/* Action Buttons */}
+            <div className="flex justify-between space-x-3">
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center"
+              >
+                <X size={18} className="mr-2" />
+                Cancel
+              </button>
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md w-auto"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Updating..." : "Update"}
-              </button>
-
-              {/* Close Button */}
-              <button
-                onClick={() => setEditModalOpen(false)}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md w-auto"
-              >
-                Close
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Save size={18} className="mr-2" />
+                    Update
+                  </>
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">

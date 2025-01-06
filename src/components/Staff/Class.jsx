@@ -119,6 +119,9 @@ const ClassLayout = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
                 Price
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  tracking-wider">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
