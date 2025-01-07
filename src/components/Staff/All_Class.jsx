@@ -202,7 +202,7 @@ const All_Class = ({
       )}
       {EditmodalOpen && selectedItem && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-3xl m-4">
+          <div className="bg-white max-h-[80vh] overflow-y-auto dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-3xl m-4">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Edit Class Information
@@ -503,7 +503,7 @@ const All_Class = ({
 
       {modalOpen && selectedItem && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
+          <div className="bg-white max-h-[80vh] overflow-y-auto dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-3xl">
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                 Class Details

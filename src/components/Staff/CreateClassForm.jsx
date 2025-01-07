@@ -267,7 +267,7 @@ const CreateClassForm = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto p-4 relative">
+      <div className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto p-4 relative overflow-y-auto max-h-full">
         <button
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
           onClick={toggleCreateClassForm}
@@ -277,7 +277,7 @@ const CreateClassForm = ({
         <form onSubmit={handleSubmit} className="">
           <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
             <CardHeader className="bg-gray-50 border-b border-gray-200">
-              <CardTitle className="text-2xl font-bold text-gray-800">
+              <CardTitle className="text-2xl text-center font-bold text-gray-800">
                 Create New Class
               </CardTitle>
             </CardHeader>
@@ -379,60 +379,7 @@ const CreateClassForm = ({
                     className="w-full"
                   />
                 </div>
-                {/* <div className="">
-                  <Label
-                    htmlFor="dayOfWeek"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Day of Week
-                  </Label>
-                  <Input
-                    id="dayOfWeek"
-                    name="dayOfWeek"
-                    value={classDTO.dayOfWeek}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
-                </div> */}
               </div>
-
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="">
-                  <Label
-                    htmlFor="startDate"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Start Date
-                  </Label>
-                  <Input
-                    id="startDate"
-                    name="startDate"
-                    type="date"
-                    value={classDTO.startDate}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
-                </div>
-                <div className="">
-                  <Label
-                    htmlFor="endDate"
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    End Date
-                  </Label>
-                  <Input
-                    id="endDate"
-                    name="endDate"
-                    type="date"
-                    value={classDTO.endDate}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
-                </div>
-              </div> */}
 
               <div className="">
                 <Label className="text-sm font-medium text-gray-700">

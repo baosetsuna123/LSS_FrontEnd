@@ -178,7 +178,7 @@ const EditClassPopup = ({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 mt-6">
+          <div className="flex justify-between space-x-3 mt-6">
             <button
               onClick={() => {
                 handleCancel();

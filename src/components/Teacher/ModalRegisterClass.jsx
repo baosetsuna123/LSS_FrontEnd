@@ -261,7 +261,7 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
             className="!text-sm *:cursor-pointer"
           />
         </Box>
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-between gap-3">
           <Button
             variant="outlined"
             color="primary"
