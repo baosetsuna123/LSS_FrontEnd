@@ -170,7 +170,7 @@ export function MyOrders() {
           <div className="flex items-center border rounded p-2 dark:bg-gray-700">
             <input
               type="text"
-              placeholder="Search by Lesson Name"
+              placeholder="Search by className"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200 ease-in-out shadow-sm dark:text-white dark:bg-gray-700"
@@ -192,7 +192,7 @@ export function MyOrders() {
                   Order ID
                 </TableHead>
                 <TableHead className="text-gray-900 dark:text-white pl-10">
-                  Lesson Name
+                  Class Name
                 </TableHead>
                 <TableHead className="text-right text-gray-900 dark:text-white">
                   Total Price

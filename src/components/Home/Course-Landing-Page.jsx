@@ -270,7 +270,7 @@ export function CourseLandingPage() {
             <section className="w-full py-4 md:py-16 lg:py-24">
               <div className="container px-4 mx-auto md:px-6">
                 <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
-                  Related Lessons
+                  Related Classes
                 </h2>
                 {loadingm ? (
                   <div className="flex justify-center">
@@ -427,7 +427,7 @@ export function CourseLandingPage() {
             <section className="w-full py-3 md:py-6 lg:py-12">
               <div className="container px-4 mx-auto md:px-6">
                 <h2 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-center mb-8">
-                  Featured Lessons
+                  Featured Classes
                 </h2>
                 {loading ? (
                   <div className="flex justify-center">

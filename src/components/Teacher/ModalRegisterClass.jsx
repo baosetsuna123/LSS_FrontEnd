@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
   const [selectedRows, setSelectedRows] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   const isRowSelectable = (params) => {
     const newRowDateSlots = params.row.dateSlots;
     for (const selectedRowId of selectedRows) {
@@ -64,6 +64,7 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
         toast.error("please select at least one class");
         return;
       }
+      setLoading(true);
       await Promise.all(
         selectedRows.map(async (row) => {
           const res = await joinClassTeacher(token, row);
@@ -77,6 +78,8 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
       toast.error(
         "Teacher already has a class scheduled on the same date and slot."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -169,7 +172,7 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
     },
     {
       field: "dateSlots",
-      headerName: "Dates & Slots (Date (SlotIDs))",
+      headerName: "Dates & Slots (Date (Slots))",
       width: 450,
       headerAlign: "center",
       align: "center",
@@ -184,7 +187,9 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
           return (
             <div
               style={{
-                display: "flex",
+                display: "flex", // Use flexbox
+                alignItems: "center", // Center content vertically
+                justifyContent: "center", // Center content horizontally
                 gap: "10px",
                 overflowX: "auto",
               }}
@@ -268,10 +273,11 @@ const ModalRegisterClass = ({ data, open, handleClose, fetchTimetable }) => {
           <Button
             variant="contained"
             color="primary"
+            disabled={loading}
             onClick={handleSave}
             sx={{ mt: 2 }}
           >
-            Save
+            {loading ? "Loading..." : "Register"}
           </Button>
         </div>
       </Box>

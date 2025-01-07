@@ -302,7 +302,7 @@ function TeacherHome() {
           onClick={() => setShowModalRegister(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
         >
-          Register for class
+          Register for Class
         </button>
       </div>
       <YearSelector onWeekChange={handleWeekChange} />

@@ -102,7 +102,7 @@ const Classes = () => {
       setClasses(updatedClasses);
       setFilteredClasses(updatedClasses);
       setIsModalOpen(false);
-      toast.success(`Lesson status changed to ${newStatus}.`);
+      toast.success(`Class status changed to ${newStatus}.`);
     } catch (error) {
       console.error(`Error changing class status to ${newStatus}:`, error);
       toast.error("Failed to update class status. Please try again.");
@@ -126,7 +126,7 @@ const Classes = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Lessons</h1>
+      <h1 className="text-2xl font-bold mb-4">Classes</h1>
       {isLoading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-75"></div>
@@ -136,7 +136,7 @@ const Classes = () => {
           <div className="flex justify-between items-center mb-4">
             <Input
               type="text"
-              placeholder="Search by lesson name"
+              placeholder="Search by class name"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
@@ -158,7 +158,7 @@ const Classes = () => {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>Lesson Name</TableHead>
+                <TableHead>Class Name</TableHead>
                 <TableHead>CourseCode</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tutor Name</TableHead>
@@ -251,9 +251,9 @@ const Classes = () => {
             <div className="flex items-center mb-4">
               <AlertCircle className="h-6 w-6 text-yellow-500 mr-4" />
               <div>
-                <h3 className="text-lg font-semibold">Change Lesson Status</h3>
+                <h3 className="text-lg font-semibold">Change Class Status</h3>
                 <p className="text-sm text-gray-600">
-                  Are you sure you want to change the status of this lesson to{" "}
+                  Are you sure you want to change the status of this class to{" "}
                   <span className="font-bold text-green-500">{newStatus}</span>?
                 </p>
               </div>

@@ -61,7 +61,7 @@ export function AdminLayout({ children }) {
     },
     {
       icon: School,
-      label: "Lessons",
+      label: "Classes",
       path: "Classes",
     },
     { icon: Settings, label: "Params", path: "EditParams" },

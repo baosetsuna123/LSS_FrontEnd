@@ -140,7 +140,7 @@ function ClassList() {
       <div className="mb-6 flex justify-between items-center">
         <input
           type="text"
-          placeholder="Search lesson..."
+          placeholder="Search class..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-1/3 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -305,7 +305,7 @@ function DetailsModal({ cls, onClose }) {
           />
           <InfoItem
             icon={<FaChalkboardTeacher />}
-            label="Teacher"
+            label="Tutor"
             value={cls.teacherName}
           />
           <div className="flex items-center p-3 bg-gray-50 rounded-lg">

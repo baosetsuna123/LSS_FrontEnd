@@ -93,13 +93,8 @@ export function ViewAllClasses() {
   // Determine if no data matched the search query
   const breadcrumbItems = [
     { label: "Home", link: "/" },
-    { label: "Lesson", link: "/class" },
+    { label: "Class", link: "/class" },
   ];
-  console.log("contextClasses.length:", contextClasses.length);
-  console.log("itemsPerPage:", itemsPerPage);
-  console.log("totalPages:", totalPages);
-  console.log("currentPage:", currentPage);
-  console.log("fitlercalss:", filteredClasses);
 
   return (
     <>
@@ -113,14 +108,14 @@ export function ViewAllClasses() {
       </section>
 
       <div className="container mx-auto p-4 max-w-6xl">
-        <h1 className="text-3xl font-bold mb-6">View All Lessons</h1>
+        <h1 className="text-3xl font-bold mb-6">View All Classes</h1>
 
         {/* Search Bar and Price Range Slider in One Row */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
           <div className="flex-grow relative mb-4 md:mb-0 md:mr-4">
             <Input
               type="text"
-              placeholder="Search by lesson or tutor name"
+              placeholder="Search by className or tutorName"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"

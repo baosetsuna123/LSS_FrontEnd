@@ -257,7 +257,7 @@ export function ClassDetail() {
           <Breadcrumb
             items={[
               { label: "Home", link: "/" },
-              { label: "Lesson", link: "/class" },
+              { label: "Class", link: "/class" },
               { label: "Detail" },
             ]}
           />
