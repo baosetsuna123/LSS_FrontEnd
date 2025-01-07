@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Button,
-  Checkbox,
-  ListItemText,
-} from "@mui/material";
 import { fetchAllCategories, updateCurrentUser } from "@/data/api";
 import { toast } from "react-hot-toast";
 import profile from "../../assets/profilebg.jfif";
+import avatar from "../../assets/avatar.png";
+import { User, Mail, Phone, BookOpen, Save } from "lucide-react";
+import {
+  Checkbox,
+  FormControl,
+  ListItemText,
+  MenuItem,
+  Select,
+} from "@mui/material";
 
 export default function Profile() {
   const result = JSON.parse(localStorage.getItem("result") || "{}");
@@ -93,14 +92,14 @@ export default function Profile() {
       // Update localStorage to persist updated data
       const updatedResult = {
         ...result,
-        fullName: profileData.fullName, // Update fullName
-        address: profileData.address, // Update address
-        phoneNumber: profileData.phoneNumber, // Update phoneNumber
+        fullName: profileData.fullName,
+        address: profileData.address,
+        phoneNumber: profileData.phoneNumber,
         major: updatedMajor,
       };
       localStorage.setItem("result", JSON.stringify(updatedResult));
 
-      setProfileData(updatedProfileData); // Optional: Sync state with UI
+      setProfileData(updatedProfileData);
     } catch (e) {
       console.log(e);
       toast.error("Failed to update profile.");
@@ -120,78 +119,83 @@ export default function Profile() {
       }}
     >
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-lg transform transition-all duration-500 hover:scale-105 dark:bg-gray-800 dark:text-white">
+        <div className="flex justify-center mb-6">
+          <img
+            src={avatar}
+            alt="User Avatar"
+            className="w-24 h-24 rounded-full"
+          />
+        </div>
         <h1 className="text-4xl font-semibold text-gray-900 mb-8 text-center dark:text-gray-100">
           Update Profile
         </h1>
         <div className="space-y-6">
-          <div className="flex items-center mb-4">
-            <label className="w-1/3 text-gray-700 text-lg font-semibold dark:text-gray-300">
-              Username:
-            </label>
-            <p className="w-2/3 text-gray-900 text-lg dark:text-gray-100">
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <User className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" />
+              <label className="text-gray-700 text-lg font-semibold dark:text-gray-300">
+                Username
+              </label>
+            </div>
+            <p className="text-gray-900 text-lg dark:text-gray-100 pl-8">
               {profileData.username}
             </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <label className="w-1/3 text-lg font-semibold text-gray-800 dark:text-gray-300">
-              Full Name:
-            </label>
-            <TextField
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <User className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" />
+              <label className="text-lg font-semibold text-gray-800 dark:text-gray-300">
+                Full Name
+              </label>
+            </div>
+            <input
               name="fullName"
               value={profileData.fullName}
               onChange={handleProfileChange}
-              fullWidth
-              variant="outlined"
-              className="text-lg dark:bg-gray-700 dark:text-white dark:focus:ring-white"
+              className="w-full px-3 py-2 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-400"
             />
           </div>
 
-          <div className="flex items-center mb-4">
-            <label className="w-1/3 text-gray-700 text-lg font-semibold dark:text-gray-300">
-              Email:
-            </label>
-            <p className="w-2/3 text-gray-900 text-lg dark:text-gray-100">
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <Mail className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" />
+              <label className="text-gray-700 text-lg font-semibold dark:text-gray-300">
+                Email
+              </label>
+            </div>
+            <p className="text-gray-900 text-lg dark:text-gray-100 pl-8">
               {profileData.email}
             </p>
           </div>
 
-          <div className="flex items-center mb-4">
-            <label className="w-1/3 text-lg font-semibold text-gray-800 dark:text-gray-300">
-              Phone Number:
-            </label>
-            <TextField
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <Phone className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" />
+              <label className="text-lg font-semibold text-gray-800 dark:text-gray-300">
+                Phone Number
+              </label>
+            </div>
+            <input
               name="phoneNumber"
               value={profileData.phoneNumber}
               onChange={handleProfileChange}
-              fullWidth
-              variant="outlined"
-              className="text-lg dark:bg-gray-700 dark:text-white dark:focus:ring-white"
+              className="w-full px-3 py-2 text-lg border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:focus:ring-blue-400"
             />
           </div>
 
-          {/* <div className="flex items-center space-x-4">
-            <label className="w-1/3 text-lg font-semibold text-gray-800 dark:text-gray-300">
-              Address:
-            </label>
-            <TextField
-              name="address"
-              value={profileData.address}
-              onChange={handleProfileChange}
-              fullWidth
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <BookOpen className="w-6 h-6 mr-2 text-gray-500 dark:text-gray-400" />
+              <label className="text-lg font-semibold text-gray-800 dark:text-gray-300">
+                Choose your Major
+              </label>
+            </div>
+            <FormControl
               variant="outlined"
-              className="text-lg dark:bg-gray-700 dark:text-white"
-            />
-          </div> */}
-
-          <div className="flex items-center space-x-4">
-            <InputLabel
-              id="category-label"
-              className="min-w-fit text-lg font-semibold text-gray-800 dark:text-gray-300"
+              className="flex-1"
+              style={{ width: "100%" }}
             >
-              Choose your Major:
-            </InputLabel>
-            <FormControl variant="outlined" className="flex-1">
               <Select
                 labelId="category-label"
                 value={categoryIds[0] || ""} // Display the first selected category or empty
@@ -222,16 +226,14 @@ export default function Profile() {
             </FormControl>
           </div>
 
-          <Button
+          <button
             onClick={handleUpdateProfile}
-            variant="contained"
-            color="primary"
             disabled={loading}
-            fullWidth
-            className="mt-6 py-3 text-lg font-semibold rounded-lg shadow-xl hover:bg-blue-700 transition duration-300 dark:hover:bg-blue-800"
+            className="w-full mt-6 py-3 text-lg font-semibold rounded-lg shadow-xl bg-blue-500 text-white hover:bg-blue-600 transition duration-300 dark:bg-blue-600 dark:hover:bg-blue-700 flex items-center justify-center"
           >
+            <Save className="w-5 h-5 mr-2" />
             {loading ? "Updating..." : "Update Profile"}
-          </Button>
+          </button>
         </div>
       </div>
     </div>
