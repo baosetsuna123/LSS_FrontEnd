@@ -218,6 +218,10 @@ export default function CourseLayout({
       toast.success("Course created successfully!");
       setIsDocumentVisible(false); // Hide the document form
       setIsCourseCreated(false);
+      setDocumentData({
+        title: "", // Reset the form fields
+        content: "",
+      });
     } catch (error) {
       toast.error("Error creating document");
       console.error(error);
