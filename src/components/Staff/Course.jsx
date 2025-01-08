@@ -98,7 +98,11 @@ export default function CourseLayout({
       alert("Failed to fetch documents. Please try again later.");
     }
   };
-
+  useEffect(() => {
+    if (isDocumentVisible) {
+      setDocumentData({ title: "", content: "" });
+    }
+  }, [isDocumentVisible]);
   const handleChange = (e) => {
     setCourseDTO({
       ...courseDTO,
