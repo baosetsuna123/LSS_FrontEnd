@@ -18,7 +18,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target:
-          "https://fptslsp-b6ash4b6cea2gweq.southeastasia-01.azurewebsites.net",
+          "https://fptlsp-f8bjehcyd0hpdycv.southeastasia-01.azurewebsites.net/",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         secure: true,
