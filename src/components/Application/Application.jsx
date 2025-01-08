@@ -8,8 +8,8 @@ import { AlertTriangle, CircleX } from "lucide-react";
 
 export function Application() {
   const [description, setDescription] = useState("");
-  const [certificates, setCertificates] = useState([null, null]); // Initialize with two empty certificates
-  const [certificateNames, setCertificateNames] = useState(["", ""]); // Initialize with two empty certificate names
+  const [certificates, setCertificates] = useState([null]); // Initialize with two empty certificates
+  const [certificateNames, setCertificateNames] = useState([""]); // Initialize with two empty certificate names
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -63,8 +63,8 @@ export function Application() {
       navigate("/login");
       // Reset form fields after successful submission
       setDescription("");
-      setCertificates([null, null]); // Reset certificates to 2 empty values
-      setCertificateNames(["", ""]); // Reset certificate names to 2 empty values
+      setCertificates([null]); // Reset certificates to 2 empty values
+      setCertificateNames([""]); // Reset certificate names to 2 empty values
     } catch (error) {
       toast.error(error.message || "Failed to create application");
     } finally {
