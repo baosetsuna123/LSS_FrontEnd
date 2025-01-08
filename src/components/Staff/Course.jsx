@@ -190,6 +190,10 @@ export default function CourseLayout({
       setCourses((prevCourses) => [...prevCourses, courseData]);
       setStatus("Creating Document...");
       setIsFormVisible(false);
+      setDocumentData({
+        title: "", // Name of the document
+        content: "",
+      });
       setIsDocumentVisible(true); // Show the document form
       setIsCourseCreated(true);
     } catch (error) {
