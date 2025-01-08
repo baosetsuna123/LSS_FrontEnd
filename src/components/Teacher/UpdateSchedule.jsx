@@ -298,7 +298,7 @@ function UpdateSchedule() {
             </p>
             <ul className="list-disc pl-5 text-sm text-gray-500 space-y-2">
               <li>
-                Your salary will be reduced by 10% for this cancelled class.
+                Your salary will be reduced by 20% for this cancelled class.
               </li>
               <li>
                 This reduction will also apply to your next completed lessons.
