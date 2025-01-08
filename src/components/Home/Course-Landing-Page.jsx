@@ -20,7 +20,7 @@ export function CourseLandingPage() {
   const [average, setAverage] = useState(0);
   const token = sessionStorage.getItem("token");
   const { classes, loading } = useClassContext();
-
+  console.log(classes);
   useEffect(() => {
     const fetchMajorClasses = async () => {
       try {
@@ -29,7 +29,7 @@ export function CourseLandingPage() {
         const classes = await fetchMajorClassByStudent(token);
 
         const sortedClasses = classes.sort(
-          (a, b) => a?.startDate - b?.startDate
+          (a, b) => a?.createDate - b?.createDate
         );
 
         setMajorClasses(sortedClasses);
@@ -83,7 +83,7 @@ export function CourseLandingPage() {
   useEffect(() => {
     if (classes && classes.length > 0) {
       // Sort the classes by the number of students in descending order
-      const sorted = [...classes].sort((a, b) => a?.startDate - b?.startDate);
+      const sorted = [...classes].sort((a, b) => a?.createDate - b?.createDate);
       setSortedClasses(sorted);
     }
   }, [classes]);
@@ -299,10 +299,9 @@ export function CourseLandingPage() {
                       )
                       .map((course, index) => {
                         const rating = averageMajor[index]; // Get the average rating for the current class
-                        if (!rating) return null; // Skip rendering if no rating is available
 
-                        const fullStars = Math.floor(rating); // Number of full stars
-                        const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Either 1 half star or none
+                        const fullStars = Math.floor(rating || 0); // Number of full stars
+                        const halfStar = rating && rating % 1 >= 0.5 ? 1 : 0; // Either 1 half star or none
                         const emptyStars = Math.max(
                           6 - fullStars - halfStar,
                           0
@@ -339,55 +338,57 @@ export function CourseLandingPage() {
                                 </p>
                               </div>
 
-                              {/* Display the average rating */}
-                              <div className="mt-4">
-                                <div className="flex justify-center mt-2 gap-x-2">
-                                  {/* Render full stars */}
-                                  {[...Array(fullStars)].map((_, i) => (
-                                    <svg
-                                      key={`full-${i}`}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="#fdd835"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  ))}
+                              {/* Display the average rating if available */}
+                              {rating > 0 && (
+                                <div className="mt-4">
+                                  <div className="flex justify-center mt-2 gap-x-2">
+                                    {/* Render full stars */}
+                                    {[...Array(fullStars)].map((_, i) => (
+                                      <svg
+                                        key={`full-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
 
-                                  {/* Render half star if applicable */}
-                                  {halfStar === 1 && (
-                                    <svg
-                                      key="half-star"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="#fdd835"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  )}
+                                    {/* Render half star if applicable */}
+                                    {halfStar === 1 && (
+                                      <svg
+                                        key="half-star"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    )}
 
-                                  {/* Render empty stars */}
-                                  {[...Array(emptyStars)].map((_, i) => (
-                                    <svg
-                                      key={`empty-${i}`}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  ))}
+                                    {/* Render empty stars */}
+                                    {[...Array(emptyStars)].map((_, i) => (
+                                      <svg
+                                        key={`empty-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
 
                               <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
                                 View Details
@@ -456,14 +457,13 @@ export function CourseLandingPage() {
                       )
                       .map((course, index) => {
                         const rating = average[index]; // Get the average rating for the current class
-                        if (!rating) return null; // Skip rendering if no rating is available
 
-                        const fullStars = Math.floor(rating); // Number of full stars
-                        const halfStar = rating % 1 >= 0.5 ? 1 : 0; // Either 1 half star or none
+                        const fullStars = Math.floor(rating || 0); // Full stars
+                        const halfStar = rating && rating % 1 >= 0.5 ? 1 : 0; // Half star if applicable
                         const emptyStars = Math.max(
                           6 - fullStars - halfStar,
                           0
-                        ); // Ensure non-negative
+                        ); // Empty stars
 
                         return (
                           <Card
@@ -496,55 +496,57 @@ export function CourseLandingPage() {
                                 </p>
                               </div>
 
-                              {/* Display the average rating */}
-                              <div className="mt-4">
-                                <div className="flex justify-center mt-2 gap-x-2">
-                                  {/* Render full stars */}
-                                  {[...Array(fullStars)].map((_, i) => (
-                                    <svg
-                                      key={`full-${i}`}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="#fdd835"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  ))}
+                              {/* Display the average rating if available */}
+                              {rating > 0 && (
+                                <div className="mt-4">
+                                  <div className="flex justify-center mt-2 gap-x-2">
+                                    {/* Render full stars */}
+                                    {[...Array(fullStars)].map((_, i) => (
+                                      <svg
+                                        key={`full-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
 
-                                  {/* Render half star if applicable */}
-                                  {halfStar === 1 && (
-                                    <svg
-                                      key="half-star"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="#fdd835"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  )}
+                                    {/* Render half star if applicable */}
+                                    {halfStar === 1 && (
+                                      <svg
+                                        key="half-star"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    )}
 
-                                  {/* Render empty stars */}
-                                  {[...Array(emptyStars)].map((_, i) => (
-                                    <svg
-                                      key={`empty-${i}`}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      stroke="#fbc02d"
-                                      strokeWidth="2"
-                                      viewBox="0 0 24 24"
-                                      className="w-4 h-4"
-                                    >
-                                      <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
-                                    </svg>
-                                  ))}
+                                    {/* Render empty stars */}
+                                    {[...Array(emptyStars)].map((_, i) => (
+                                      <svg
+                                        key={`empty-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
 
                               <Button className="mt-4 w-full dark:bg-orange-500 dark:hover:bg-orange-700">
                                 View Details

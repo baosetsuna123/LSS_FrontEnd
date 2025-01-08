@@ -16,7 +16,7 @@ export function ViewAllClasses() {
   const [maxPrice, setMaxPrice] = useState(2000000);
   const [selectedCourseCodes, setSelectedCourseCodes] = useState([]);
   const [filteredClasses, setFilteredClasses] = useState(contextClasses);
-
+  console.log(contextClasses);
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;

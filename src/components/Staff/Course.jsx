@@ -88,8 +88,18 @@ export default function CourseLayout({
 
     try {
       const documents = await getDocumentsByCourseCode(courseCode, token);
-      console.log(documents);
-      setSelectedItem(documents[0]); // Set the selected document
+
+      if (!documents || documents.length === 0) {
+        // If no documents exist, set up an empty template for creating a new document
+        setSelectedItem({
+          title: "", // Default empty fields
+          content: "",
+        });
+      } else {
+        // If documents exist, select the first document
+        setSelectedItem(documents[0]);
+      }
+
       setEditModalOpen(true); // Open the modal
       setIsFormVisible(false); // Hide the form if needed
     } catch (error) {
@@ -98,6 +108,7 @@ export default function CourseLayout({
       alert("Failed to fetch documents. Please try again later.");
     }
   };
+
   useEffect(() => {
     if (isDocumentVisible) {
       setDocumentData({ title: "", content: "" });
@@ -451,7 +462,7 @@ export default function CourseLayout({
       )}
       {isCourseCreated && isDocumentVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-2xl">
+          <div className="bg-white max-h-[90vh] overflow-y-auto shadow-lg rounded-lg p-6 w-full max-w-2xl">
             {!isEditing && (isFormVisible || isDocumentVisible) && (
               <div className="mb-6">
                 <div className="flex items-center space-x-4 bg-gray-100 p-4 rounded-lg">
@@ -802,7 +813,7 @@ export default function CourseLayout({
 
       {EditmodalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-20 p-4">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+          <div className="bg-white max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-xl w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
                 Edit Document

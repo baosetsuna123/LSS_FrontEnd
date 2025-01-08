@@ -45,7 +45,7 @@ export function ApplicationManagement() {
     }
   }, [token, loadBalance]);
   const [filteredApplications, setFilteredApplications] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("Withdraw Applications");
+  const [selectedTab, setSelectedTab] = useState("Withdrawal Applications");
   const [searchQuery, setSearchQuery] = useState("");
   const [withdrawPage, setWithdrawPage] = useState(1); // Separate page for Withdraw Applications
   const [otherPage, setOtherPage] = useState(1); // Separate page for Other Applications
@@ -56,11 +56,17 @@ export function ApplicationManagement() {
       setLoading(true);
       try {
         const data = await viewAllApplications(token);
-        const sortedData = data.sort(
+
+        const validData = data.filter(
+          (item) => !isNaN(new Date(item.createdDate))
+        );
+
+        const sortedData = validData.sort(
           (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
         );
+
         setApplications(sortedData);
-        console.log(data);
+        console.log(sortedData);
       } catch (error) {
         console.error("Failed to fetch applications:", error);
       } finally {
@@ -113,7 +119,7 @@ export function ApplicationManagement() {
 
   // Filter applications based on selected tab
   const withdrawApplications = filteredApplications.filter(
-    (app) => app.applicationType.name === "Withdraw Application"
+    (app) => app.applicationType.name === "Withdrawal Application"
   );
   const otherApplications = filteredApplications.filter(
     (app) => app.applicationType.name === "Other Application"
@@ -126,7 +132,7 @@ export function ApplicationManagement() {
     indexOfFirstWithdrawApp,
     indexOfLastWithdrawApp
   );
-
+  console.log(currentWithdrawApplications);
   // Pagination for Other Applications
   const indexOfLastOtherApp = otherPage * applicationsPerPage;
   const indexOfFirstOtherApp = indexOfLastOtherApp - applicationsPerPage;
@@ -155,11 +161,11 @@ export function ApplicationManagement() {
       <div className="mb-4 flex space-x-4">
         <Button
           className={`${
-            selectedTab === "Withdraw Applications"
+            selectedTab === "Withdrawal Applications"
               ? "bg-blue-600 text-white font-semibold border-blue-600"
               : "bg-white text-blue-600 border-blue-600"
           } px-4 py-2 rounded-lg shadow-md transition-colors duration-300 hover:bg-blue-500 hover:text-white`}
-          onClick={() => setSelectedTab("Withdraw Applications")}
+          onClick={() => setSelectedTab("Withdrawal Applications")}
         >
           Withdraw Applications
         </Button>
@@ -177,7 +183,7 @@ export function ApplicationManagement() {
       </div>
 
       {/* Tab Content */}
-      {selectedTab === "Withdraw Applications" && (
+      {selectedTab === "Withdrawal Applications" && (
         <>
           {loading ? (
             <div className="flex justify-center items-center w-full h-full">
