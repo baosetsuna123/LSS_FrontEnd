@@ -127,6 +127,7 @@ function ClassList() {
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  console.log(indexOfLastItem, indexOfFirstItem);
   const currentItems = filteredClasses.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
 
