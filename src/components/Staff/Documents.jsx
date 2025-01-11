@@ -13,6 +13,7 @@ import {
   Paperclip,
   Book,
   Tag,
+  ChevronsLeftRightEllipsis,
 } from "lucide-react";
 import { getDocumentById, updateDocument } from "@/data/api";
 import toast from "react-hot-toast";
@@ -31,24 +32,29 @@ const Documents = ({
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    // completedSlots: "",
     file: null,
   });
 
   const handleEditClick = (item) => {
+    setEditModalOpen(true); // Open the modal
+
     setSelectedItem(item); // Set the selected item
     setFormData({
       title: item.title || "",
       content: item.content || "",
+      completedSlots: selectedItem.completedSlots || "",
+
       file: item.filePath || null, // Reset file input
     });
     console.log(item.filePath);
-    setEditModalOpen(true); // Open the modal
   };
   useEffect(() => {
     if (selectedItem) {
       setFormData({
         title: selectedItem.title || "",
         content: selectedItem.content || "",
+        completedSlots: selectedItem.completedSlots || "",
         file: selectedItem.filePath || null, // Set the initial file (filePath) when editing
       });
     }
@@ -62,9 +68,21 @@ const Documents = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+
+    setFormData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        [name]:
+          name === "completedSlots"
+            ? value === ""
+              ? ""
+              : parseInt(value, 10)
+            : value, // Allow empty or convert to a number
+      };
+      console.log(value);
+      console.log(name);
+      console.log(updatedState);
+      return updatedState;
     });
   };
 
@@ -76,7 +94,8 @@ const Documents = ({
     });
   };
   const [loading, setLoading] = useState(false);
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true); // Set loading state
       // Call the updateDocument API
@@ -178,79 +197,77 @@ const Documents = ({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentData.length > 0 ? (
-              currentData.map((item, index) => {
-                return (
-                  <tr
-                    key={item.categoryId}
-                    className="hover:bg-gray-100 transition duration-200"
+              currentData.map((item, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 transition duration-200"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                    {item.courseCode}
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={item.title}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap cursor-pointer">
-                      {item.courseCode}
-                    </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                      title={item.title}
-                    >
-                      {item.title || "N/A"}
-                    </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap cursor-pointer"
-                      title={item.content || "N/A"} // Show "N/A" as the title if content is null
-                    >
-                      {item.content
-                        ? item.content.length > 20
-                          ? `${item.content.slice(0, 20) + "..."}`
-                          : item.content
-                        : "N/A"}{" "}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {item.filePath ? (
-                        <a
-                          href={item.filePath} // Link to the file
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          View File
-                        </a>
-                      ) : (
-                        <span>No file available</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap relative">
-                      <button
-                        onClick={() => handleButtonClick(index)}
-                        className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+                    {item.title || "N/A"}
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    title={item.content || "N/A"}
+                  >
+                    {item.content
+                      ? item.content.length > 20
+                        ? `${item.content.slice(0, 20)}...`
+                        : item.content
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {item.filePath ? (
+                      <a
+                        href={item.filePath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
                       >
-                        <EllipsisVertical />
-                      </button>
-                      {dialogOpen === index && (
-                        <div className="absolute bottom-full mb-1 left-0 bg-white p-1 shadow-lg rounded-md w-auto z-10 flex space-x-4">
-                          <div
-                            className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-green-500"
-                            onClick={() => handleEditClick(item)}
-                          >
-                            <Edit size={16} />
-                          </div>
-                          <div
-                            className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-gray-500"
-                            onClick={() => handleDetailsClick(item)}
-                          >
-                            <Eye size={16} />
-                          </div>
+                        View File
+                      </a>
+                    ) : (
+                      <span>No file available</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap relative">
+                    <button
+                      onClick={() => handleButtonClick(index)}
+                      className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+                    >
+                      <EllipsisVertical />
+                    </button>
+                    {dialogOpen === index && (
+                      <div className="absolute bottom-full mb-1 left-0 bg-white p-1 shadow-lg rounded-md w-auto z-10 flex space-x-4">
+                        <div
+                          className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-green-500"
+                          onClick={() => handleEditClick(item)}
+                        >
+                          <Edit size={16} />
                         </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
+                        <div
+                          className="flex items-center justify-center space-x-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md text-gray-500"
+                          onClick={() => handleDetailsClick(item)}
+                        >
+                          <Eye size={16} />
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="6" // Ensure the colSpan matches the total columns
                   className="text-center text-red-600 py-4 font-semibold"
                 >
                   No Data
@@ -262,9 +279,9 @@ const Documents = ({
       </div>
       {EditmodalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
+              <h2 className="text-2xl font-semibold  text-gray-800">
                 Edit Document
               </h2>
               <button
@@ -324,7 +341,32 @@ const Documents = ({
                   />
                 </div>
               </div>
-
+              <div>
+                <label
+                  htmlFor="completedSlots"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Slots
+                </label>
+                <div className="relative">
+                  <ChevronsLeftRightEllipsis
+                    className="absolute left-3 top-3 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="number"
+                    min={3}
+                    max={10}
+                    name="completedSlots"
+                    id="completedSlots"
+                    value={formData.completedSlots}
+                    onChange={handleChange}
+                    placeholder="Enter a value between 3 and 10"
+                    className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="6"
+                  />
+                </div>
+              </div>
               {/* File Preview */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -543,6 +585,18 @@ const Documents = ({
                     </p>
                   </div>
                 </div>
+                {/* <div className="flex items-start">
+                  <ChevronsLeftRightEllipsis
+                    className="mr-2 text-gray-400 flex-shrink-0"
+                    size={20}
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Slots</p>
+                    <p className="text-base text-gray-900 break-words">
+                      {selectedItem.completedSlots}
+                    </p>
+                  </div>
+                </div> */}
                 <div className="flex items-start">
                   <Paperclip
                     className="mr-2 text-gray-400 flex-shrink-0"

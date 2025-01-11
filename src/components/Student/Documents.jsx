@@ -31,8 +31,11 @@ const Documents = () => {
 
   const isPDF = (filePath) => filePath.endsWith(".pdf");
 
-  const isDocx = (filePath) => filePath.endsWith(".docx");
-
+  const isDocx = (filePath) => {
+    const extensions = [".docx", ".doc", ".dotx", ".dot"]; // Add more Word-related extensions if needed
+    return extensions.some((ext) => filePath.toLowerCase().endsWith(ext));
+  };
+  const isExcel = (filePath) => /\.(xls|xlsx|csv)$/i.test(filePath);
   return (
     <>
       <section className="w-full dark:text-white py-4 bg-gray-100 text-gray-100 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-900 ">
@@ -103,20 +106,31 @@ const Documents = () => {
                 ) : isDocx(doc.filePath) ? (
                   <div className="text-center p-4">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      DOCX files are not directly rendered. Please download to
-                      view.
+                      Previewing DOCX content:
                     </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        handleDownload(doc.filePath, `${doc.title}.docx`)
-                      }
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download DOCX
-                    </Button>
+                    <div className="mt-4 border border-gray-300 rounded p-4 bg-gray-50 text-left overflow-auto max-h-96">
+                      <iframe
+                        src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                          doc.filePath
+                        )}&embedded=true`}
+                        width="100%"
+                        height="600px"
+                        style={{ border: "none" }}
+                        title="DOCX Viewer"
+                      ></iframe>
+                    </div>
                   </div>
+                ) : isExcel(doc.filePath) ? ( // Add Excel case here
+                  <iframe
+                    src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+                      doc.filePath.replace("http://", "https://")
+                    )}`}
+                    width="100%"
+                    height="400"
+                    className="border border-gray-300 rounded"
+                    style={{ border: "none" }}
+                    title="Excel Viewer"
+                  />
                 ) : (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                     Unsupported file type. Please download to view.

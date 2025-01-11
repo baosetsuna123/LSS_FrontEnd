@@ -15,6 +15,7 @@ import {
   BookOpen,
   Check,
   ChevronDown,
+  ChevronsLeftRightEllipsis,
   Edit2,
   Edit3,
   FileText,
@@ -55,6 +56,7 @@ export default function CourseLayout({
     title: "",
     content: "",
     file: null,
+    completedSlots: "",
   });
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -73,6 +75,7 @@ export default function CourseLayout({
   const [documentData, setDocumentData] = useState({
     title: "", // Name of the document
     content: "", // Description of the document
+    completedSlots: "",
     // You can add other fields here if your form has more fields
   });
   const [isLoadingDocument, setIsLoadingDocument] = useState(false);
@@ -88,7 +91,7 @@ export default function CourseLayout({
 
     try {
       const documents = await getDocumentsByCourseCode(courseCode, token);
-
+      console.log(documents);
       if (!documents || documents.length === 0) {
         // If no documents exist, set up an empty template for creating a new document
         setSelectedItem({
@@ -122,17 +125,33 @@ export default function CourseLayout({
   };
   const handleDocChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "completedSlots"
+          ? value === ""
+            ? ""
+            : parseInt(value, 10)
+          : value, // Allow empty or convert to a number
+    }));
   };
+
   const handleChangeDoc = (e) => {
     const { name, value } = e.target;
-    setDocumentData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+
+    setDocumentData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        [name]:
+          name === "completedSlots"
+            ? value === ""
+              ? ""
+              : parseInt(value, 10)
+            : value, // Allow empty or convert to a number
+      };
+      return updatedState;
+    });
   };
 
   const handleUpdate = async () => {
@@ -224,8 +243,8 @@ export default function CourseLayout({
     setIsLoadingDocument(true);
     const documentDTO = {
       title: documentData.title, // Make sure the name matches your documentDTO properties
-      content: documentData.content, // Example field, use what you have
-      // Add any other fields that are part of your DocumentDTO here
+      content: documentData.content,
+      completedSlots: documentData.completedSlots, // Example field, use what you have
     };
     try {
       // Now, create the document for the course
@@ -236,6 +255,7 @@ export default function CourseLayout({
       setDocumentData({
         title: "", // Reset the form fields
         content: "",
+        completedSlots: 0,
       });
     } catch (error) {
       toast.error("Error creating document");
@@ -541,6 +561,32 @@ export default function CourseLayout({
                       value={documentData.content}
                       onChange={handleChangeDoc}
                       placeholder="Enter Document Content"
+                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows="6"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor="completedSlots"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Slots
+                  </label>
+                  <div className="relative">
+                    <ChevronsLeftRightEllipsis
+                      className="absolute left-3 top-3 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      type="number"
+                      name="completedSlots"
+                      id="completedSlots"
+                      min={3}
+                      max={10}
+                      value={documentData.completedSlots}
+                      onChange={handleChangeDoc}
+                      placeholder="Enter a value between 3 and 10"
                       className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows="6"
                     />
@@ -869,6 +915,32 @@ export default function CourseLayout({
                   value={formData.content}
                   onChange={handleDocChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows="6"
+                />
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="completedSlots"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Slots
+              </label>
+              <div className="relative">
+                <ChevronsLeftRightEllipsis
+                  className="absolute left-3 top-3 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="number"
+                  min={3}
+                  max={10}
+                  name="completedSlots"
+                  id="completedSlots"
+                  value={formData.completedSlots}
+                  onChange={handleChangeDoc}
+                  placeholder="Enter a value between 3 and 10"
+                  className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="6"
                 />
               </div>

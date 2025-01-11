@@ -410,7 +410,7 @@ const All_Class = ({
                         <td className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300">
                           {slot.slotIds
                             .sort((a, b) => a - b)
-                            .map((slotId) => {
+                            .map((slotId, index) => {
                               const timeRanges = {
                                 1: "7h00 - 9h15",
                                 2: "9h30 - 11h45",
@@ -420,7 +420,7 @@ const All_Class = ({
                               };
                               return (
                                 <div
-                                  key={slotId}
+                                  key={index}
                                   className="flex items-center mb-1 last:mb-0"
                                 >
                                   <Clock className="mr-2" size={16} />
@@ -655,7 +655,7 @@ const All_Class = ({
                         <td className="px-4 py-2 text-sm text-center text-gray-700 dark:text-gray-300">
                           {slot.slotIds
                             .sort((a, b) => a - b)
-                            .map((slotId) => {
+                            .map((slotId, index) => {
                               const timeRanges = {
                                 1: "7h00 - 9h15",
                                 2: "9h30 - 11h45",
@@ -665,7 +665,7 @@ const All_Class = ({
                               };
                               return (
                                 <div
-                                  key={slotId}
+                                  key={index}
                                   className="flex items-center justify-center text-center mb-1 last:mb-0"
                                 >
                                   <Clock
@@ -744,7 +744,7 @@ const All_Class = ({
             {currentData.length > 0 ? (
               currentData.map((app, index) => (
                 <tr
-                  key={app.applicationUserId}
+                  key={index}
                   className="hover:bg-gray-100 transition duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">

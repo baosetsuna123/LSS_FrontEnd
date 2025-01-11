@@ -620,7 +620,6 @@ export const updateDocument = async (id, documentData, file, token) => {
     const response = await api.put(`/api/documents/${id}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
@@ -1768,22 +1767,29 @@ export const getClassesWithoutTeacher = async (token) => {
 };
 
 export const joinClassTeacher = async (token, id) => {
-  const response = await api.post(`/classes/${id}/joinByTeacher`, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.post(
+    `/classes/${id}/joinByTeacher`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
 export const updateLocationClass = async (token, id, location) => {
-  const response = await api.put(`/classes/${id}/location`, {
-    location: location
-  }, {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await api.put(
+    `/classes/${id}/location`,
+    {
+      location: location,
     },
-  });
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return response.data;
 };
-
