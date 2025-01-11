@@ -303,6 +303,11 @@ const CreateClassForm = ({
           `You need to select ${selectedCourse.completedSlots} slots for this class.`
         );
         return; // Stop the form submission if the total selected slots are less than completed slots
+      } else if (totalSelectedSlots > selectedCourse.completedSlots) {
+        toast.error(
+          `You have selected more slots than the needed slots for this class.`
+        );
+        return; // Stop the form submission if the total selected slots are more than completed slots
       }
     }
 
