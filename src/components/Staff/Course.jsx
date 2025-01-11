@@ -101,6 +101,7 @@ export default function CourseLayout({
       } else {
         // If documents exist, select the first document
         setSelectedItem(documents[0]);
+        console.log(documents[0]);
       }
 
       setEditModalOpen(true); // Open the modal
@@ -126,15 +127,18 @@ export default function CourseLayout({
   const handleDocChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "completedSlots"
-          ? value === ""
-            ? ""
-            : parseInt(value, 10)
-          : value, // Allow empty or convert to a number
-    }));
+    setFormData((prevState) => {
+      const updatedState = {
+        ...prevState,
+        [name]:
+          name === "completedSlots"
+            ? value === ""
+              ? ""
+              : parseInt(value, 10)
+            : value, // Allow empty or convert to a number
+      };
+      return updatedState;
+    });
   };
 
   const handleChangeDoc = (e) => {
@@ -154,7 +158,8 @@ export default function CourseLayout({
     });
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     try {
       setLoading(true); // Set loading state
       // Call the updateDocument API
@@ -270,6 +275,7 @@ export default function CourseLayout({
       setFormData({
         title: selectedItem.title || "",
         content: selectedItem.content || "",
+        completedSlots: selectedItem.completedSlots || 0,
         file: selectedItem.filePath || null, // Set the initial file (filePath) when editing
       });
     }
@@ -872,112 +878,147 @@ export default function CourseLayout({
               </button>
             </div>
 
-            {/* Title Field */}
-            <div className="mb-4">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Title
-              </label>
-              <div className="relative">
-                <Type
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleDocChange}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
+            {/* Form Start */}
+            <form onSubmit={handleUpdate} className="space-y-4">
+              {/* Title Field */}
+              <div className="mb-4">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Title
+                </label>
+                <div className="relative">
+                  <Type
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleDocChange}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Content Field */}
-            <div className="mb-4">
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Content
-              </label>
-              <div className="relative">
-                <AlignLeft
-                  className="absolute left-3 top-3 text-gray-400"
-                  size={18}
-                />
-                <textarea
-                  id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleDocChange}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  rows="6"
-                />
+              {/* Content Field */}
+              <div className="mb-4">
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Content
+                </label>
+                <div className="relative">
+                  <AlignLeft
+                    className="absolute left-3 top-3 text-gray-400"
+                    size={18}
+                  />
+                  <textarea
+                    id="content"
+                    name="content"
+                    value={formData.content}
+                    onChange={handleDocChange}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows="6"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <label
-                htmlFor="completedSlots"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Slots
-              </label>
-              <div className="relative">
-                <ChevronsLeftRightEllipsis
-                  className="absolute left-3 top-3 text-gray-400"
-                  size={18}
-                />
-                <input
-                  type="number"
-                  min={3}
-                  max={10}
-                  name="completedSlots"
-                  id="completedSlots"
-                  value={formData.completedSlots}
-                  onChange={handleChangeDoc}
-                  placeholder="Enter a value between 3 and 10"
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="6"
-                />
-              </div>
-            </div>
 
-            {/* File Preview */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                File Preview
-              </label>
-              <div className="mt-2 border border-gray-200 rounded-md p-4 bg-gray-50">
-                {formData.file ? (
-                  typeof formData.file === "string" ? (
-                    // Handle file path string (current file)
-                    formData.file.toLowerCase().endsWith(".pdf") ? (
+              {/* Slots Field */}
+              <div>
+                <label
+                  htmlFor="completedSlots"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Slots
+                </label>
+                <div className="relative">
+                  <ChevronsLeftRightEllipsis
+                    className="absolute left-3 top-3 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="number"
+                    min={3}
+                    max={10}
+                    name="completedSlots"
+                    id="completedSlots"
+                    value={formData.completedSlots}
+                    onChange={handleDocChange}
+                    placeholder="Enter a value between 3 and 10"
+                    className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* File Preview */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  File Preview
+                </label>
+                <div className="mt-2 border border-gray-200 rounded-md p-4 bg-gray-50">
+                  {formData.file ? (
+                    typeof formData.file === "string" ? (
+                      formData.file.toLowerCase().endsWith(".pdf") ? (
+                        <div className="flex items-center justify-center">
+                          <FileText size={48} className="text-red-500" />
+                          <span className="ml-2 text-sm text-gray-600">
+                            PDF Document
+                          </span>
+                        </div>
+                      ) : formData.file.toLowerCase().endsWith(".docx") ||
+                        formData.file.toLowerCase().endsWith(".doc") ? (
+                        <div className="flex items-center justify-center">
+                          <FileText size={48} className="text-blue-500" />
+                          <span className="ml-2 text-sm text-gray-600">
+                            Word Document
+                          </span>
+                        </div>
+                      ) : formData.file.toLowerCase().endsWith(".jpg") ||
+                        formData.file.toLowerCase().endsWith(".jpeg") ||
+                        formData.file.toLowerCase().endsWith(".png") ? (
+                        <img
+                          src={formData.file}
+                          alt="File Preview"
+                          className="w-full h-auto max-h-32 object-contain mx-auto"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <FileText size={48} className="text-gray-400" />
+                          <span className="ml-2 text-sm text-gray-600">
+                            Unsupported File Type
+                          </span>
+                        </div>
+                      )
+                    ) : formData.file.type.startsWith("image/") ? (
+                      <img
+                        src={URL.createObjectURL(formData.file)}
+                        alt="File Preview"
+                        className="w-full h-auto max-h-32 object-contain mx-auto"
+                      />
+                    ) : formData.file.type === "application/pdf" ? (
                       <div className="flex items-center justify-center">
                         <FileText size={48} className="text-red-500" />
                         <span className="ml-2 text-sm text-gray-600">
                           PDF Document
                         </span>
                       </div>
-                    ) : formData.file.toLowerCase().endsWith(".docx") ||
-                      formData.file.toLowerCase().endsWith(".doc") ? (
+                    ) : formData.file.type === "application/msword" ||
+                      formData.file.type ===
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
                       <div className="flex items-center justify-center">
                         <FileText size={48} className="text-blue-500" />
                         <span className="ml-2 text-sm text-gray-600">
                           Word Document
                         </span>
                       </div>
-                    ) : formData.file.toLowerCase().endsWith(".jpg") ||
-                      formData.file.toLowerCase().endsWith(".jpeg") ||
-                      formData.file.toLowerCase().endsWith(".png") ? (
-                      <img
-                        src={formData.file}
-                        alt="File Preview"
-                        className="w-full h-auto max-h-32 object-contain mx-auto"
-                      />
                     ) : (
                       <div className="flex items-center justify-center">
                         <FileText size={48} className="text-gray-400" />
@@ -986,113 +1027,85 @@ export default function CourseLayout({
                         </span>
                       </div>
                     )
-                  ) : // Handle File object (newly selected file)
-                  formData.file.type.startsWith("image/") ? (
-                    <img
-                      src={URL.createObjectURL(formData.file)}
-                      alt="File Preview"
-                      className="w-full h-auto max-h-32 object-contain mx-auto"
-                    />
-                  ) : formData.file.type === "application/pdf" ? (
-                    <div className="flex items-center justify-center">
-                      <FileText size={48} className="text-red-500" />
-                      <span className="ml-2 text-sm text-gray-600">
-                        PDF Document
-                      </span>
-                    </div>
-                  ) : formData.file.type === "application/msword" ||
-                    formData.file.type ===
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
-                    <div className="flex items-center justify-center">
-                      <FileText size={48} className="text-blue-500" />
-                      <span className="ml-2 text-sm text-gray-600">
-                        Word Document
-                      </span>
-                    </div>
                   ) : (
                     <div className="flex items-center justify-center">
-                      <FileText size={48} className="text-gray-400" />
+                      <Upload size={48} className="text-gray-400" />
                       <span className="ml-2 text-sm text-gray-600">
-                        Unsupported File Type
+                        No file selected
                       </span>
                     </div>
-                  )
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <Upload size={48} className="text-gray-400" />
-                    <span className="ml-2 text-sm text-gray-600">
-                      No file selected
-                    </span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* File Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Upload File
-              </label>
-              <div className="relative">
-                <Upload
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
-                <input
-                  type="file"
-                  name="file"
-                  onChange={handleFileChange}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
+              {/* File Input */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Upload File
+                </label>
+                <div className="relative">
+                  <Upload
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="file"
+                    name="file"
+                    onChange={handleFileChange}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-between space-x-3">
-              <button
-                onClick={() => setEditModalOpen(false)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center"
-              >
-                <X size={18} className="mr-2" />
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                disabled={loading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} className="mr-2" />
-                    Update
-                  </>
-                )}
-              </button>
-            </div>
+              {/* Action Buttons */}
+              <div className="flex justify-between space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center"
+                >
+                  <X size={18} className="mr-2" />
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={18} className="mr-2" />
+                      Update
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+            {/* Form End */}
           </div>
         </div>
       )}

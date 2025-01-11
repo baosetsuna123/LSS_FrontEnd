@@ -80,6 +80,23 @@ const CreateClassForm = ({
   };
   const [courses, setCourses] = useState([]);
   const [minDateString, setMinDateString] = useState("");
+  const selectedCourse = courses.find(
+    (course) => course.courseCode === classDTO.courseCode
+  );
+
+  // Calculate the total selected slots
+  const totalSelectedSlots = classDTO.dateSlots.reduce(
+    (acc, dateSlot) => acc + dateSlot.slotIds.length,
+    0
+  );
+
+  // Check if selected course and totalSelectedSlots are available
+  useEffect(() => {
+    if (selectedCourse) {
+      console.log("Selected Course:", selectedCourse);
+      console.log("Total Selected Slots:", totalSelectedSlots);
+    }
+  }, [selectedCourse, totalSelectedSlots]);
   useEffect(() => {
     const fetchParam = async () => {
       try {
@@ -129,9 +146,8 @@ const CreateClassForm = ({
     const fetchDropdownData = async () => {
       try {
         const data = await fetchAllCourses(token);
-        const codes = data.map((course) => course.courseCode);
         if (isMounted) {
-          setCourses(codes);
+          setCourses(data);
           console.log(data);
         }
       } catch (error) {
@@ -149,14 +165,40 @@ const CreateClassForm = ({
   }, [token]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setClassDTO((prevData) => ({ ...prevData, [name]: value }));
+
+    if (name === "courseCode") {
+      const selectedCourse = courses.find(
+        (course) => course.courseCode === value
+      );
+      if (selectedCourse) {
+        setClassDTO((prevData) => ({
+          ...prevData,
+          [name]: value,
+          completedSlots: selectedCourse.completedSlots, // Store the completedSlots in the state
+        }));
+      } else {
+        setClassDTO((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+      }
+    } else {
+      setClassDTO((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
+
   const handleInput = (e) => {
     let value = e.target.value.replace(/,/g, ""); // Remove commas for clean input
 
     if (!isNaN(value) || value === "") {
       setClassDTO((prevData) => ({ ...prevData, price: value })); // Update state with the raw number
     }
+  };
+  const isCourseValid = () => {
+    const selectedCourse = courses.find(
+      (course) => course.courseCode === classDTO.courseCode
+    );
+    return selectedCourse && selectedCourse.completedSlots > 0;
   };
   const handleDateSlotChange = (date) => {
     if (date instanceof Date && !isNaN(date)) {
@@ -242,12 +284,28 @@ const CreateClassForm = ({
       toast.error("Please enter a course code.");
       return; // Stop the form submission if courseCode is not filled
     }
-
-    // Validate dateSlots (make sure it's not empty)
     if (classDTO.dateSlots.length === 0) {
       toast.error("Please select at least one date slot.");
       return; // Stop the form submission if no dateSlots are selected
     }
+    const selectedCourse = courses.find(
+      (course) => course.courseCode === classDTO.courseCode
+    );
+    if (selectedCourse) {
+      const totalSelectedSlots = classDTO.dateSlots.reduce(
+        (total, dateSlot) => {
+          return total + dateSlot.slotIds.length;
+        },
+        0
+      );
+      if (totalSelectedSlots < selectedCourse.completedSlots) {
+        toast.error(
+          `You need to select ${selectedCourse.completedSlots} slots for this class.`
+        );
+        return; // Stop the form submission if the total selected slots are less than completed slots
+      }
+    }
+
     try {
       setLoading(true);
       const newClass = await fetchCreateClass(classDTO, image, token);
@@ -259,7 +317,19 @@ const CreateClassForm = ({
       toast.success("Class created successfully");
     } catch (error) {
       console.error("Error creating class:", error);
-      toast.error("Error creating class");
+      console.log("Full Error Object:", error);
+      if (error.response) {
+        console.log("Error Response:", error.response);
+      } else {
+        console.log("No response object available.");
+      }
+      if (error.message && error.message.includes("The number of slots")) {
+        toast.error(
+          "Please make sure the number of slots matches the completed slots."
+        );
+      } else {
+        toast.error("Error creating class");
+      }
     } finally {
       setLoading(false);
     }
@@ -309,12 +379,14 @@ const CreateClassForm = ({
                   <select
                     name="courseCode"
                     onChange={handleInputChange}
-                    className="border p-2  rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                    className="border p-2 rounded-lg w-full border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                   >
                     <option value="">Select Course</option>
-                    {courses.map((courseCode) => (
-                      <option key={courseCode} value={courseCode}>
-                        {courseCode}
+                    {courses.map((course, index) => (
+                      <option key={index} value={course.courseCode}>
+                        {course.completedSlots > 0
+                          ? `${course.courseCode} (${course.completedSlots} slots)`
+                          : `${course.courseCode}`}
                       </option>
                     ))}
                   </select>
@@ -390,6 +462,10 @@ const CreateClassForm = ({
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
+                        disabled={
+                          !isCourseValid() ||
+                          totalSelectedSlots >= selectedCourse.completedSlots
+                        }
                         className={cn(
                           "w-[240px] justify-start text-left font-normal",
                           !currentDateSlot.date && "text-muted-foreground"
@@ -409,7 +485,11 @@ const CreateClassForm = ({
                         disabled={(date) => {
                           const minDate = new Date(minDateString);
                           minDate.setHours(0, 0, 0, 0); // Set time to midnight
-                          return date < minDate || isDateDisabled(date); // Disable dates before minDate or already selected
+                          return (
+                            date < minDate ||
+                            isDateDisabled(date) ||
+                            totalSelectedSlots >= selectedCourse.completedSlots
+                          ); // Disable dates if selected slots >= completed slots
                         }}
                         selected={
                           currentDateSlot.date
@@ -424,7 +504,10 @@ const CreateClassForm = ({
                   <FormControl
                     fullWidth
                     variant="outlined"
-                    disabled={!currentDateSlot.date}
+                    disabled={
+                      !currentDateSlot.date ||
+                      totalSelectedSlots >= selectedCourse.completedSlots
+                    }
                     sx={{
                       ".MuiOutlinedInput-root": {
                         height: "40px", // Adjust the height of the Select field
@@ -459,24 +542,30 @@ const CreateClassForm = ({
                           })
                           .join(", ");
                       }}
-                      placeholder="Select Slot" // You can use placeholder instead of InputLabel
+                      placeholder="Select Slot"
                     >
                       {slots.map((slot) => (
                         <MenuItem
                           key={slot.slotId}
                           value={slot.slotId.toString()}
+                          disabled={
+                            totalSelectedSlots >= selectedCourse?.completedSlots
+                          }
                         >
                           <Checkbox
                             checked={currentDateSlot.slotIds.includes(
                               slot.slotId
                             )}
+                            disabled={
+                              totalSelectedSlots >=
+                              selectedCourse?.completedSlots
+                            }
                           />
                           {`Slot ${slot.period} (${slot.start} - ${slot.end})`}
                         </MenuItem>
                       ))}
                     </Select>
 
-                    {/* Optionally, add helper text if needed */}
                     <FormHelperText>Choose available slot(s)</FormHelperText>
                   </FormControl>
 
@@ -485,6 +574,9 @@ const CreateClassForm = ({
                     onClick={addDateSlot}
                     size="icon"
                     className="bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={
+                      totalSelectedSlots >= selectedCourse?.completedSlots
+                    } // Disable button if selected slots >= completed slots
                   >
                     <PlusCircle className="h-4 w-4" />
                   </Button>

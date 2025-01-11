@@ -79,9 +79,6 @@ const Documents = ({
               : parseInt(value, 10)
             : value, // Allow empty or convert to a number
       };
-      console.log(value);
-      console.log(name);
-      console.log(updatedState);
       return updatedState;
     });
   };
@@ -585,7 +582,7 @@ const Documents = ({
                     </p>
                   </div>
                 </div>
-                {/* <div className="flex items-start">
+                <div className="flex items-start">
                   <ChevronsLeftRightEllipsis
                     className="mr-2 text-gray-400 flex-shrink-0"
                     size={20}
@@ -596,7 +593,7 @@ const Documents = ({
                       {selectedItem.completedSlots}
                     </p>
                   </div>
-                </div> */}
+                </div>
                 <div className="flex items-start">
                   <Paperclip
                     className="mr-2 text-gray-400 flex-shrink-0"
