@@ -13,7 +13,7 @@ import defaults from "../../assets/default.jfif";
 export function ViewAllClasses() {
   const { classes: contextClasses, getClasses } = useClassContext();
   const [searchTerm, setSearchTerm] = useState("");
-  const [maxPrice, setMaxPrice] = useState(2000000);
+  const [maxPrice, setMaxPrice] = useState(500000);
   const [selectedCourseCodes, setSelectedCourseCodes] = useState([]);
   const [filteredClasses, setFilteredClasses] = useState(contextClasses);
   console.log(contextClasses);
@@ -77,7 +77,7 @@ export function ViewAllClasses() {
 
   const clearAllFilters = () => {
     setSearchTerm("");
-    setMaxPrice(250000);
+    setMaxPrice(500000);
     setSelectedCourseCodes([]);
   };
   console.log("maxPrice:", maxPrice);
@@ -132,8 +132,8 @@ export function ViewAllClasses() {
             </CardHeader>
             <CardContent>
               <Slider
-                min={500000}
-                max={2000000}
+                min={100000}
+                max={500000}
                 step={100000}
                 value={[maxPrice]}
                 onValueChange={(value) => setMaxPrice(value[0])}
@@ -191,42 +191,95 @@ export function ViewAllClasses() {
             <div className="md:col-span-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {currentClasses.length > 0 ? (
-                  currentClasses.map((classItem) => (
-                    <Card
-                      key={classItem.classId}
-                      onClick={() => handleClassClick(classItem.classId)}
-                      className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl bg-white dark:bg-gray-800"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex flex-col gap-4">
-                          <img
-                            src={classItem.imageUrl || defaults}
-                            alt={classItem.name}
-                            className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
-                          />
-                          <div>
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 transition-colors duration-300">
-                              {classItem.name}
-                            </h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Course Code: {classItem.courseCode}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                              Tutor: {classItem.teacherName}
-                            </p>
+                  currentClasses.map((classItem) => {
+                    const rating = classItem.teacherFeedback; // Assume teacherFeedback contains the average rating
+                    const fullStars = Math.floor(rating || 0); // Full stars
+                    const halfStar = rating && rating % 1 >= 0.5 ? 1 : 0; // Half star if applicable
+                    const emptyStars = Math.max(6 - fullStars - halfStar, 0); // Empty stars
+
+                    return (
+                      <Card
+                        key={classItem.classId}
+                        onClick={() => handleClassClick(classItem.classId)}
+                        className="transform transition-all duration-300 hover:scale-105 hover:shadow-2xl bg-white dark:bg-gray-800"
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex flex-col gap-4">
+                            <img
+                              src={classItem.imageUrl || defaults}
+                              alt={classItem.name}
+                              className="w-full h-48 object-cover rounded-lg transition-transform duration-300 hover:brightness-90"
+                            />
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-300 transition-colors duration-300">
+                                  {classItem.name}
+                                </h2>
+                                {/* Render stars next to the name */}
+                                {rating > 0 && (
+                                  <div className="flex gap-x-1">
+                                    {[...Array(fullStars)].map((_, i) => (
+                                      <svg
+                                        key={`full-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
+                                    {halfStar === 1 && (
+                                      <svg
+                                        key="half-star"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#fdd835"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    )}
+                                    {[...Array(emptyStars)].map((_, i) => (
+                                      <svg
+                                        key={`empty-${i}`}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        stroke="#fbc02d"
+                                        strokeWidth="2"
+                                        viewBox="0 0 24 24"
+                                        className="w-4 h-4"
+                                      >
+                                        <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.906 1.464 8.307L12 18.896l-7.4 3.623 1.464-8.307-6.064-5.906 8.332-1.151z" />
+                                      </svg>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
+                                Course Code: {classItem.courseCode}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">
+                                Tutor: {classItem.teacherName}
+                              </p>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <p className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                                {formatCurrency(classItem.price)}
+                              </p>
+                              <Button className="transition-colors dark:bg-orange-500 duration-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400">
+                                View Details
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <p className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-                              {formatCurrency(classItem.price)}
-                            </p>
-                            <Button className="transition-colors dark:bg-orange-500 duration-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400">
-                              View Details
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                        </CardContent>
+                      </Card>
+                    );
+                  })
                 ) : (
                   <div className="col-span-2 flex justify-center">
                     <p className="text-lg font-bold text-red-500">
