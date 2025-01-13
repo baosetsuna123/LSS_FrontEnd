@@ -372,7 +372,6 @@ const Documents = ({
                 <div className="mt-2 border border-gray-200 rounded-md p-4 bg-gray-50">
                   {formData.file ? (
                     typeof formData.file === "string" ? (
-                      // Handle file path string (current file)
                       formData.file.toLowerCase().endsWith(".pdf") ? (
                         <div className="flex items-center justify-center">
                           <FileText size={48} className="text-red-500" />
@@ -386,6 +385,14 @@ const Documents = ({
                           <FileText size={48} className="text-blue-500" />
                           <span className="ml-2 text-sm text-gray-600">
                             Word Document
+                          </span>
+                        </div>
+                      ) : formData.file.toLowerCase().endsWith(".xlsx") ||
+                        formData.file.toLowerCase().endsWith(".xls") ? (
+                        <div className="flex items-center justify-center">
+                          <FileText size={48} className="text-green-500" />
+                          <span className="ml-2 text-sm text-gray-600">
+                            Excel Document
                           </span>
                         </div>
                       ) : formData.file.toLowerCase().endsWith(".jpg") ||
@@ -404,8 +411,7 @@ const Documents = ({
                           </span>
                         </div>
                       )
-                    ) : // Handle File object (newly selected file)
-                    formData.file.type.startsWith("image/") ? (
+                    ) : formData.file.type.startsWith("image/") ? (
                       <img
                         src={URL.createObjectURL(formData.file)}
                         alt="File Preview"
@@ -425,6 +431,15 @@ const Documents = ({
                         <FileText size={48} className="text-blue-500" />
                         <span className="ml-2 text-sm text-gray-600">
                           Word Document
+                        </span>
+                      </div>
+                    ) : formData.file.type === "application/vnd.ms-excel" ||
+                      formData.file.type ===
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? (
+                      <div className="flex items-center justify-center">
+                        <FileText size={48} className="text-green-500" />
+                        <span className="ml-2 text-sm text-gray-600">
+                          Excel Document
                         </span>
                       </div>
                     ) : (
@@ -645,6 +660,14 @@ const Documents = ({
                     <FileText size={48} className="text-blue-500" />
                     <span className="ml-2 text-sm text-gray-600">
                       Word Document
+                    </span>
+                  </div>
+                ) : selectedItem.filePath.toLowerCase().endsWith(".xlsx") ||
+                  selectedItem.filePath.toLowerCase().endsWith(".xls") ? (
+                  <div className="flex items-center justify-center p-4">
+                    <FileText size={48} className="text-green-500" />
+                    <span className="ml-2 text-sm text-gray-600">
+                      Excel Document
                     </span>
                   </div>
                 ) : selectedItem.filePath.toLowerCase().endsWith(".jpg") ||

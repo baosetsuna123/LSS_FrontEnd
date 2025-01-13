@@ -981,6 +981,14 @@ export default function CourseLayout({
                             Word Document
                           </span>
                         </div>
+                      ) : formData.file.toLowerCase().endsWith(".xlsx") ||
+                        formData.file.toLowerCase().endsWith(".xls") ? (
+                        <div className="flex items-center justify-center">
+                          <FileText size={48} className="text-green-500" />
+                          <span className="ml-2 text-sm text-gray-600">
+                            Excel Document
+                          </span>
+                        </div>
                       ) : formData.file.toLowerCase().endsWith(".jpg") ||
                         formData.file.toLowerCase().endsWith(".jpeg") ||
                         formData.file.toLowerCase().endsWith(".png") ? (
@@ -1017,6 +1025,15 @@ export default function CourseLayout({
                         <FileText size={48} className="text-blue-500" />
                         <span className="ml-2 text-sm text-gray-600">
                           Word Document
+                        </span>
+                      </div>
+                    ) : formData.file.type === "application/vnd.ms-excel" ||
+                      formData.file.type ===
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? (
+                      <div className="flex items-center justify-center">
+                        <FileText size={48} className="text-green-500" />
+                        <span className="ml-2 text-sm text-gray-600">
+                          Excel Document
                         </span>
                       </div>
                     ) : (
