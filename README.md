@@ -868,7 +868,7 @@ This project is licensed under the MIT License.
 
 - 🌐 GitHub: [@baosetsuna123](https://github.com/baosetsuna123)
 - 📧 Email: baohse321@gmail.com
-- 💼 LinkedIn: [Bao Tran](https://www.linkedin.com/in/bao-tran-5b0362285/)
+- 💼 LinkedIn: [Bao Tran](https://linkedin.com/in/yourprofile)
 
 ---
 
